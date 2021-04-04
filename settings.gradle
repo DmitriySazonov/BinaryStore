@@ -1,0 +1,5 @@
+include ':BinaryStoreAdapters'
+include ':BinaryStore'
+include ':SerializerGenerator'
+include ':app'
+rootProject.name = "BinaryJson"
