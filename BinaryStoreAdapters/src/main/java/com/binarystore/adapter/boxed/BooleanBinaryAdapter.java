@@ -2,7 +2,7 @@ package com.binarystore.adapter.boxed;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapter;
-import com.binarystore.adapter.ByteBuffer;
+import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.adapter.DefaultAdapters;
 
 public class BooleanBinaryAdapter implements BinaryAdapter<Boolean> {
@@ -31,10 +31,5 @@ public class BooleanBinaryAdapter implements BinaryAdapter<Boolean> {
     public Boolean deserialize(ByteBuffer byteBuffer) {
         byte value = byteBuffer.readByte();
         return value == NULL ? null : value == TRUE;
-    }
-
-    @Override
-    public Boolean[] createArray(int size) throws Exception {
-        return new Boolean[size];
     }
 }

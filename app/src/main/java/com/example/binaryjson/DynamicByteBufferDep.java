@@ -1,12 +1,11 @@
-package com.binarystore.adapter;
+package com.example.binaryjson;
 
 import java.util.Arrays;
 
-public class ByteBuffer {
+public class DynamicByteBufferDep {
 
     public static final int BOOLEAN_BYTES = 1;
     public static final int BYTE_BYTES = 1;
-    public static final int SHORT_BYTES = 2;
     public static final int INTEGER_BYTES = 4;
     public static final int LONG_BYTES = 8;
     public static final int FLOAT_BYTES = 4;
@@ -18,11 +17,11 @@ public class ByteBuffer {
     private byte[] bytes;
     private int size = -1;
 
-    public ByteBuffer(int initialSize) {
+    public DynamicByteBufferDep(int initialSize) {
         bytes = new byte[initialSize];
     }
 
-    public ByteBuffer(byte[] bytes) {
+    public DynamicByteBufferDep(byte[] bytes) {
         this.bytes = bytes;
     }
 
@@ -50,14 +49,6 @@ public class ByteBuffer {
     public void write(byte value) {
         checkFreeSpace(BYTE_BYTES);
         bytes[++size] = value;
-    }
-
-    public void write(short value) {
-        checkFreeSpace(SHORT_BYTES);
-        byte byte1 = (byte) value;
-        byte byte2 = (byte) (value >> 8);
-        bytes[++size] = byte2;
-        bytes[++size] = byte1;
     }
 
     public void write(int value) {
@@ -114,13 +105,6 @@ public class ByteBuffer {
         return bytes[++size] == TRUE;
     }
 
-    public short readShort() {
-        return makeShort(
-                bytes[++size],
-                bytes[++size]
-        );
-    }
-
     public int readInt() {
         return makeInt(
                 bytes[++size],
@@ -162,10 +146,6 @@ public class ByteBuffer {
         boolean hasFreeSpace = bytes.length - size > needSpace;
         if (hasFreeSpace) return;
         bytes = Arrays.copyOf(bytes, bytes.length * 2);
-    }
-
-    private static short makeShort(byte b1, byte b0) {
-        return (short) (((((short) b1) & 0xff) << 8) | ((((short) b0) & 0xff)));
     }
 
     private static int makeInt(byte b3, byte b2, byte b1, byte b0) {

@@ -2,7 +2,7 @@ package com.binarystore.adapter.boxed;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapter;
-import com.binarystore.adapter.ByteBuffer;
+import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.adapter.DefaultAdapters;
 
 public class IntBinaryAdapter implements BinaryAdapter<Integer> {
@@ -34,10 +34,5 @@ public class IntBinaryAdapter implements BinaryAdapter<Integer> {
     @Override
     public Integer deserialize(ByteBuffer byteBuffer) throws Exception {
         return byteBuffer.readBoolean() ? byteBuffer.readInt() : null;
-    }
-
-    @Override
-    public Integer[] createArray(int size) throws Exception {
-        return new Integer[size];
     }
 }

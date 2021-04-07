@@ -2,7 +2,7 @@ package com.binarystore.adapter.boxed;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapter;
-import com.binarystore.adapter.ByteBuffer;
+import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.adapter.DefaultAdapters;
 
 public class ShortBinaryAdapter implements BinaryAdapter<Short> {
@@ -34,10 +34,5 @@ public class ShortBinaryAdapter implements BinaryAdapter<Short> {
     @Override
     public Short deserialize(ByteBuffer byteBuffer) throws Exception {
         return byteBuffer.readBoolean() ? byteBuffer.readShort() : null;
-    }
-
-    @Override
-    public Short[] createArray(int size) throws Exception {
-        return new Short[size];
     }
 }

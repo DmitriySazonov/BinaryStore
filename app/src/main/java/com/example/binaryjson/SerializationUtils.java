@@ -11,7 +11,7 @@ public class SerializationUtils {
         System.out.println("Hello");
     }
 
-    public static void putString(DynamicByteBuffer buffer, String value) {
+    public static void putString(DynamicByteBufferDep buffer, String value) {
         final int len = value.length();
         final byte[] bytes = new byte[len * 2];
         char curChar;
@@ -24,7 +24,7 @@ public class SerializationUtils {
         buffer.write(bytes);
     }
 
-    public static String getString(DynamicByteBuffer buffer) {
+    public static String getString(DynamicByteBufferDep buffer) {
         final int length = buffer.readInt();
         final byte[] bytes = new byte[length * 2];
         buffer.readBytes(bytes);

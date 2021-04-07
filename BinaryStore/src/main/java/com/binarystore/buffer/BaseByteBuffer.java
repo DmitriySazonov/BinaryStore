@@ -1,54 +1,60 @@
-package com.example.binaryjson;
+package com.binarystore.buffer;
 
-import java.util.Arrays;
-
-public class DynamicByteBuffer {
-
-    public static final int BOOLEAN_BYTES = 1;
-    public static final int BYTE_BYTES = 1;
-    public static final int INTEGER_BYTES = 4;
-    public static final int LONG_BYTES = 8;
-    public static final int FLOAT_BYTES = 4;
-    public static final int DOUBLE_BYTES = 8;
+public abstract class BaseByteBuffer implements ByteBuffer {
 
     private static final byte TRUE = 1;
     private static final byte FALSE = 0;
 
-    private byte[] bytes;
-    private int size = -1;
+    protected byte[] bytes;
+    protected int start;
+    protected int end;
+    protected int offset = 0;
 
-    public DynamicByteBuffer(int initialSize) {
-        bytes = new byte[initialSize];
+    protected BaseByteBuffer(byte[] bytes, int start, int end) {
+        setSource(bytes, start, end);
     }
 
-    public DynamicByteBuffer(byte[] bytes) {
+    protected void setSource(byte[] bytes, int start, int end) {
         this.bytes = bytes;
+        this.start = start;
+        this.end = end;
     }
 
-    public byte[] getBytes() {
-        return bytes;
-    }
+    abstract void checkFreeSpace(int needSpace);
 
     public int getOffset() {
-        return size + 1;
+        return offset;
+    }
+
+    @Override
+    public int getSize() {
+        return end - start;
     }
 
     public void setOffset(int offset) {
-        this.size = offset - 1;
+        this.offset = offset;
     }
 
     public void moveOffset(int offset) {
-        this.size += offset;
+        this.offset += offset;
     }
 
     public void write(boolean value) {
         checkFreeSpace(BOOLEAN_BYTES);
-        bytes[++size] = value ? TRUE : FALSE;
+        bytes[start + offset++] = value ? TRUE : FALSE;
     }
 
     public void write(byte value) {
         checkFreeSpace(BYTE_BYTES);
-        bytes[++size] = value;
+        bytes[start + offset++] = value;
+    }
+
+    public void write(short value) {
+        checkFreeSpace(SHORT_BYTES);
+        byte byte1 = (byte) value;
+        byte byte2 = (byte) (value >> 8);
+        bytes[start + offset++] = byte2;
+        bytes[start + offset++] = byte1;
     }
 
     public void write(int value) {
@@ -57,10 +63,10 @@ public class DynamicByteBuffer {
         byte byte2 = (byte) (value >> 8);
         byte byte3 = (byte) (value >> 16);
         byte byte4 = (byte) (value >> 24);
-        bytes[++size] = byte4;
-        bytes[++size] = byte3;
-        bytes[++size] = byte2;
-        bytes[++size] = byte1;
+        bytes[start + offset++] = byte4;
+        bytes[start + offset++] = byte3;
+        bytes[start + offset++] = byte2;
+        bytes[start + offset++] = byte1;
     }
 
     public void write(long value) {
@@ -73,14 +79,14 @@ public class DynamicByteBuffer {
         byte byte6 = (byte) (value >> 40);
         byte byte7 = (byte) (value >> 48);
         byte byte8 = (byte) (value >> 56);
-        bytes[++size] = byte8;
-        bytes[++size] = byte7;
-        bytes[++size] = byte6;
-        bytes[++size] = byte5;
-        bytes[++size] = byte4;
-        bytes[++size] = byte3;
-        bytes[++size] = byte2;
-        bytes[++size] = byte1;
+        bytes[start + offset++] = byte8;
+        bytes[start + offset++] = byte7;
+        bytes[start + offset++] = byte6;
+        bytes[start + offset++] = byte5;
+        bytes[start + offset++] = byte4;
+        bytes[start + offset++] = byte3;
+        bytes[start + offset++] = byte2;
+        bytes[start + offset++] = byte1;
     }
 
     public void write(float value) {
@@ -93,37 +99,44 @@ public class DynamicByteBuffer {
 
     public void write(final byte[] value) {
         checkFreeSpace(value.length);
-        System.arraycopy(value, 0, bytes, size + 1, value.length);
-        size += value.length;
+        System.arraycopy(value, 0, bytes, offset, value.length);
+        offset += value.length;
     }
 
     public byte readByte() {
-        return bytes[++size];
+        return bytes[start + offset++];
     }
 
     public boolean readBoolean() {
-        return bytes[++size] == TRUE;
+        return bytes[start + offset++] == TRUE;
+    }
+
+    public short readShort() {
+        return makeShort(
+                bytes[start + offset++],
+                bytes[start + offset++]
+        );
     }
 
     public int readInt() {
         return makeInt(
-                bytes[++size],
-                bytes[++size],
-                bytes[++size],
-                bytes[++size]
+                bytes[start + offset++],
+                bytes[start + offset++],
+                bytes[start + offset++],
+                bytes[start + offset++]
         );
     }
 
     public long readLong() {
         return makeLong(
-                bytes[++size],
-                bytes[++size],
-                bytes[++size],
-                bytes[++size],
-                bytes[++size],
-                bytes[++size],
-                bytes[++size],
-                bytes[++size]
+                bytes[start + offset++],
+                bytes[start + offset++],
+                bytes[start + offset++],
+                bytes[start + offset++],
+                bytes[start + offset++],
+                bytes[start + offset++],
+                bytes[start + offset++],
+                bytes[start + offset++]
         );
     }
 
@@ -138,14 +151,12 @@ public class DynamicByteBuffer {
     }
 
     public void readBytes(byte[] dst) {
-        System.arraycopy(bytes, size + 1, dst, 0, dst.length);
-        size += dst.length;
+        System.arraycopy(bytes, offset, dst, 0, dst.length);
+        offset += dst.length;
     }
 
-    private void checkFreeSpace(int needSpace) {
-        boolean hasFreeSpace = bytes.length - size > needSpace;
-        if (hasFreeSpace) return;
-        bytes = Arrays.copyOf(bytes, bytes.length * 2);
+    private static short makeShort(byte b1, byte b0) {
+        return (short) (((((short) b1) & 0xff) << 8) | ((((short) b0) & 0xff)));
     }
 
     private static int makeInt(byte b3, byte b2, byte b1, byte b0) {

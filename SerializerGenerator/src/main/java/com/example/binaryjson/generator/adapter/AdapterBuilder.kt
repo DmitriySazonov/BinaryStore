@@ -35,7 +35,6 @@ object AdapterBuilder {
             addMethod(AdapterDeserializeBuilder.generateDeserializeMethod(metadata))
             addMethod(AdapterSerializeBuilder.generateSerializeMethod(metadata))
             addMethod(AdapterGetSizeBuilder.generateSizeMethod(metadata))
-            addMethod(AdapterCreateArrayBuilder.generateMethod(metadata))
         }.build()
         return JavaFile.builder(packageName, typeSpec).build()
     }

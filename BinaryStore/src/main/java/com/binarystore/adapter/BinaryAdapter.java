@@ -1,5 +1,7 @@
 package com.binarystore.adapter;
 
+import com.binarystore.buffer.ByteBuffer;
+
 public interface BinaryAdapter<T> {
 
     int id();
@@ -9,6 +11,4 @@ public interface BinaryAdapter<T> {
     void serialize(ByteBuffer byteBuffer, T value) throws Exception;
 
     T deserialize(ByteBuffer byteBuffer) throws Exception;
-
-    T[] createArray(int size) throws Exception;
 }

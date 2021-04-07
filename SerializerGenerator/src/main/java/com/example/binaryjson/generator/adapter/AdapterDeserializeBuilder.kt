@@ -1,7 +1,7 @@
 package com.example.binaryjson.generator.adapter
 
 import com.binarystore.InjectType
-import com.binarystore.adapter.ByteBuffer
+import com.binarystore.buffer.ByteBuffer
 import com.example.binaryjson.generator.FieldMetadata
 import com.example.binaryjson.generator.TypeMetadata
 import com.squareup.javapoet.*

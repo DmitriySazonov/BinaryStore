@@ -2,8 +2,8 @@ package com.binarystore.adapter.boxed;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapter;
-import com.binarystore.adapter.ByteBuffer;
 import com.binarystore.adapter.DefaultAdapters;
+import com.binarystore.buffer.ByteBuffer;
 
 public class DoubleBinaryAdapter implements BinaryAdapter<Double> {
 
@@ -34,10 +34,5 @@ public class DoubleBinaryAdapter implements BinaryAdapter<Double> {
     @Override
     public Double deserialize(ByteBuffer byteBuffer) throws Exception {
         return byteBuffer.readBoolean() ? byteBuffer.readDouble() : null;
-    }
-
-    @Override
-    public Double[] createArray(int size) throws Exception {
-        return new Double[size];
     }
 }

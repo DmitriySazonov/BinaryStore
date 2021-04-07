@@ -2,7 +2,7 @@ package com.binarystore.adapter.boxed;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapter;
-import com.binarystore.adapter.ByteBuffer;
+import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.adapter.DefaultAdapters;
 
 public class LongBinaryAdapter implements BinaryAdapter<Long> {
@@ -34,10 +34,5 @@ public class LongBinaryAdapter implements BinaryAdapter<Long> {
     @Override
     public Long deserialize(ByteBuffer byteBuffer) throws Exception {
         return byteBuffer.readBoolean() ? byteBuffer.readLong() : null;
-    }
-
-    @Override
-    public Long[] createArray(int size) throws Exception {
-        return new Long[size];
     }
 }

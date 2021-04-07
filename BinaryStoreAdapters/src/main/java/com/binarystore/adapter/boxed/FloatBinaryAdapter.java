@@ -2,7 +2,7 @@ package com.binarystore.adapter.boxed;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapter;
-import com.binarystore.adapter.ByteBuffer;
+import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.adapter.DefaultAdapters;
 
 public class FloatBinaryAdapter implements BinaryAdapter<Float> {
@@ -34,10 +34,5 @@ public class FloatBinaryAdapter implements BinaryAdapter<Float> {
     @Override
     public Float deserialize(ByteBuffer byteBuffer) throws Exception {
         return byteBuffer.readBoolean() ? byteBuffer.readFloat() : null;
-    }
-
-    @Override
-    public Float[] createArray(int size) throws Exception {
-        return new Float[size];
     }
 }

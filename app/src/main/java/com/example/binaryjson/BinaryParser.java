@@ -17,7 +17,7 @@ public class BinaryParser {
     }
 
     public static Map<String, Object> parseMap(byte[] bytes) throws Exception {
-        final DynamicByteBuffer buffer = new DynamicByteBuffer(bytes);
+        final DynamicByteBufferDep buffer = new DynamicByteBufferDep(bytes);
         final String[] names = parseNamesArray(buffer);
         if (buffer.readByte() != Tokens.MAP)
             throw new IllegalArgumentException("Root object isn't a Map");
@@ -25,14 +25,14 @@ public class BinaryParser {
     }
 
     public static JSONObject parseJSONObject(byte[] bytes) throws Exception {
-        final DynamicByteBuffer buffer = new DynamicByteBuffer(bytes);
+        final DynamicByteBufferDep buffer = new DynamicByteBufferDep(bytes);
         final String[] names = parseNamesArray(buffer);
         if (buffer.readByte() != Tokens.JSON_OBJECT)
             throw new IllegalArgumentException("Root object isn't a JSONObject");
         return parseJSONObject(buffer, names);
     }
 
-    private static Object parseValue(DynamicByteBuffer buffer, String[] names) throws Exception {
+    private static Object parseValue(DynamicByteBufferDep buffer, String[] names) throws Exception {
         final byte token = buffer.readByte();
         if (token == Tokens.BOOLEAN)
             return buffer.readBoolean();
@@ -61,7 +61,7 @@ public class BinaryParser {
         return null;
     }
 
-    private static Map<String, Object> parseMap(DynamicByteBuffer buffer, String[] names) throws Exception {
+    private static Map<String, Object> parseMap(DynamicByteBufferDep buffer, String[] names) throws Exception {
         final Map<String, Object> values = new HashMap<>();
         final int count = buffer.readInt();
         for (int i = 0; i < count; i++) {
@@ -73,7 +73,7 @@ public class BinaryParser {
         return values;
     }
 
-    private static Set<Object> parseSet(DynamicByteBuffer buffer, String[] names) throws Exception {
+    private static Set<Object> parseSet(DynamicByteBufferDep buffer, String[] names) throws Exception {
         final int count = buffer.readInt();
         final Set<Object> values = new HashSet<>();
         for (int i = 0; i < count; i++) {
@@ -83,7 +83,7 @@ public class BinaryParser {
     }
 
     @SuppressLint("Assert")
-    private static JSONObject parseJSONObject(DynamicByteBuffer buffer, String[] names) throws Exception {
+    private static JSONObject parseJSONObject(DynamicByteBufferDep buffer, String[] names) throws Exception {
         final JSONObject values = new JSONObject();
         final int count = buffer.readInt();
         for (int i = 0; i < count; i++) {
@@ -96,7 +96,7 @@ public class BinaryParser {
     }
 
     @SuppressLint("Assert")
-    private static JSONArray parseJSONArray(DynamicByteBuffer buffer, String[] names) throws Exception {
+    private static JSONArray parseJSONArray(DynamicByteBufferDep buffer, String[] names) throws Exception {
         final int count = buffer.readInt();
         final JSONArray values = new JSONArray();
         for (int i = 0; i < count; i++) {
@@ -105,7 +105,7 @@ public class BinaryParser {
         return values;
     }
 
-    private static String[] parseNamesArray(DynamicByteBuffer buffer) throws Exception {
+    private static String[] parseNamesArray(DynamicByteBufferDep buffer) throws Exception {
         final int offset = buffer.readInt();
         buffer.setOffset(offset);
         final int size = buffer.readInt();
@@ -115,7 +115,7 @@ public class BinaryParser {
             final int position = buffer.readInt();
             names[position] = name;
         }
-        buffer.setOffset(DynamicByteBuffer.INTEGER_BYTES);
+        buffer.setOffset(DynamicByteBufferDep.INTEGER_BYTES);
         return names;
     }
 }

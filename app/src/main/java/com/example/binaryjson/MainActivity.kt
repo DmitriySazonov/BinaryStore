@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.binarystore.BinaryAdapterManager
 import com.binarystore.adapter.BasicBinaryAdapters
-import com.binarystore.adapter.ByteBuffer
+import com.binarystore.buffer.DynamicByteBuffer
 import com.binarystore.meta.MetadataStoreInMemory
 import com.binarystore.register
 import com.example.binaryjson.measure.JSONMeasure
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         val adapter = provider.getAdapter(TestClass::class.java)
         val testClass = TestClass("Hello", "world")
         val size = adapter.getSize(testClass)
-        val byteBuffer = ByteBuffer(size)
+        val byteBuffer = DynamicByteBuffer(size)
         adapter.serialize(byteBuffer, testClass)
         byteBuffer.offset = 0
         val desTestClass = adapter.deserialize(byteBuffer)

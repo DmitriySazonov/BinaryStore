@@ -2,8 +2,8 @@ package com.binarystore.adapter.boxed;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapter;
-import com.binarystore.adapter.ByteBuffer;
 import com.binarystore.adapter.DefaultAdapters;
+import com.binarystore.buffer.ByteBuffer;
 
 public class ByteBinaryAdapter implements BinaryAdapter<Byte> {
 
@@ -13,7 +13,7 @@ public class ByteBinaryAdapter implements BinaryAdapter<Byte> {
 
     @Override
     public int id() {
-        return DefaultAdapters.INT;
+        return DefaultAdapters.BYTE;
     }
 
     @Override
@@ -34,10 +34,5 @@ public class ByteBinaryAdapter implements BinaryAdapter<Byte> {
     @Override
     public Byte deserialize(ByteBuffer byteBuffer) throws Exception {
         return byteBuffer.readBoolean() ? byteBuffer.readByte() : null;
-    }
-
-    @Override
-    public Byte[] createArray(int size) throws Exception {
-        return new Byte[size];
     }
 }

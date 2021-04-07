@@ -24,9 +24,9 @@ public class BinarySerializer {
     }
 
     private static byte[] toByteArrayInternal(Object object) throws Exception {
-        DynamicByteBuffer buffer = new DynamicByteBuffer(BUFFER_SIZE);
+        DynamicByteBufferDep buffer = new DynamicByteBufferDep(BUFFER_SIZE);
         NameMap nameMap = new NameMap();
-        buffer.setOffset(DynamicByteBuffer.INTEGER_BYTES);
+        buffer.setOffset(DynamicByteBufferDep.INTEGER_BYTES);
         storeValue(object, buffer, nameMap);
         final int offset = buffer.getOffset();
         storeNameMap(nameMap, buffer);
@@ -35,7 +35,7 @@ public class BinarySerializer {
         return buffer.getBytes();
     }
 
-    private static void storeMap(Map<String, Object> map, DynamicByteBuffer buffer, NameMap nameMap) throws Exception {
+    private static void storeMap(Map<String, Object> map, DynamicByteBufferDep buffer, NameMap nameMap) throws Exception {
         buffer.write(Tokens.MAP);
         buffer.write(map.size());
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -44,7 +44,7 @@ public class BinarySerializer {
         }
     }
 
-    private static void storeJsonObject(JSONObject object, DynamicByteBuffer buffer, NameMap nameMap) throws Exception {
+    private static void storeJsonObject(JSONObject object, DynamicByteBufferDep buffer, NameMap nameMap) throws Exception {
         buffer.write(Tokens.JSON_OBJECT);
         final Iterator<String> iterator = object.keys();
         buffer.write(object.length());
@@ -56,7 +56,7 @@ public class BinarySerializer {
         }
     }
 
-    private static void storeJsonArray(JSONArray array, DynamicByteBuffer buffer, NameMap nameMap) throws Exception {
+    private static void storeJsonArray(JSONArray array, DynamicByteBufferDep buffer, NameMap nameMap) throws Exception {
         buffer.write(Tokens.JSON_ARRAY);
         buffer.write(array.length());
         for (int i = 0; i < array.length(); i++) {
@@ -64,7 +64,7 @@ public class BinarySerializer {
         }
     }
 
-    private static void storeSet(Set set, DynamicByteBuffer buffer, NameMap nameMap) throws Exception {
+    private static void storeSet(Set set, DynamicByteBufferDep buffer, NameMap nameMap) throws Exception {
         buffer.write(Tokens.SET);
         buffer.write(set.size());
         for (Object value : set) {
@@ -72,7 +72,7 @@ public class BinarySerializer {
         }
     }
 
-    private static void storeValue(Object object, DynamicByteBuffer buffer, NameMap nameMap) throws Exception {
+    private static void storeValue(Object object, DynamicByteBufferDep buffer, NameMap nameMap) throws Exception {
         if (object instanceof Boolean) {
             buffer.write(Tokens.BOOLEAN);
             buffer.write((Boolean) object);
@@ -107,7 +107,7 @@ public class BinarySerializer {
         }
     }
 
-    private static void storeNameMap(NameMap nameMap, DynamicByteBuffer buffer) {
+    private static void storeNameMap(NameMap nameMap, DynamicByteBufferDep buffer) {
         Map<String, Integer> names = nameMap.getResultMap();
         buffer.write(names.size());
         for (Map.Entry<String, Integer> entry : names.entrySet()) {

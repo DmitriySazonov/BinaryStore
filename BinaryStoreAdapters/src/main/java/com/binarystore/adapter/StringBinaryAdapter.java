@@ -1,8 +1,10 @@
 package com.binarystore.adapter;
 
+import com.binarystore.buffer.ByteBuffer;
+
 public final class StringBinaryAdapter implements BinaryAdapter<String> {
 
-    private static final int NULL_SIZE = ByteBuffer.BOOLEAN_BYTES;
+    private static final int NULL_SIZE = com.binarystore.buffer.ByteBuffer.BOOLEAN_BYTES;
     private static final int FULL_HEADER_SIZE = NULL_SIZE + ByteBuffer.INTEGER_BYTES;
     public static final AdapterFactory<String> factory = context -> new StringBinaryAdapter();
 
@@ -17,7 +19,7 @@ public final class StringBinaryAdapter implements BinaryAdapter<String> {
     }
 
     @Override
-    public void serialize(ByteBuffer byteBuffer, String value) {
+    public void serialize(com.binarystore.buffer.ByteBuffer byteBuffer, String value) {
         if (value == null) {
             byteBuffer.write(false);
             return;
@@ -36,7 +38,7 @@ public final class StringBinaryAdapter implements BinaryAdapter<String> {
     }
 
     @Override
-    public String deserialize(ByteBuffer byteBuffer) {
+    public String deserialize(com.binarystore.buffer.ByteBuffer byteBuffer) {
         if (!byteBuffer.readBoolean()) return null;
         final int length = byteBuffer.readInt();
         final byte[] bytes = new byte[length * 2];
@@ -47,10 +49,5 @@ public final class StringBinaryAdapter implements BinaryAdapter<String> {
             chars[i] = (char) (((bytes[j++] & 0xFF)) | ((bytes[j++] & 0xFF) << 8));
         }
         return new String(chars);
-    }
-
-    @Override
-    public String[] createArray(int size) throws Exception {
-        return new String[size];
     }
 }
