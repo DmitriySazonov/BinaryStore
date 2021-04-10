@@ -2,15 +2,6 @@ package com.example.binaryjson;
 
 public class SerializationUtils {
 
-    public static void test() {
-        String[] object1 = new String[]{"", ""};
-        Object[] object2 = new Object[]{object1, object1};
-        Object[][] object3 = (Object[][]) object2;
-
-
-        System.out.println("Hello");
-    }
-
     public static void putString(DynamicByteBufferDep buffer, String value) {
         final int len = value.length();
         final byte[] bytes = new byte[len * 2];

@@ -7,6 +7,6 @@ data class TypeMetadata(
         val id: Int,
         val versionId: Int,
         val injectType: InjectType,
-        val fields: List<FieldMetadata>,
+        val fields: List<FieldMeta>,
         val element: TypeElement
 )

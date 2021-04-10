@@ -35,7 +35,7 @@ class BinaryAdapterGenerator : AbstractProcessor() {
                     val collector = FieldsCollector(element)
                     element.accept(it, collector)
                     val metadata = element.getMetadata(collector.fields)
-                    val javaFile = AdapterBuilder.build(metadata)
+                    val javaFile = AdapterBuilder().build(metadata)
                     FileHelper.write(processingEnv, javaFile)
                 } catch (e: Throwable) {
                     processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, e.toString())
@@ -44,7 +44,7 @@ class BinaryAdapterGenerator : AbstractProcessor() {
         }
     }
 
-    private fun TypeElement.getMetadata(fields: List<FieldMetadata>): TypeMetadata {
+    private fun TypeElement.getMetadata(fields: List<FieldMeta>): TypeMetadata {
         val annotation = getAnnotation(Persistable::class.java)
         return TypeMetadata(
                 id = annotation.id,

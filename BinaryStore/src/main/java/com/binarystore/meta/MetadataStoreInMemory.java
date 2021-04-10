@@ -1,21 +1,21 @@
 package com.binarystore.meta;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.HashMap;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 public class MetadataStoreInMemory implements MetadataStore {
 
-    private HashMap<Long, byte[]> meta = new HashMap<>();
+    private final HashMap<Long, byte[]> meta = new HashMap<>();
 
     @Override
-    public void put(int key, int version, @NotNull byte[] data) {
+    public void put(int key, int version, @Nonnull byte[] data) {
         meta.put(toLong(key, version), data);
     }
 
     @Override
-    @Nullable
+    @CheckForNull
     public byte[] get(int key, int version) {
         return meta.get(toLong(key, version));
     }

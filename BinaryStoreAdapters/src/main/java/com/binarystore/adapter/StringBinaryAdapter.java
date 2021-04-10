@@ -2,15 +2,25 @@ package com.binarystore.adapter;
 
 import com.binarystore.buffer.ByteBuffer;
 
-public final class StringBinaryAdapter implements BinaryAdapter<String> {
+import javax.annotation.Nonnull;
+
+public final class StringBinaryAdapter extends BaseBinaryAdapter<String> {
+
+    private static final int ID = DefaultAdapters.STRING;
 
     private static final int NULL_SIZE = com.binarystore.buffer.ByteBuffer.BOOLEAN_BYTES;
     private static final int FULL_HEADER_SIZE = NULL_SIZE + ByteBuffer.INTEGER_BYTES;
-    public static final AdapterFactory<String> factory = context -> new StringBinaryAdapter();
+    public static final AdapterFactory<String> factory = new AbstractAdapterFactory<String>(ID) {
+        @Override
+        @Nonnull
+        public BinaryAdapter<String> create(@Nonnull Context context) {
+            return new StringBinaryAdapter();
+        }
+    };
 
     @Override
     public int id() {
-        return DefaultAdapters.STRING;
+        return ID;
     }
 
     @Override

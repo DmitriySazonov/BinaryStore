@@ -1,3 +1,5 @@
+include ':BinaryStoreKt'
+include ':BinaryStoreAndroidAdapters'
 include ':BinaryStoreAdapters'
 include ':BinaryStore'
 include ':SerializerGenerator'

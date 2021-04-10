@@ -1,8 +1,6 @@
 package com.example.binaryjson;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
+import com.binarystore.Array;
 import com.binarystore.Persistable;
 
 import java.util.Map;
@@ -13,11 +11,14 @@ public class TestClassJava {
     @Persistable(id = 4)
     static class InnerClass {
         final Map<String, String> map;
-//        final String[] array;
+        final String[][][][] array;
+        @Array(even = true)
+        final int[][][][] arrayInt;
 
-        InnerClass(Map<String, String> map) {
+        InnerClass(Map<String, String> map, String[][][][] array, int[][][][] arrayInt) {
             this.map = map;
-//            this.array = array;
+            this.array = array;
+            this.arrayInt = arrayInt;
         }
     }
 

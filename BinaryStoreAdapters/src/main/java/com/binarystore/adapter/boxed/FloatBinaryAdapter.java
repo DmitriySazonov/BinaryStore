@@ -1,19 +1,31 @@
 package com.binarystore.adapter.boxed;
 
+import com.binarystore.adapter.AbstractAdapterFactory;
 import com.binarystore.adapter.AdapterFactory;
+import com.binarystore.adapter.BaseBinaryAdapter;
 import com.binarystore.adapter.BinaryAdapter;
-import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.adapter.DefaultAdapters;
+import com.binarystore.buffer.ByteBuffer;
 
-public class FloatBinaryAdapter implements BinaryAdapter<Float> {
+import javax.annotation.Nonnull;
+
+public class FloatBinaryAdapter extends BaseBinaryAdapter<Float> {
+
+    private static final int ID = DefaultAdapters.FLOAT;
 
     private static final int NULL_SIZE = ByteBuffer.BOOLEAN_BYTES;
     private static final int FULL_SIZE = NULL_SIZE + ByteBuffer.FLOAT_BYTES;
-    public static final AdapterFactory<Float> factory = context -> new FloatBinaryAdapter();
+    public static final AdapterFactory<Float> factory = new AbstractAdapterFactory<Float>(ID) {
+        @Override
+        @Nonnull
+        public BinaryAdapter<Float> create(@Nonnull Context context) {
+            return new FloatBinaryAdapter();
+        }
+    };
 
     @Override
     public int id() {
-        return DefaultAdapters.FLOAT;
+        return ID;
     }
 
     @Override

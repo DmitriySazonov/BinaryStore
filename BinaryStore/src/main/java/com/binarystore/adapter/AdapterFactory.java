@@ -2,6 +2,8 @@ package com.binarystore.adapter;
 
 import com.binarystore.meta.MetadataStore;
 
+import javax.annotation.Nonnull;
+
 public interface AdapterFactory<T> {
     final class Context {
         public final BinaryAdapterProvider provider;
@@ -16,5 +18,8 @@ public interface AdapterFactory<T> {
         }
     }
 
-    BinaryAdapter<T> create(Context context);
+    int adapterId();
+
+    @Nonnull
+    BinaryAdapter<T> create(@Nonnull Context context);
 }

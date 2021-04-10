@@ -2,6 +2,18 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
+apply from: rootProject.file('baseProject.gradle')
+
+buildscript {
+    repositories {
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
@@ -22,12 +34,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 
@@ -40,6 +48,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation project(":BinaryStore")
+    implementation project(":BinaryStoreKt")
     implementation project(":BinaryStoreAdapters")
     kapt project(":SerializerGenerator")
 

@@ -1,8 +1,9 @@
 package com.binarystore.adapter;
 
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 public interface AdapterFactoryRegister {
 
-    <T> void register(@NotNull Class<T> clazz, @NotNull AdapterFactory<T> factory);
+    <T> void register(@Nonnull Class<T> clazz, @Nonnull AdapterFactory<T> factory);
 }

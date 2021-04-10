@@ -3,22 +3,36 @@ package com.example.binaryjson.generator.adapter
 import com.binarystore.adapter.BinaryAdapter
 import com.binarystore.adapter.BinaryAdapterProvider
 import com.binarystore.meta.MetadataStore
-import com.example.binaryjson.generator.FieldMetadata
 import com.example.binaryjson.generator.TypeMetadata
-import com.squareup.javapoet.*
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.FieldSpec
+import com.squareup.javapoet.JavaFile
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ParameterizedTypeName
+import com.squareup.javapoet.TypeName
+import com.squareup.javapoet.TypeSpec
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 
-object AdapterBuilder {
+private const val ADAPTER_SUFFIX = "BinaryAdapter"
 
-    private const val ADAPTER_SUFFIX = "BinaryAdapter"
+class AdapterBuilder(
+        private val codeBuilders: List<CodeBuilder> = listOf(
+                AdapterGetIdBuilder,
+                AdapterDeserializeBuilder,
+                AdapterSerializeBuilder,
+                AdapterGetSizeBuilder
+        )
+) {
 
     fun build(metadata: TypeMetadata): JavaFile {
         val (classPrefix, packageName) = getPrefixAndPackage(metadata.element)
         val className = metadata.element.simpleName.toString()
         val adapterName = makeAdapterName(classPrefix, className)
-        val uniqueTypes = findUniqueTypes(metadata.fields)
+        val uniqueTypes = codeBuilders.map {
+            it.requiredAdapters(metadata)
+        }.flatten().toHashSet()
         val typeSpec: TypeSpec = TypeSpec.classBuilder(adapterName).apply {
             addModifiers(Modifier.PUBLIC)
             addModifiers(Modifier.FINAL)
@@ -28,13 +42,17 @@ object AdapterBuilder {
             addField(generateVersionField(metadata.versionId))
             addField(MetadataStore::class.java, META_STORE_FIELD,
                     Modifier.PRIVATE, Modifier.FINAL)
-            addFields(generateAdapterField(uniqueTypes))
 
+            addFields(generateAdapterField(uniqueTypes))
             addMethod(generateConstructor(uniqueTypes))
-            addMethod(AdapterGetIdBuilder.generateGetIdMethod(metadata))
-            addMethod(AdapterDeserializeBuilder.generateDeserializeMethod(metadata))
-            addMethod(AdapterSerializeBuilder.generateSerializeMethod(metadata))
-            addMethod(AdapterGetSizeBuilder.generateSizeMethod(metadata))
+
+            codeBuilders.map {
+                it.createFields(metadata)
+            }.flatten().forEach(::addField)
+
+            codeBuilders.map {
+                it.createMethods(metadata)
+            }.flatten().forEach(::addMethod)
         }.build()
         return JavaFile.builder(packageName, typeSpec).build()
     }
@@ -61,22 +79,6 @@ object AdapterBuilder {
         return "$prefix$type$ADAPTER_SUFFIX"
     }
 
-    private fun findUniqueTypes(fields: List<FieldMetadata>): List<ClassName> {
-        return fields.mapNotNull {
-            tryGetClassName(it.type)
-        }.toSet().toList()
-    }
-
-    private fun tryGetClassName(type: TypeName): ClassName? {
-        if (type is ClassName)
-            return type
-        return when (type) {
-            is ArrayTypeName -> type.componentType
-            is ParameterizedTypeName -> type.rawType
-            else -> null
-        }?.let(::tryGetClassName)
-    }
-
     private fun generateVersionField(versionId: Int): FieldSpec {
         return FieldSpec.builder(TypeName.INT,
                 VERSION_FIELD,
@@ -87,7 +89,7 @@ object AdapterBuilder {
         }.build()
     }
 
-    private fun generateConstructor(fields: List<ClassName>): MethodSpec {
+    private fun generateConstructor(fields: Collection<ClassName>): MethodSpec {
         val providerName = "provider"
         val metaStoreName = "metadataStore"
         return MethodSpec.constructorBuilder().apply {
@@ -102,7 +104,7 @@ object AdapterBuilder {
         }.build()
     }
 
-    private fun generateAdapterField(fields: List<ClassName>): List<FieldSpec> {
+    private fun generateAdapterField(fields: Collection<ClassName>): List<FieldSpec> {
         return fields.map { type ->
             val name = adapterFiledName(type)
             val adapterType = ParameterizedTypeName.get(

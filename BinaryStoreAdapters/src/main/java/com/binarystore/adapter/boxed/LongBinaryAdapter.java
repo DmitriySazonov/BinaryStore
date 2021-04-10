@@ -1,19 +1,31 @@
 package com.binarystore.adapter.boxed;
 
+import com.binarystore.adapter.AbstractAdapterFactory;
 import com.binarystore.adapter.AdapterFactory;
+import com.binarystore.adapter.BaseBinaryAdapter;
 import com.binarystore.adapter.BinaryAdapter;
-import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.adapter.DefaultAdapters;
+import com.binarystore.buffer.ByteBuffer;
 
-public class LongBinaryAdapter implements BinaryAdapter<Long> {
+import javax.annotation.Nonnull;
+
+public class LongBinaryAdapter extends BaseBinaryAdapter<Long> {
+
+    private static final int ID = DefaultAdapters.LONG;
 
     private static final int NULL_SIZE = ByteBuffer.BOOLEAN_BYTES;
     private static final int FULL_SIZE = NULL_SIZE + ByteBuffer.LONG_BYTES;
-    public static final AdapterFactory<Long> factory = context -> new LongBinaryAdapter();
+    public static final AdapterFactory<Long> factory = new AbstractAdapterFactory<Long>(ID) {
+        @Override
+        @Nonnull
+        public BinaryAdapter<Long> create(@Nonnull Context context) {
+            return new LongBinaryAdapter();
+        }
+    };
 
     @Override
     public int id() {
-        return DefaultAdapters.LONG;
+        return ID;
     }
 
     @Override

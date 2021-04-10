@@ -23,7 +23,7 @@ public class SharedPreferenceManager {
 
     private final boolean useBinary;
     private final ExecutorService executorService;
-    private Map<String, BinarySharedPreference> preferenceCache = new HashMap<>();
+    private final Map<String, BinarySharedPreference> preferenceCache = new HashMap<>();
 
     public SharedPreferenceManager(ExecutorService executorService, boolean useBinary) {
         this.useBinary = useBinary;
@@ -61,6 +61,7 @@ public class SharedPreferenceManager {
         return prefs;
     }
 
+    @SuppressWarnings("unchecked")
     private BinarySharedPreference createBinarySharedPreference(Context context, String name) {
         File binaryFile = getFilePath(context, name);
         if (binaryFile.exists()) {

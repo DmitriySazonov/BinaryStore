@@ -1,16 +1,27 @@
 package com.example.binaryjson.generator.adapter
 
 import com.binarystore.buffer.ByteBuffer
-import com.example.binaryjson.generator.FieldMetadata
+import com.example.binaryjson.generator.FieldMeta
 import com.example.binaryjson.generator.TypeMetadata
-import com.squareup.javapoet.*
+import com.squareup.javapoet.ArrayTypeName
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.CodeBlock
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ParameterizedTypeName
+import com.squareup.javapoet.TypeName
 import javax.lang.model.element.Modifier
 
-object AdapterGetSizeBuilder {
+object AdapterGetSizeBuilder : CodeBuilder {
 
     private const val GET_SIZE_METHOD = "getSize"
 
-    fun generateSizeMethod(metadata: TypeMetadata): MethodSpec {
+    override fun createMethods(metadata: TypeMetadata): List<MethodSpec> {
+        val methods = ArrayList(generateArraysGetSizeMethods(metadata))
+        methods += generateSizeMethod(metadata)
+        return methods
+    }
+
+    private fun generateSizeMethod(metadata: TypeMetadata): MethodSpec {
         return MethodSpec.methodBuilder(GET_SIZE_METHOD)
                 .addAnnotation(Override::class.java)
                 .addException(Exception::class.java)
@@ -22,23 +33,80 @@ object AdapterGetSizeBuilder {
                 .build()
     }
 
-    private fun generateSizeCode(fields: List<FieldMetadata>): CodeBlock {
+    private fun generateSizeCode(fields: List<FieldMeta>): CodeBlock {
         return CodeBlock.builder().apply {
             add("return ")
             val primitiveSplit = fields.groupBy { it.type.isPrimitive }
             primitiveSplit[false]?.forEach {
-                val code = when (val type = it.type) {
-                    is ClassName -> generateSizeCodeClass(it.name, type)
-                    is ParameterizedTypeName -> generateSizeCodeClass(it.name, type.rawType)
-                    else -> throw IllegalArgumentException("Fail generate getSize code. " +
-                            "Unknown type $type")
-                }
+                val code = generateGetFieldSizeCode("${VALUE}.${it.name}", it.type)
                 add("$code + \n")
             }
             val primitiveSum = (primitiveSplit[true]?.sumBy { getPrimitiveSize(it.type) } ?: 0) +
                     AdapterDeserializeBuilder.VERSION_TAG_SIZE
             add("$primitiveSum;\n")
         }.build()
+    }
+
+    private fun generateArraysGetSizeMethods(metadata: TypeMetadata): List<MethodSpec> {
+        return metadata.fields.mapNotNull {
+            it as? FieldMeta.Array
+        }.map {
+            MethodSpec.methodBuilder(getSizeArrayMethodName(it.type)).apply {
+                addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+                addException(Exception::class.java)
+                addParameter(it.type, VALUE)
+                if (it.even && it.baseType.isPrimitive) {
+                    addCode(generateGetSizeCodePrimitiveEvenArray(it.type))
+                } else {
+                    addCode(generateGetSizeCodeArray(it.type))
+                }
+                returns(TypeName.INT)
+            }.build()
+        }
+    }
+
+    private fun generateGetSizeCodeArray(type: ArrayTypeName): CodeBlock {
+        val baseType = type.baseType
+        val accumulator = "accumulator"
+        return CodeBlock.builder().apply {
+            addStatement("int $accumulator = 0")
+            forEach(VALUE, type) {
+                addStatement("$accumulator += ${generateGetFieldSizeCode(it, baseType)}")
+            }
+            addStatement("return $accumulator")
+        }.build()
+    }
+
+    private fun generateGetSizeCodePrimitiveEvenArray(type: ArrayTypeName): CodeBlock {
+        val baseType = type.baseType
+        return CodeBlock.builder().apply {
+            val size = getPrimitiveSize(baseType)
+            val arrayDimension = { deep: Int ->
+                (0 until deep).joinToString("") { "[0]" }
+            }
+            add("return $size")
+            repeat(type.deep) {
+                add(" * $VALUE${arrayDimension(it)}.length")
+            }
+            add(";")
+        }.build()
+    }
+
+    private fun generateArraysGetSizeInvoke(expression: String, type: ArrayTypeName): String {
+        return "${getSizeArrayMethodName(type)}($expression)"
+    }
+
+    private fun getSizeArrayMethodName(type: ArrayTypeName): String {
+        return "${GET_SIZE_METHOD}_${type.simpleName}Array"
+    }
+
+    private fun generateGetFieldSizeCode(expression: String, type: TypeName): String {
+        return when (type) {
+            is ClassName -> generateSizeCodeClass(expression, type)
+            is ParameterizedTypeName -> generateSizeCodeClass(expression, type.rawType)
+            is ArrayTypeName -> generateArraysGetSizeInvoke(expression, type)
+            else -> getPrimitiveSize(type).toString()
+        }
     }
 
     private fun getPrimitiveSize(type: TypeName): Int {
@@ -56,6 +124,6 @@ object AdapterGetSizeBuilder {
 
     private fun generateSizeCodeClass(fieldName: String, className: ClassName): String {
         return adapterFiledName(className) +
-                ".${GET_SIZE_METHOD}(${VALUE}.${fieldName})"
+                ".${GET_SIZE_METHOD}($fieldName)"
     }
 }
