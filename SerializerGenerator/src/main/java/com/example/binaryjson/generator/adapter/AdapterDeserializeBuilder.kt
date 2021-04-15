@@ -3,15 +3,9 @@ package com.example.binaryjson.generator.adapter
 import com.binarystore.InjectType
 import com.binarystore.buffer.ByteBuffer
 import com.example.binaryjson.generator.TypeMetadata
-import com.squareup.javapoet.ArrayTypeName
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.CodeBlock
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterizedTypeName
-import com.squareup.javapoet.TypeName
+import com.squareup.javapoet.*
 import java.util.*
 import javax.lang.model.element.Modifier
-import kotlin.collections.ArrayList
 
 object AdapterDeserializeBuilder : CodeBuilder {
 
@@ -20,10 +14,9 @@ object AdapterDeserializeBuilder : CodeBuilder {
     private const val BUFFER_NAME = "byteBuffer"
     private const val VERSION_NAME = "version"
 
-    override fun createMethods(metadata: TypeMetadata): List<MethodSpec> {
-        val methods = ArrayList(generateArraysDeserializeMethods(metadata))
-        methods += generateDeserializeMethod(metadata)
-        return methods
+    override fun TypeSpec.Builder.build(context: CodeBuilder.Context) {
+        addMethods(generateArraysDeserializeMethods(context.metadata))
+        addMethod(generateDeserializeMethod(context.metadata))
     }
 
     private fun generateDeserializeMethod(metadata: TypeMetadata): MethodSpec {

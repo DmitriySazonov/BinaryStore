@@ -3,14 +3,9 @@ package com.example.binaryjson.generator.adapter
 import com.binarystore.adapter.BinaryAdapter
 import com.binarystore.adapter.BinaryAdapterProvider
 import com.binarystore.meta.MetadataStore
+import com.example.binaryjson.generator.FieldMeta
 import com.example.binaryjson.generator.TypeMetadata
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.FieldSpec
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterizedTypeName
-import com.squareup.javapoet.TypeName
-import com.squareup.javapoet.TypeSpec
+import com.squareup.javapoet.*
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
@@ -19,6 +14,7 @@ private const val ADAPTER_SUFFIX = "BinaryAdapter"
 
 class AdapterBuilder(
         private val codeBuilders: List<CodeBuilder> = listOf(
+                AdapterFactoryBuilder,
                 AdapterGetIdBuilder,
                 AdapterDeserializeBuilder,
                 AdapterSerializeBuilder,
@@ -26,14 +22,22 @@ class AdapterBuilder(
         )
 ) {
 
+    private data class CodeBuilderContext(
+            override val typeClass: ClassName,
+            override val metadata: TypeMetadata
+    ) : CodeBuilder.Context
+
     fun build(metadata: TypeMetadata): JavaFile {
         val (classPrefix, packageName) = getPrefixAndPackage(metadata.element)
         val className = metadata.element.simpleName.toString()
         val adapterName = makeAdapterName(classPrefix, className)
-        val uniqueTypes = codeBuilders.map {
-            it.requiredAdapters(metadata)
-        }.flatten().toHashSet()
+        val uniqueTypes = findUniqueTypes(metadata.fields)
+        val adapterClassName = ClassName.get(packageName, adapterName)
+        val context = CodeBuilderContext(adapterClassName, metadata)
         val typeSpec: TypeSpec = TypeSpec.classBuilder(adapterName).apply {
+            codeBuilders.forEach {
+                it.apply { build(context) }
+            }
             addModifiers(Modifier.PUBLIC)
             addModifiers(Modifier.FINAL)
             addOriginatingElement(metadata.element)
@@ -45,16 +49,24 @@ class AdapterBuilder(
 
             addFields(generateAdapterField(uniqueTypes))
             addMethod(generateConstructor(uniqueTypes))
-
-            codeBuilders.map {
-                it.createFields(metadata)
-            }.flatten().forEach(::addField)
-
-            codeBuilders.map {
-                it.createMethods(metadata)
-            }.flatten().forEach(::addMethod)
         }.build()
         return JavaFile.builder(packageName, typeSpec).build()
+    }
+
+    private fun findUniqueTypes(fields: List<FieldMeta>): List<ClassName> {
+        return fields.mapNotNull {
+            tryGetClassName(it.type)
+        }.toSet().toList()
+    }
+
+    private fun tryGetClassName(type: TypeName): ClassName? {
+        if (type is ClassName)
+            return type
+        return when (type) {
+            is ArrayTypeName -> type.componentType
+            is ParameterizedTypeName -> type.rawType
+            else -> null
+        }?.let(::tryGetClassName)
     }
 
     private fun getPrefixAndPackage(element: TypeElement): Pair<String, String> {

@@ -3,22 +3,16 @@ package com.example.binaryjson.generator.adapter
 import com.binarystore.buffer.ByteBuffer
 import com.example.binaryjson.generator.FieldMeta
 import com.example.binaryjson.generator.TypeMetadata
-import com.squareup.javapoet.ArrayTypeName
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.CodeBlock
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterizedTypeName
-import com.squareup.javapoet.TypeName
+import com.squareup.javapoet.*
 import javax.lang.model.element.Modifier
 
 object AdapterGetSizeBuilder : CodeBuilder {
 
     private const val GET_SIZE_METHOD = "getSize"
 
-    override fun createMethods(metadata: TypeMetadata): List<MethodSpec> {
-        val methods = ArrayList(generateArraysGetSizeMethods(metadata))
-        methods += generateSizeMethod(metadata)
-        return methods
+    override fun TypeSpec.Builder.build(context: CodeBuilder.Context) {
+        addMethods(generateArraysGetSizeMethods(context.metadata))
+        addMethod(generateSizeMethod(context.metadata))
     }
 
     private fun generateSizeMethod(metadata: TypeMetadata): MethodSpec {
