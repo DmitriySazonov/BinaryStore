@@ -7,12 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE})
-public @interface Persistable {
-    String id();
+public @interface Key {
+    String value();
 
-    IdType idType() default IdType.STRING;
-
-    int versionId() default 1;
-
-    InjectType inject() default InjectType.CONSTRUCTOR;
 }

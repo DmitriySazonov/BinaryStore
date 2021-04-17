@@ -1,11 +1,8 @@
 package com.example.binaryjson.generator.adapter
 
-import com.squareup.javapoet.ArrayTypeName
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.CodeBlock
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterizedTypeName
-import com.squareup.javapoet.TypeName
+import com.binarystore.adapter.Key
+import com.example.binaryjson.generator.Id
+import com.squareup.javapoet.*
 import java.util.*
 import javax.lang.model.element.Modifier
 
@@ -13,6 +10,19 @@ const val VALUE = "value"
 const val META_STORE_FIELD = "metadataStore"
 const val VERSION_FIELD = "versionId"
 const val ADAPTER_FIELD_SUFFIX = "Adapter"
+
+fun Id.generateReturnCode(spec: MethodSpec.Builder) {
+    when (this) {
+        is Id.Int -> {
+            spec.addStatement("return new \$T(${value})", Key.Int::class.java)
+            spec.returns(Key.Int::class.java)
+        }
+        is Id.String -> {
+            spec.addStatement("return new \$T(\"${value}\")", Key.String::class.java)
+            spec.returns(Key.String::class.java)
+        }
+    }
+}
 
 inline fun CodeBlock.Builder.forEach(
         name: String,

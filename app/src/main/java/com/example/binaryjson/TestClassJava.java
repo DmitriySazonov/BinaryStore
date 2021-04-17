@@ -5,10 +5,10 @@ import com.binarystore.Persistable;
 
 import java.util.Map;
 
-@Persistable(id = 3)
+@Persistable(id = "TestClassJava")
 public class TestClassJava {
 
-    @Persistable(id = 4)
+    @Persistable(id = "InnerClass")
     static class InnerClass {
         final Map<String, String> map;
         final String[][][][] array;

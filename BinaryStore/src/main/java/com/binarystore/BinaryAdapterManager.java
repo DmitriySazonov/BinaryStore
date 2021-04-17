@@ -4,6 +4,7 @@ import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.AdapterFactoryRegister;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
+import com.binarystore.adapter.Key;
 import com.binarystore.meta.MetadataStore;
 
 import java.util.HashMap;
@@ -14,21 +15,27 @@ import javax.annotation.Nonnull;
 
 public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFactoryRegister {
 
-    private static class FactoryEntry {
+    private static class AdapterEntry {
         final Class<?> clazz;
         final AdapterFactory<?> factory;
+        private BinaryAdapter<?> adapter = null;
 
-        <T> FactoryEntry(Class<T> clazz, AdapterFactory<T> factory) {
+        <T> AdapterEntry(Class<T> clazz, AdapterFactory<T> factory) {
             this.clazz = clazz;
             this.factory = factory;
         }
+
+        private BinaryAdapter<?> getAdapter(AdapterFactory.Context context) {
+            if (adapter == null) {
+                adapter = factory.create(context);
+                checkIdEqual(adapter.id(), factory.adapterKey());
+            }
+            return adapter;
+        }
     }
 
-    private final HashMap<Integer, FactoryEntry> idToFactory = new HashMap<>();
-    private final HashMap<Class<?>, AdapterFactory<?>> classToFactory = new HashMap<>();
-
-    private final HashMap<Integer, BinaryAdapter<?>> idToAdapter = new HashMap<>();
-    private final HashMap<Class<?>, BinaryAdapter<?>> classToAdapter = new HashMap<>();
+    private final HashMap<Key<?>, AdapterEntry> idToEntry = new HashMap<>();
+    private final HashMap<Class<?>, AdapterEntry> classToEntry = new HashMap<>();
 
     private final AdapterFactory.Context factoryContext;
 
@@ -37,59 +44,35 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     }
 
     public void resolveAllAdapters() {
-        for (Map.Entry<Class<?>, AdapterFactory<?>> entry : classToFactory.entrySet()) {
-            getAdapter(entry.getKey());
+        for (Map.Entry<Class<?>, AdapterEntry> entry : classToEntry.entrySet()) {
+            entry.getValue().getAdapter(factoryContext);
         }
     }
 
     @Override
     public <T> void register(@Nonnull Class<T> clazz, @Nonnull AdapterFactory<T> factory) {
-        idToFactory.put(factory.adapterId(), new FactoryEntry(clazz, factory));
-        classToFactory.put(clazz, factory);
+        final AdapterEntry entry = new AdapterEntry(clazz, factory);
+        idToEntry.put(factory.adapterKey(), entry);
+        classToEntry.put(clazz, entry);
     }
 
     @Override
     @CheckForNull
     @SuppressWarnings("unchecked")
     public <T> BinaryAdapter<T> getAdapter(@Nonnull Class<T> clazz) {
-        BinaryAdapter<?> adapter = classToAdapter.get(clazz);
-        if (adapter == null) {
-            AdapterFactory<?> factory = classToFactory.get(clazz);
-            if (factory != null) {
-                adapter = factory.create(factoryContext);
-            } else {
-                return null;
-            }
-            checkIdEqual(adapter.id(), factory.adapterId());
-            classToAdapter.put(clazz, adapter);
-            idToAdapter.put(adapter.id(), adapter);
-        }
-
-        return (BinaryAdapter<T>) adapter;
+        AdapterEntry entry = classToEntry.get(clazz);
+        return entry != null ? (BinaryAdapter<T>) entry.getAdapter(factoryContext) : null;
     }
 
     @Override
     @CheckForNull
-    public BinaryAdapter<?> getAdapter(int id) {
-        BinaryAdapter<?> adapter = idToAdapter.get(id);
-        if (adapter == null) {
-            FactoryEntry entry = idToFactory.get(id);
-            AdapterFactory<?> factory = entry.factory;
-            if (factory != null) {
-                adapter = factory.create(factoryContext);
-            } else {
-                return null;
-            }
-            checkIdEqual(adapter.id(), factory.adapterId());
-            classToAdapter.put(entry.clazz, adapter);
-            idToAdapter.put(adapter.id(), adapter);
-        }
-
-        return adapter;
+    public BinaryAdapter<?> getAdapter(Key<?> id) {
+        AdapterEntry entry = idToEntry.get(id);
+        return entry != null ? entry.getAdapter(factoryContext) : null;
     }
 
-    private void checkIdEqual(int adapterId, int factoryId) {
-        if (adapterId != factoryId) {
+    private static void checkIdEqual(Key<?> adapterId, Key<?> factoryId) {
+        if (!adapterId.equals(factoryId)) {
             throw new IllegalStateException("ID(" + adapterId + ") of adapter doesn't " +
                     "equal ID(" + factoryId + ") of factory");
         }

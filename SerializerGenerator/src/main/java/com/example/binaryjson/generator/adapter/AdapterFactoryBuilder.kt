@@ -27,11 +27,10 @@ object AdapterFactoryBuilder : CodeBuilder {
     }
 
     private fun generateFactoryMethodAdapterId(context: CodeBuilder.Context): MethodSpec {
-        return MethodSpec.methodBuilder("adapterId").apply {
+        return MethodSpec.methodBuilder("adapterKey").apply {
             addAnnotation(Override::class.java)
             addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            addCode("return ${context.metadata.id};")
-            returns(TypeName.INT)
+            context.metadata.id.generateReturnCode(this)
         }.build()
     }
 

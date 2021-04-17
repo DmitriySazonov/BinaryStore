@@ -5,13 +5,14 @@ import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BaseBinaryAdapter;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.DefaultAdapters;
+import com.binarystore.adapter.Key;
 import com.binarystore.buffer.ByteBuffer;
 
 import javax.annotation.Nonnull;
 
 public class LongBinaryAdapter extends BaseBinaryAdapter<Long> {
 
-    private static final int ID = DefaultAdapters.LONG;
+    private static final Key.Int ID = DefaultAdapters.LONG;
 
     private static final int NULL_SIZE = ByteBuffer.BOOLEAN_BYTES;
     private static final int FULL_SIZE = NULL_SIZE + ByteBuffer.LONG_BYTES;
@@ -24,7 +25,7 @@ public class LongBinaryAdapter extends BaseBinaryAdapter<Long> {
     };
 
     @Override
-    public int id() {
+    public Key.Int id() {
         return ID;
     }
 

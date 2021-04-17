@@ -1,12 +1,12 @@
 package com.binarystore.adapter;
 
 public @interface DefaultAdapters {
-    int BOOLEAN = IdProvider.sId(1);
-    int BYTE = IdProvider.sId(2);
-    int SHORT = IdProvider.sId(3);
-    int INT = IdProvider.sId(4);
-    int LONG = IdProvider.sId(5);
-    int FLOAT = IdProvider.sId(6);
-    int DOUBLE = IdProvider.sId(7);
-    int STRING = IdProvider.sId(8);
+    Key.Int BOOLEAN = new Key.Int(IdProvider.sId(1));
+    Key.Int BYTE = new Key.Int(IdProvider.sId(2));
+    Key.Int SHORT = new Key.Int(IdProvider.sId(3));
+    Key.Int INT = new Key.Int(IdProvider.sId(4));
+    Key.Int LONG = new Key.Int(IdProvider.sId(5));
+    Key.Int FLOAT = new Key.Int(IdProvider.sId(6));
+    Key.Int DOUBLE = new Key.Int(IdProvider.sId(7));
+    Key.Int STRING = new Key.Int(IdProvider.sId(8));
 }

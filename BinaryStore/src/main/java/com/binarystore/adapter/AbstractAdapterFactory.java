@@ -2,14 +2,14 @@ package com.binarystore.adapter;
 
 public abstract class AbstractAdapterFactory<T> implements AdapterFactory<T> {
 
-    private final int adapterId;
+    private final Key<?> adapterKey;
 
-    public AbstractAdapterFactory(int adapterId) {
-        this.adapterId = adapterId;
+    public AbstractAdapterFactory(Key<?> adapterKey) {
+        this.adapterKey = adapterKey;
     }
 
     @Override
-    public int adapterId() {
-        return adapterId;
+    public Key<?> adapterKey() {
+        return adapterKey;
     }
 }

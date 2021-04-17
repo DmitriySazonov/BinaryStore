@@ -8,5 +8,5 @@ public interface BinaryAdapterProvider {
     <T> BinaryAdapter<T> getAdapter(@Nonnull Class<T> clazz);
 
     @CheckForNull
-    BinaryAdapter<?> getAdapter(int id);
+    BinaryAdapter<?> getAdapter(Key<?> id);
 }

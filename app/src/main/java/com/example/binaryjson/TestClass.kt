@@ -2,7 +2,7 @@ package com.example.binaryjson
 
 import com.binarystore.Persistable
 
-@Persistable(id = 2)
+@Persistable(id = "TestClass")
 class TestClass(
         @JvmField val field1: String = "lseilghboeavn",
         @JvmField val field2: String = "lseilghboeavn",

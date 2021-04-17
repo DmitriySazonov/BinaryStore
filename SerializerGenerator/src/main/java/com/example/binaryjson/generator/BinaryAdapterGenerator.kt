@@ -1,7 +1,9 @@
 package com.example.binaryjson.generator
 
+import com.binarystore.IdType
 import com.binarystore.Persistable
 import com.example.binaryjson.generator.adapter.AdapterBuilder
+import com.squareup.javapoet.TypeName
 import java.util.*
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
@@ -46,12 +48,26 @@ class BinaryAdapterGenerator : AbstractProcessor() {
 
     private fun TypeElement.getMetadata(fields: List<FieldMeta>): TypeMetadata {
         val annotation = getAnnotation(Persistable::class.java)
+        val id = when (annotation.idType) {
+            IdType.STRING -> Id.String(annotation.id)
+            IdType.INT -> Id.Int(annotation.id.toIntOrNull()
+                    ?: throwIdBadType(this, annotation))
+        }
         return TypeMetadata(
-                id = annotation.id,
+                id = id,
                 versionId = annotation.versionId,
                 injectType = annotation.inject,
                 fields = Collections.unmodifiableList(fields),
                 element = this
+        )
+    }
+
+    private fun throwIdBadType(element: TypeElement, persistable: Persistable): Nothing {
+        TypeName.get(element.asType())
+        throw IllegalArgumentException(
+                "Bad id for type ${TypeName.get(element.asType())} " +
+                        "In annotation declared type(${persistable.idType}) for id " +
+                        "But was provided '${persistable.id}'"
         )
     }
 }

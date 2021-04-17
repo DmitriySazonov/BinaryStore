@@ -5,13 +5,14 @@ import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BaseBinaryAdapter;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.DefaultAdapters;
+import com.binarystore.adapter.Key;
 import com.binarystore.buffer.ByteBuffer;
 
 import javax.annotation.Nonnull;
 
 public class FloatBinaryAdapter extends BaseBinaryAdapter<Float> {
 
-    private static final int ID = DefaultAdapters.FLOAT;
+    private static final Key.Int ID = DefaultAdapters.FLOAT;
 
     private static final int NULL_SIZE = ByteBuffer.BOOLEAN_BYTES;
     private static final int FULL_SIZE = NULL_SIZE + ByteBuffer.FLOAT_BYTES;
@@ -24,7 +25,7 @@ public class FloatBinaryAdapter extends BaseBinaryAdapter<Float> {
     };
 
     @Override
-    public int id() {
+    public Key.Int id() {
         return ID;
     }
 

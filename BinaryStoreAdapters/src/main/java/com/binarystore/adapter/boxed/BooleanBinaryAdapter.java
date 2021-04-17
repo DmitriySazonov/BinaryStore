@@ -5,13 +5,14 @@ import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BaseBinaryAdapter;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.DefaultAdapters;
+import com.binarystore.adapter.Key;
 import com.binarystore.buffer.ByteBuffer;
 
 import javax.annotation.Nonnull;
 
 public class BooleanBinaryAdapter extends BaseBinaryAdapter<Boolean> {
 
-    private static final int ID = DefaultAdapters.BOOLEAN;
+    private static final Key.Int ID = DefaultAdapters.BOOLEAN;
 
     private static final byte NULL = -1;
     private static final byte TRUE = 1;
@@ -25,7 +26,7 @@ public class BooleanBinaryAdapter extends BaseBinaryAdapter<Boolean> {
     };
 
     @Override
-    public int id() {
+    public Key.Int id() {
         return ID;
     }
 

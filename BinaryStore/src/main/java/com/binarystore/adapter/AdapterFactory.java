@@ -18,7 +18,7 @@ public interface AdapterFactory<T> {
         }
     }
 
-    int adapterId();
+    Key<?> adapterKey();
 
     @Nonnull
     BinaryAdapter<T> create(@Nonnull Context context);
