@@ -3,6 +3,8 @@ package com.example.binaryjson.generator
 import com.binarystore.IdType
 import com.binarystore.Persistable
 import com.example.binaryjson.generator.adapter.AdapterBuilder
+import com.example.binaryjson.generator.registrator.RegistratorBuilder
+import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import java.util.*
 import javax.annotation.processing.AbstractProcessor
@@ -21,6 +23,8 @@ class BinaryAdapterGenerator : AbstractProcessor() {
         }
 
         processPersistable(roundEnv)
+                .also(::generateRegistrator)
+
         return true
     }
 
@@ -28,20 +32,29 @@ class BinaryAdapterGenerator : AbstractProcessor() {
         return SourceVersion.latestSupported()
     }
 
-    private fun processPersistable(roundEnv: RoundEnvironment) {
+    private fun generateRegistrator(adapters: List<ClassName>) {
+        try {
+            FileHelper.write(processingEnv, RegistratorBuilder.build(adapters))
+        } catch (e: Throwable) {
+            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, e.toString())
+        }
+    }
+
+    private fun processPersistable(roundEnv: RoundEnvironment): List<ClassName> {
         val clazz = Persistable::class.java
-        roundEnv.getElementsAnnotatedWith(clazz).forEach { element ->
-            if (element !is TypeElement) return@forEach
-            BinaryAdapterVisitor().also {
-                try {
-                    val collector = FieldsCollector(element)
-                    element.accept(it, collector)
-                    val metadata = element.getMetadata(collector.fields)
-                    val javaFile = AdapterBuilder().build(metadata)
-                    FileHelper.write(processingEnv, javaFile)
-                } catch (e: Throwable) {
-                    processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, e.toString())
-                }
+        return roundEnv.getElementsAnnotatedWith(clazz).mapNotNull { element ->
+            if (element !is TypeElement) return@mapNotNull null
+            val visitor = BinaryAdapterVisitor()
+            try {
+                val collector = FieldsCollector(element)
+                element.accept(visitor, collector)
+                val metadata = element.getMetadata(collector.fields)
+                val javaFile = AdapterBuilder().build(metadata)
+                FileHelper.write(processingEnv, javaFile)
+                ClassName.get(javaFile.packageName, javaFile.typeSpec.name)
+            } catch (e: Throwable) {
+                processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, e.toString())
+                null
             }
         }
     }

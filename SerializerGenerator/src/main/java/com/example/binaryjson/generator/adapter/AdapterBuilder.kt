@@ -11,9 +11,10 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 
 private const val ADAPTER_SUFFIX = "BinaryAdapter"
+private const val ID_FIELD_NAME = "ID"
 
 class AdapterBuilder(
-        private val codeBuilders: List<CodeBuilder> = listOf(
+        private val codeBuilders: List<AdapterCodeBuilder> = listOf(
                 AdapterFactoryBuilder,
                 AdapterGetIdBuilder,
                 AdapterDeserializeBuilder,
@@ -23,9 +24,10 @@ class AdapterBuilder(
 ) {
 
     private data class CodeBuilderContext(
-            override val typeClass: ClassName,
-            override val metadata: TypeMetadata
-    ) : CodeBuilder.Context
+            override val adapterClassName: ClassName,
+            override val metadata: TypeMetadata,
+            override val idStaticFiledName: String
+    ) : AdapterCodeBuilder.Context
 
     fun build(metadata: TypeMetadata): JavaFile {
         val (classPrefix, packageName) = getPrefixAndPackage(metadata.element)
@@ -33,8 +35,9 @@ class AdapterBuilder(
         val adapterName = makeAdapterName(classPrefix, className)
         val uniqueTypes = findUniqueTypes(metadata.fields)
         val adapterClassName = ClassName.get(packageName, adapterName)
-        val context = CodeBuilderContext(adapterClassName, metadata)
+        val context = CodeBuilderContext(adapterClassName, metadata, ID_FIELD_NAME)
         val typeSpec: TypeSpec = TypeSpec.classBuilder(adapterName).apply {
+            metadata.id.generateStaticFiled(ID_FIELD_NAME, this)
             codeBuilders.forEach {
                 it.apply { build(context) }
             }
@@ -105,12 +108,13 @@ class AdapterBuilder(
         val providerName = "provider"
         val metaStoreName = "metadataStore"
         return MethodSpec.constructorBuilder().apply {
+            addException(Exception::class.java)
             addParameter(BinaryAdapterProvider::class.java, providerName)
             addParameter(MetadataStore::class.java, metaStoreName)
 
             fields.forEach {
                 addStatement("${adapterFiledName(it)} = " +
-                        "${providerName}.getAdapter(${it.simpleName()}.class)")
+                        "${providerName}.getAdapterForClass(\$T.class)", it)
             }
             addStatement("this.$META_STORE_FIELD = $metaStoreName")
         }.build()

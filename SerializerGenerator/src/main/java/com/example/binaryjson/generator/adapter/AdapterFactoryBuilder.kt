@@ -1,23 +1,35 @@
 package com.example.binaryjson.generator.adapter
 
 import com.binarystore.adapter.AdapterFactory
-import com.binarystore.adapter.BinaryAdapter
+import com.binarystore.adapter.AdapterFactoryRegister
 import com.squareup.javapoet.*
 import javax.annotation.Nonnull
 import javax.lang.model.element.Modifier
 
-object AdapterFactoryBuilder : CodeBuilder {
+object AdapterFactoryBuilder : AdapterCodeBuilder {
 
+    const val REGISTER_METHOD_NAME = "registerInto"
     private const val FACTORY_TYPE_NAME = "Factory"
     private const val FACTORY_CONTEXT_NAME = "context"
+    private const val REGISTER = "register"
 
-    override fun TypeSpec.Builder.build(context: CodeBuilder.Context) {
+    override fun TypeSpec.Builder.build(context: AdapterCodeBuilder.Context) {
         addType(generateFactoryType(context))
+        addMethod(generateRegisterMethod(context))
     }
 
-    private fun generateFactoryType(context: CodeBuilder.Context): TypeSpec {
+    private fun generateRegisterMethod(context: AdapterCodeBuilder.Context): MethodSpec {
+        return MethodSpec.methodBuilder(REGISTER_METHOD_NAME).apply {
+            addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            addParameter(AdapterFactoryRegister::class.java, REGISTER)
+            addStatement("${REGISTER}.register(\$T.class, new $FACTORY_TYPE_NAME())",
+                    context.metadata.type)
+        }.build()
+    }
+
+    private fun generateFactoryType(context: AdapterCodeBuilder.Context): TypeSpec {
         val adapterClass = ClassName.get(AdapterFactory::class.java)
-        val factoryType = ParameterizedTypeName.get(adapterClass, context.metadata.type)
+        val factoryType = ParameterizedTypeName.get(adapterClass, context.metadata.type, context.adapterClassName)
         return TypeSpec.classBuilder(FACTORY_TYPE_NAME).apply {
             addSuperinterface(factoryType)
             addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
@@ -26,19 +38,20 @@ object AdapterFactoryBuilder : CodeBuilder {
         }.build()
     }
 
-    private fun generateFactoryMethodAdapterId(context: CodeBuilder.Context): MethodSpec {
+    private fun generateFactoryMethodAdapterId(context: AdapterCodeBuilder.Context): MethodSpec {
         return MethodSpec.methodBuilder("adapterKey").apply {
             addAnnotation(Override::class.java)
             addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            context.metadata.id.generateReturnCode(this)
+            addStatement("return ${context.idStaticFiledName}")
+            returns(context.metadata.id.keyClass)
         }.build()
     }
 
-    private fun generateFactoryMethodCreate(context: CodeBuilder.Context): MethodSpec {
-        val adapterClass = ClassName.get(BinaryAdapter::class.java)
+    private fun generateFactoryMethodCreate(context: AdapterCodeBuilder.Context): MethodSpec {
         return MethodSpec.methodBuilder("create").apply {
             addAnnotation(Override::class.java)
             addAnnotation(Nonnull::class.java)
+            addException(Exception::class.java)
             addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             addParameter(
                     ParameterSpec.builder(
@@ -50,8 +63,8 @@ object AdapterFactoryBuilder : CodeBuilder {
             )
             val provider = "${FACTORY_CONTEXT_NAME}.provider"
             val metadataStore = "${FACTORY_CONTEXT_NAME}.metadataStore"
-            addCode("return new \$T($provider, $metadataStore);", context.typeClass)
-            returns(ParameterizedTypeName.get(adapterClass, context.metadata.type))
+            addCode("return new \$T($provider, $metadataStore);", context.adapterClassName)
+            returns(context.adapterClassName)
         }.build()
     }
 }

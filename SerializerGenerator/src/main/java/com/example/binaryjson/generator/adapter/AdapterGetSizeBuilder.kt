@@ -6,11 +6,11 @@ import com.example.binaryjson.generator.TypeMetadata
 import com.squareup.javapoet.*
 import javax.lang.model.element.Modifier
 
-object AdapterGetSizeBuilder : CodeBuilder {
+object AdapterGetSizeBuilder : AdapterCodeBuilder {
 
     private const val GET_SIZE_METHOD = "getSize"
 
-    override fun TypeSpec.Builder.build(context: CodeBuilder.Context) {
+    override fun TypeSpec.Builder.build(context: AdapterCodeBuilder.Context) {
         addMethods(generateArraysGetSizeMethods(context.metadata))
         addMethod(generateSizeMethod(context.metadata))
     }
@@ -62,12 +62,13 @@ object AdapterGetSizeBuilder : CodeBuilder {
     private fun generateGetSizeCodeArray(type: ArrayTypeName): CodeBlock {
         val baseType = type.baseType
         val accumulator = "accumulator"
+        val deep = type.deep
         return CodeBlock.builder().apply {
             addStatement("int $accumulator = 0")
             forEach(VALUE, type) {
                 addStatement("$accumulator += ${generateGetFieldSizeCode(it, baseType)}")
             }
-            addStatement("return $accumulator")
+            addStatement("return ${ByteBuffer.INTEGER_BYTES * deep} + $accumulator")
         }.build()
     }
 
@@ -78,8 +79,9 @@ object AdapterGetSizeBuilder : CodeBuilder {
             val arrayDimension = { deep: Int ->
                 (0 until deep).joinToString("") { "[0]" }
             }
-            add("return $size")
-            repeat(type.deep) {
+            val deep = type.deep
+            add("return ${ByteBuffer.INTEGER_BYTES * deep} +  $size")
+            repeat(deep) {
                 add(" * $VALUE${arrayDimension(it)}.length")
             }
             add(";")

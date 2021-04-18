@@ -6,20 +6,23 @@ import com.binarystore.Persistable
 class TestClass(
         @JvmField val field1: String = "lseilghboeavn",
         @JvmField val field2: String = "lseilghboeavn",
+        @JvmField val field4: String = "lseilghboeavn",
         @JvmField val field3: TestClassJava = TestClassJava(
                 "", false, null, 0),
-        @JvmField val field4: String = "lseilghboeavn",
         @JvmField val field5: String = "lseilghboeavn",
-        @JvmField val field6: String = "lseilghboeavn",
+        @JvmField val field6: TestClassJava = TestClassJava(
+                "", false, null, 0),
         @JvmField val field7: String = "lseilghboeavn",
         @JvmField val field8: String = "lseilghboeavn",
         @JvmField val field9: String = "lseilghboeavn",
         @JvmField val field10: String = "fjnslgrebdfvd",
-        @JvmField val field11: String = "fjnslgrebdfvd",
+        @JvmField val field11: TestClassJava = TestClassJava(
+                "", false, null, 0),
         @JvmField val field12: String = "fjnslgrebdfvd",
         @JvmField val field13: String = "fjnslgrebdfvd",
         @JvmField val field14: String = "fjnslgrebdfvd",
-        @JvmField val field15: String = "fjnslgrebdfvd",
+        @JvmField val field15: TestClassJava = TestClassJava(
+                "", false, null, 0),
         @JvmField val field16: String = "fjnslgrebdfvd",
         @JvmField val field17: String = "fjnslgrebdfvd",
         @JvmField val field18: String = "fjnslgrebdfvd",

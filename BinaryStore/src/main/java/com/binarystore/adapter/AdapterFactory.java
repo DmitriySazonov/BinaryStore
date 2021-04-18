@@ -4,7 +4,7 @@ import com.binarystore.meta.MetadataStore;
 
 import javax.annotation.Nonnull;
 
-public interface AdapterFactory<T> {
+public interface AdapterFactory<T, A extends BinaryAdapter<T>> {
     final class Context {
         public final BinaryAdapterProvider provider;
         public final MetadataStore metadataStore;
@@ -21,5 +21,5 @@ public interface AdapterFactory<T> {
     Key<?> adapterKey();
 
     @Nonnull
-    BinaryAdapter<T> create(@Nonnull Context context);
+    A create(@Nonnull Context context) throws Exception;
 }

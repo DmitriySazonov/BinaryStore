@@ -4,7 +4,7 @@ import com.binarystore.buffer.ByteBuffer;
 
 public interface BinaryAdapter<T> {
 
-    Key id();
+    Key<?> id();
 
     int getSize(T value) throws Exception;
 

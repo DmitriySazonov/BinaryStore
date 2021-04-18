@@ -1,6 +1,7 @@
 package com.example.binaryjson;
 
 import com.binarystore.Array;
+import com.binarystore.InjectType;
 import com.binarystore.Persistable;
 
 import java.util.Map;
@@ -8,17 +9,15 @@ import java.util.Map;
 @Persistable(id = "TestClassJava")
 public class TestClassJava {
 
-    @Persistable(id = "InnerClass")
-    static class InnerClass {
-        final Map<String, String> map;
-        final String[][][][] array;
+    @Persistable(id = "InnerClass", inject = InjectType.ASSIGNMENT)
+    static class InnerClass extends TestClassJava {
+        Map<String, String> map;
+        String[][][][] array;
         @Array(even = true)
-        final int[][][][] arrayInt;
+        int[][][][] arrayInt;
 
-        InnerClass(Map<String, String> map, String[][][][] array, int[][][][] arrayInt) {
-            this.map = map;
-            this.array = array;
-            this.arrayInt = arrayInt;
+        InnerClass() {
+            super("", false, false, (byte) 2);
         }
     }
 

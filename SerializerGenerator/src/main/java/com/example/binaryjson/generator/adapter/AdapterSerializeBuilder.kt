@@ -5,12 +5,12 @@ import com.example.binaryjson.generator.TypeMetadata
 import com.squareup.javapoet.*
 import javax.lang.model.element.Modifier
 
-object AdapterSerializeBuilder : CodeBuilder {
+object AdapterSerializeBuilder : AdapterCodeBuilder {
 
     private const val SERIALIZE_METHOD = "serialize"
     private const val BUFFER_NAME = "byteBuffer"
 
-    override fun TypeSpec.Builder.build(context: CodeBuilder.Context) {
+    override fun TypeSpec.Builder.build(context: AdapterCodeBuilder.Context) {
         addMethods(generateArraysSerializeMethods(context.metadata))
         addMethod(generateSerializeMethod(context.metadata))
     }

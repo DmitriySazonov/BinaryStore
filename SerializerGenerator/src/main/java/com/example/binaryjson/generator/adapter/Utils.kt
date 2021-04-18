@@ -11,17 +11,22 @@ const val META_STORE_FIELD = "metadataStore"
 const val VERSION_FIELD = "versionId"
 const val ADAPTER_FIELD_SUFFIX = "Adapter"
 
-fun Id.generateReturnCode(spec: MethodSpec.Builder) {
-    when (this) {
-        is Id.Int -> {
-            spec.addStatement("return new \$T(${value})", Key.Int::class.java)
-            spec.returns(Key.Int::class.java)
-        }
-        is Id.String -> {
-            spec.addStatement("return new \$T(\"${value}\")", Key.String::class.java)
-            spec.returns(Key.String::class.java)
-        }
+val Id.keyClass
+    get() = when (this) {
+        is Id.Int -> Key.Int::class.java
+        is Id.String -> Key.String::class.java
     }
+
+fun Id.generateStaticFiled(name: String, builder: TypeSpec.Builder) {
+    val clazz = keyClass
+    val initializer = when (this) {
+        is Id.Int -> "new \$T(${value})"
+        is Id.String -> "new \$T(\"${value}\")"
+    }
+    builder.addField(FieldSpec.builder(clazz, name).apply {
+        addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+        initializer(initializer, clazz)
+    }.build())
 }
 
 inline fun CodeBlock.Builder.forEach(

@@ -1,14 +1,11 @@
 package com.binarystore.adapter.boxed;
 
-import com.binarystore.adapter.AbstractAdapterFactory;
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BaseBinaryAdapter;
-import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
+import com.binarystore.adapter.SingletonAdapterFactory;
 import com.binarystore.buffer.ByteBuffer;
-
-import javax.annotation.Nonnull;
 
 public class ByteBinaryAdapter extends BaseBinaryAdapter<Byte> {
 
@@ -16,13 +13,8 @@ public class ByteBinaryAdapter extends BaseBinaryAdapter<Byte> {
 
     private static final int NULL_SIZE = ByteBuffer.BOOLEAN_BYTES;
     private static final int FULL_SIZE = NULL_SIZE + ByteBuffer.BYTE_BYTES;
-    public static final AdapterFactory<Byte> factory = new AbstractAdapterFactory<Byte>(ID) {
-        @Override
-        @Nonnull
-        public BinaryAdapter<Byte> create(@Nonnull Context context) {
-            return new ByteBinaryAdapter();
-        }
-    };
+    public static final AdapterFactory<Byte, ByteBinaryAdapter> factory =
+            new SingletonAdapterFactory<>(ID, new ByteBinaryAdapter());
 
     @Override
     public Key.Int id() {

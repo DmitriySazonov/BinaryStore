@@ -1,16 +1,21 @@
 package com.example.binaryjson
 
 import android.os.Bundle
-import android.os.SystemClock
-import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.binarystore.AdaptersRegistrator
 import com.binarystore.BinaryAdapterManager
 import com.binarystore.adapter.BasicBinaryAdapters
 import com.binarystore.buffer.StaticByteBuffer
 import com.binarystore.meta.MetadataStoreInMemory
+import com.example.binaryjson.benchmark.Benchmark
 import com.example.binaryjson.measure.JSONMeasure
 import com.example.binaryjson.measure.Measure
 import com.example.binaryjson.measure.SharedPrefsMeasure
+import com.example.binaryjson.test.StoryResponse
+import com.example.binaryjson.test.StoryResponseParser
+import org.json.JSONObject
+import java.nio.charset.StandardCharsets
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,70 +31,76 @@ class MainActivity : AppCompatActivity() {
             )
     )
 
-    class Benchmark(val id: String) {
+    object CompareCaseSuite : Benchmark.CaseSuite() {
+        val CONFIGURE = case("configure")
+        val GET_ADAPTER = case("get_adapter")
+        val GET_SIZE = case("get_size")
+        val CREATE_BUFFER = case("create_buffer")
+        val SERIALIZE = case("serialize")
+        val DESERIALIZE = case("deserialize")
 
-        private val values = HashMap<String, Long>()
-        private val diffs = HashMap<String, Long>()
-
-        fun start(name: String) {
-            values[name] = SystemClock.elapsedRealtimeNanos()
-        }
-
-        fun end(name: String) {
-            val time = values[name] ?: return
-            val diff = diffs[name] ?: 0
-            diffs[name] = diff + (SystemClock.elapsedRealtimeNanos() - time)
-        }
-
-        fun print(count: Int, name: String? = null) {
-            diffs.filter {
-                name == null || it.key == name
-            }.forEach { (name, time) ->
-                Log.d("Benchmark", "$id - $name - ${time / count.toDouble()}")
-            }
-        }
+        val READ_JSON = case("read_json")
+        val CREATE_JSON_OBJ = case("create_json_obj")
+        val PARSE_FROM_JSON = case("parse_from_json")
+        val TO_BYTE_ARRAY = case("to_byte_array")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val benchmark = Benchmark("")
-        val count = 1000
-        repeat(count) {
-            test(benchmark)
+        setContentView(R.layout.activity_main)
+        val benchmark = Benchmark(CompareCaseSuite)
+        val count = 1
+        json.length
+        findViewById<View>(R.id.testRun).setOnClickListener {
+            repeat(count) { test(benchmark) }
+            benchmark.print()
         }
-        benchmark.print(count)
     }
 
+    val json by lazy { String(assets.open("get_stories.json").readBytes()) }
     private fun test(benchmark: Benchmark) {
-
-        benchmark.start("configure")
+        benchmark.start(CompareCaseSuite.CONFIGURE)
         val metadataStore = MetadataStoreInMemory()
         val provider = BinaryAdapterManager(metadataStore).apply {
             BasicBinaryAdapters.registerInto(this)
-            register(TestClass::class.java, TestClassBinaryAdapter.Factory())
-            register(TestClassJava::class.java, TestClassJavaBinaryAdapter.Factory())
+            AdaptersRegistrator.registerInto(this)
         }
-        benchmark.end("configure")
-        benchmark.start("resolve")
-        provider.resolveAllAdapters()
-        benchmark.end("resolve")
-        benchmark.start("getProvider")
-        val adapter = provider.getAdapter(TestClass::class.java) ?: return
-        benchmark.end("getProvider")
-        val testClass = TestClass("Напишу ка я что-то по русски", "world")
-        benchmark.start("getSize")
-        val size = adapter.getSize(testClass)
-        benchmark.end("getSize")
-        benchmark.start("createBuffer")
-        val byteBuffer = StaticByteBuffer(size)
-        benchmark.end("createBuffer")
-        benchmark.start("serialize")
-        adapter.serialize(byteBuffer, testClass)
-        benchmark.end("serialize")
-        byteBuffer.offset = 0
-        benchmark.start("deserialize")
-        val desTestClass = adapter.deserialize(byteBuffer)
-        benchmark.end("deserialize")
-        desTestClass.toString()
+        benchmark.end(CompareCaseSuite.CONFIGURE)
+
+        benchmark.start(CompareCaseSuite.CREATE_JSON_OBJ)
+        val json = JSONObject(json)
+        benchmark.end(CompareCaseSuite.CREATE_JSON_OBJ)
+
+        benchmark.start(CompareCaseSuite.PARSE_FROM_JSON)
+        val response = StoryResponseParser.parse(json)
+        benchmark.end(CompareCaseSuite.PARSE_FROM_JSON)
+
+        benchmark.start(CompareCaseSuite.GET_ADAPTER)
+        val adapter = provider.getAdapterForClass(StoryResponse::class.java)!!
+        benchmark.end(CompareCaseSuite.GET_ADAPTER)
+
+        benchmark.start(CompareCaseSuite.GET_SIZE)
+        val size = adapter.getSize(response)
+        benchmark.end(CompareCaseSuite.GET_SIZE)
+
+        benchmark.start(CompareCaseSuite.CREATE_BUFFER)
+        val buffer = StaticByteBuffer(size)
+        benchmark.end(CompareCaseSuite.CREATE_BUFFER)
+
+        benchmark.start(CompareCaseSuite.SERIALIZE)
+        adapter.serialize(buffer, response)
+        benchmark.end(CompareCaseSuite.SERIALIZE)
+
+        buffer.offset = 0
+
+        benchmark.start(CompareCaseSuite.DESERIALIZE)
+        val desResponse = adapter.deserialize(buffer)
+        benchmark.end(CompareCaseSuite.DESERIALIZE)
+
+        benchmark.start(CompareCaseSuite.TO_BYTE_ARRAY)
+        String(this.json.toByteArray(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
+        benchmark.end(CompareCaseSuite.TO_BYTE_ARRAY)
+
+        desResponse.toString()
     }
 }

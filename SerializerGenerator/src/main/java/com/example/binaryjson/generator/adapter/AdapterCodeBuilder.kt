@@ -4,11 +4,13 @@ import com.example.binaryjson.generator.TypeMetadata
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeSpec
 
-interface CodeBuilder {
+interface AdapterCodeBuilder {
 
     interface Context {
-        val typeClass: ClassName
+        val adapterClassName: ClassName
         val metadata: TypeMetadata
+
+        val idStaticFiledName: String
     }
 
     fun TypeSpec.Builder.build(context: Context) = Unit

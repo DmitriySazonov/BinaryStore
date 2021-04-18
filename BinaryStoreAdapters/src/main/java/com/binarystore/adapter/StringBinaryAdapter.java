@@ -2,21 +2,15 @@ package com.binarystore.adapter;
 
 import com.binarystore.buffer.ByteBuffer;
 
-import javax.annotation.Nonnull;
-
 public final class StringBinaryAdapter extends BaseBinaryAdapter<String> {
 
+    private static final String EMPTY = "";
     private static final Key.Int ID = DefaultAdapters.STRING;
 
     private static final int NULL_SIZE = com.binarystore.buffer.ByteBuffer.BOOLEAN_BYTES;
     private static final int FULL_HEADER_SIZE = NULL_SIZE + ByteBuffer.INTEGER_BYTES;
-    public static final AdapterFactory<String> factory = new AbstractAdapterFactory<String>(ID) {
-        @Override
-        @Nonnull
-        public BinaryAdapter<String> create(@Nonnull Context context) {
-            return new StringBinaryAdapter();
-        }
-    };
+    public static final AdapterFactory<String, StringBinaryAdapter> factory =
+            new SingletonAdapterFactory<>(ID, new StringBinaryAdapter());
 
     @Override
     public Key.Int id() {
@@ -35,7 +29,9 @@ public final class StringBinaryAdapter extends BaseBinaryAdapter<String> {
             return;
         }
         byteBuffer.write(true);
-        byteBuffer.write(value.length());
+        final int length = value.length();
+        byteBuffer.write(length);
+        if (length == 0) return;
         byteBuffer.write(value);
     }
 
@@ -43,6 +39,7 @@ public final class StringBinaryAdapter extends BaseBinaryAdapter<String> {
     public String deserialize(ByteBuffer byteBuffer) {
         if (!byteBuffer.readBoolean()) return null;
         final int length = byteBuffer.readInt();
+        if (length == 0) return EMPTY;
         return byteBuffer.readString(length);
     }
 }

@@ -7,14 +7,14 @@ import com.squareup.javapoet.*
 import java.util.*
 import javax.lang.model.element.Modifier
 
-object AdapterDeserializeBuilder : CodeBuilder {
+object AdapterDeserializeBuilder : AdapterCodeBuilder {
 
     const val VERSION_TAG_SIZE = ByteBuffer.INTEGER_BYTES
     private const val DESERIALIZE_METHOD = "deserialize"
     private const val BUFFER_NAME = "byteBuffer"
     private const val VERSION_NAME = "version"
 
-    override fun TypeSpec.Builder.build(context: CodeBuilder.Context) {
+    override fun TypeSpec.Builder.build(context: AdapterCodeBuilder.Context) {
         addMethods(generateArraysDeserializeMethods(context.metadata))
         addMethod(generateDeserializeMethod(context.metadata))
     }
