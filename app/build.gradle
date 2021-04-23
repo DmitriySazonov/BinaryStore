@@ -50,6 +50,7 @@ dependencies {
     implementation project(":BinaryStore")
     implementation project(":BinaryStoreKt")
     implementation project(":BinaryStoreAdapters")
+    implementation project(":BinaryStoreAndroidAdapters")
     kapt project(":SerializerGenerator")
 
 }
