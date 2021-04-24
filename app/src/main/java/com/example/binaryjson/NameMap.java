@@ -1,16 +1,16 @@
 package com.example.binaryjson;
 
+import com.binarystore.InjectType;
+import com.binarystore.Persistable;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Persistable(id = "NameMap", inject = InjectType.ASSIGNMENT)
 public class NameMap {
 
-    private int lastId = 0;
-    private HashMap<String, Integer> nameMap = new HashMap<>();
-
-    public NameMap() {
-
-    }
+    int lastId = 0;
+    HashMap<String, Integer> nameMap = new HashMap<>();
 
     public int getIdOrPut(final String name) {
         final Integer id = nameMap.get(name);

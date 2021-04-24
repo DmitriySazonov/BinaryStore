@@ -1,11 +1,6 @@
-package com.example.binaryjson.prefs;
+package com.binarystore.adapter.preference;
 
 import android.content.SharedPreferences;
-
-import androidx.annotation.Nullable;
-
-import com.example.binaryjson.BinaryParser;
-import com.example.binaryjson.BinarySerializer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import javax.annotation.CheckForNull;
+
 public class BinarySharedPreference implements SharedPreferences {
 
     private final File file;
@@ -24,21 +21,10 @@ public class BinarySharedPreference implements SharedPreferences {
     private final Map<String, Object> map;
     private WriteOnDiskRunnable writeOnDiskRunnable;
 
-    public BinarySharedPreference(File file, ExecutorService executorService) {
-        this(file, readFromFile(file), executorService);
-    }
-
-    public BinarySharedPreference(File file, Map<String, Object> values, ExecutorService executorService) {
+    BinarySharedPreference(File file, ExecutorService executorService) {
         this.file = file;
-        this.map = values;
+        this.map = readFromFile(file);
         this.executorService = executorService;
-    }
-
-    public void applyChanges() {
-        synchronized (this) {
-            writeOnDiskRunnable = new WriteOnDiskRunnable();
-            executorService.submit(writeOnDiskRunnable);
-        }
     }
 
     @Override
@@ -46,15 +32,16 @@ public class BinarySharedPreference implements SharedPreferences {
         return map;
     }
 
-    @Nullable
     @Override
-    public String getString(String key, @Nullable String defValue) {
+    @CheckForNull
+    public String getString(String key, @CheckForNull String defValue) {
         return getOrDefault(key, String.class, defValue);
     }
 
-    @Nullable
     @Override
-    public Set<String> getStringSet(String key, @Nullable Set<String> defValues) {
+    @CheckForNull
+    @SuppressWarnings("unchecked")
+    public Set<String> getStringSet(String key, @CheckForNull Set<String> defValues) {
         return getOrDefault(key, Set.class, defValues);
     }
 
@@ -84,7 +71,7 @@ public class BinarySharedPreference implements SharedPreferences {
     }
 
     @Override
-    public Editor edit() {
+    public BinaryEditor edit() {
         return new BinaryEditor();
     }
 
@@ -142,7 +129,7 @@ public class BinarySharedPreference implements SharedPreferences {
         }
         try {
             OutputStream stream = new FileOutputStream(file);
-            stream.write(BinarySerializer.toByteArray(map));
+//            stream.write(BinarySerializer.toByteArray(map));
             stream.close();
             return true;
         } catch (Exception e) {
@@ -156,13 +143,18 @@ public class BinarySharedPreference implements SharedPreferences {
             byte[] bytes = new byte[stream.available()];
             stream.read(bytes);
             stream.close();
-            return BinaryParser.parseMap(bytes);
+            throw new IllegalArgumentException();
+//            return BinaryParser.parseMap(bytes);
         } catch (Exception e) {
             return new HashMap<>();
         }
     }
 
-    private class BinaryEditor extends BaseEditor {
+    public class BinaryEditor extends BaseEditor<BinaryEditor> {
+
+        private BinaryEditor() {
+
+        }
 
         @Override
         public synchronized boolean commit() {

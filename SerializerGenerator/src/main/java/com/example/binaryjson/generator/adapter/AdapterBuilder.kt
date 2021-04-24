@@ -17,7 +17,7 @@ private const val ADAPTER_SUFFIX = "BinaryAdapter"
 private const val ID_FIELD_NAME = "ID"
 private const val BUFFER_NAME = "byteBuffer"
 
-private const val GET_ID_METHOD = "id"
+private const val GET_KEY_METHOD = "key"
 
 private const val VALUE = "value"
 private const val META_STORE_FIELD = "metadataStore"
@@ -182,7 +182,7 @@ class AdapterBuilder {
     }
 
     private fun generateGetIdMethod(metadata: TypeMetadata): MethodSpec {
-        return adapterMethod(GET_ID_METHOD) {
+        return adapterMethod(GET_KEY_METHOD) {
             addStatement("return $ID_FIELD_NAME")
             returns(metadata.id.keyClass)
         }

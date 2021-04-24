@@ -1,4 +1,4 @@
-package com.example.binaryjson.prefs;
+package com.binarystore.adapter.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -69,8 +69,11 @@ public class SharedPreferenceManager {
         }
         final SharedPreferences defaultPrefs = getDefaultSharedPreference(context, name);
         BinarySharedPreference binaryPreference = new BinarySharedPreference(binaryFile,
-                (Map<String, Object>) defaultPrefs.getAll(), executorService);
-        binaryPreference.applyChanges();
+                executorService);
+        final Map<String, Object> newValues = (Map<String, Object>) defaultPrefs.getAll();
+        binaryPreference.edit()
+                .replaceAll(newValues)
+                .apply();
         return binaryPreference;
     }
 

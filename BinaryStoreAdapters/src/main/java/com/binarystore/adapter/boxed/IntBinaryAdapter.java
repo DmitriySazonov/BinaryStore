@@ -17,7 +17,7 @@ public class IntBinaryAdapter extends BaseBinaryAdapter<Integer> {
             new SingletonAdapterFactory<>(ID, new IntBinaryAdapter());
 
     @Override
-    public Key.Int id() {
+    public Key.Int key() {
         return ID;
     }
 

@@ -17,7 +17,7 @@ public class DoubleBinaryAdapter extends BaseBinaryAdapter<Double> {
             new SingletonAdapterFactory<>(ID, new DoubleBinaryAdapter());
 
     @Override
-    public Key.Int id() {
+    public Key.Int key() {
         return ID;
     }
 

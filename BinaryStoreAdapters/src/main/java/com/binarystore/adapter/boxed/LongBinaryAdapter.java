@@ -17,7 +17,7 @@ public class LongBinaryAdapter extends BaseBinaryAdapter<Long> {
             new SingletonAdapterFactory<>(ID, new LongBinaryAdapter());
 
     @Override
-    public Key.Int id() {
+    public Key.Int key() {
         return ID;
     }
 

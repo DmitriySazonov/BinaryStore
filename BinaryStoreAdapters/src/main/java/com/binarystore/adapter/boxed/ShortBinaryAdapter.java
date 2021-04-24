@@ -17,7 +17,7 @@ public class ShortBinaryAdapter extends BaseBinaryAdapter<Short> {
             new SingletonAdapterFactory<>(ID, new ShortBinaryAdapter());
 
     @Override
-    public Key.Int id() {
+    public Key.Int key() {
         return ID;
     }
 
