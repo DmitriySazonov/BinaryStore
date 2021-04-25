@@ -13,7 +13,7 @@ data class TypeMetadata(
         val id: Id,
         val versionId: Int,
         val injectType: InjectType,
-        val fields: List<FieldMeta>,
+        val fields: List<Field>,
         val element: TypeElement
 ) {
     val type: TypeName = TypeName.get(element.asType())

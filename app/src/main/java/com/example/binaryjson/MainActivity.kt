@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-       /* val metadataStore = MetadataStoreInMemory()
+        val metadataStore = MetadataStoreInMemory()
         val provider = BinaryAdapterManager(metadataStore).apply {
             BasicBinaryAdapters.registerInto(this)
             AdaptersRegistrator.registerInto(this)
@@ -32,8 +32,8 @@ class MainActivity : AppCompatActivity() {
         adapter.serialize(buffer, value)
         buffer.offset = 0
         val newValue = adapter.deserialize(buffer)
-        newValue.toString()*/
+        newValue.toString()
 
-        JSONCompareMeasure(this).start()
+//        JSONCompareMeasure(this).start()
     }
 }

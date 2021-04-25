@@ -1,7 +1,6 @@
 package com.example.binaryjson.generator.adapter
 
 import com.binarystore.buffer.ByteBuffer
-import com.example.binaryjson.generator.FieldMeta
 import com.squareup.javapoet.ArrayTypeName
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.ParameterizedTypeName
@@ -39,12 +38,6 @@ val ArrayTypeName.deep: Int
         }
         return deep
     }
-
-fun findUniqueTypes(fields: List<FieldMeta>): List<ClassName> {
-    return fields.mapNotNull {
-        tryGetClassName(it.type)
-    }.toSet().toList()
-}
 
 private fun tryGetClassName(type: TypeName): ClassName? {
     if (type is ClassName)
