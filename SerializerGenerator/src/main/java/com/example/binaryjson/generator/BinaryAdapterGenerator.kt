@@ -36,6 +36,7 @@ class BinaryAdapterGenerator : AbstractProcessor() {
         try {
             FileHelper.write(processingEnv, RegistratorBuilder.build(adapters))
         } catch (e: Throwable) {
+            e.printStackTrace()
             processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, e.toString())
         }
     }
@@ -53,13 +54,14 @@ class BinaryAdapterGenerator : AbstractProcessor() {
                 FileHelper.write(processingEnv, javaFile)
                 ClassName.get(javaFile.packageName, javaFile.typeSpec.name)
             } catch (e: Throwable) {
+                e.printStackTrace()
                 processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, e.toString())
                 null
             }
         }
     }
 
-    private fun TypeElement.getMetadata(fields: List<FieldMeta>): TypeMetadata {
+    private fun TypeElement.getMetadata(fields: List<Field>): TypeMetadata {
         val annotation = getAnnotation(Persistable::class.java)
         val id = when (annotation.idType) {
             IdType.STRING -> Id.String(annotation.id)

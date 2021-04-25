@@ -1,19 +1,20 @@
 package com.example.binaryjson.generator.adapter.types
 
+import com.example.binaryjson.generator.TypeMeta
 import com.example.binaryjson.generator.adapter.getPrimitiveSize
-import com.example.binaryjson.generator.simpleName
 import com.squareup.javapoet.CodeBlock
-import com.squareup.javapoet.TypeName
 import java.util.*
 
-class PrimitiveCodeEntry(
-        private val type: TypeName,
-) : AdapterCodeEntry {
+class PrimitiveCodeGenerator(
+        private val typeMeta: TypeMeta.Primitive,
+) : TypeCodeGenerator {
+
+    private val type = typeMeta.type
 
     override fun generateSerialize(
             valueName: String,
             bufferName: String,
-            context: AdapterCodeEntry.Context,
+            context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ) {
         builder.addStatement("${bufferName}.write(${valueName})")
@@ -21,22 +22,22 @@ class PrimitiveCodeEntry(
 
     override fun generateDeserialize(
             bufferName: String,
-            context: AdapterCodeEntry.Context,
+            context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
-    ): AdapterCodeEntry.ValueName {
+    ): TypeCodeGenerator.ValueName {
         val valueName = context.generateValName()
         val deserializeCode = "${bufferName}.read${type.toString().capitalize(Locale.ROOT)}()"
         builder.addStatement("final $type $valueName = $deserializeCode")
-        return AdapterCodeEntry.ValueName(valueName)
+        return TypeCodeGenerator.ValueName(valueName)
     }
 
     override fun generateGetSize(
             valueName: String,
-            context: AdapterCodeEntry.Context,
+            context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
-    ): List<AdapterCodeEntry.SizePart> {
+    ): List<TypeCodeGenerator.SizePart> {
         return listOf(
-                AdapterCodeEntry.SizePart.Constant(type.getPrimitiveSize())
+                TypeCodeGenerator.SizePart.Constant(type.getPrimitiveSize())
         )
     }
 }

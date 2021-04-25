@@ -1,43 +1,41 @@
 package com.example.binaryjson.generator.adapter.types
 
 import com.binarystore.buffer.ByteBuffer
-import com.example.binaryjson.generator.adapter.baseType
-import com.example.binaryjson.generator.adapter.deep
+import com.example.binaryjson.generator.TypeMeta
 import com.example.binaryjson.generator.adapter.forEach
 import com.example.binaryjson.generator.adapter.getPrimitiveSize
-import com.example.binaryjson.generator.adapter.types.AdapterCodeEntry.SizePart
-import com.squareup.javapoet.ArrayTypeName
+import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator.SizePart
 import com.squareup.javapoet.CodeBlock
 
-class ArrayCodeEntry(
-        private val type: ArrayTypeName,
-        private val event: Boolean,
-        private val factory: AdapterCodeEntryFactory,
-) : AdapterCodeEntry {
+class ArrayCodeGenerator(
+        private val typeMeta: TypeMeta.Array,
+        private val factory: TypeCodeGeneratorFactory,
+) : TypeCodeGenerator {
 
-    private val baseType = type.baseType
-    private val deep = type.deep
+    private val baseType = typeMeta.baseTypeMeta.type
+    private val baseTypeMeta = typeMeta.baseTypeMeta
+    private val deep = typeMeta.deep
 
     override fun generateSerialize(
             valueName: String,
             bufferName: String,
-            context: AdapterCodeEntry.Context,
+            context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ) {
         builder.apply {
-            forEach(valueName, type, beforeFor = {
+            forEach(valueName, typeMeta.type, beforeFor = {
                 addStatement("${bufferName}.write(${it}.length)")
             }) {
-                factory.create(baseType).generateSerialize(it, bufferName, context, builder)
+                factory.create(baseTypeMeta).generateSerialize(it, bufferName, context, builder)
             }
         }
     }
 
     override fun generateDeserialize(
             bufferName: String,
-            context: AdapterCodeEntry.Context,
+            context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
-    ): AdapterCodeEntry.ValueName {
+    ): TypeCodeGenerator.ValueName {
         val returnName = context.generateValName()
         builder.apply {
             val arrayDefine = (0 until deep).joinToString("") { "[]" }
@@ -48,23 +46,23 @@ class ArrayCodeEntry(
             }
             addStatement("\$T$arrayDefine $returnName", baseType)
             var deep = deep
-            forEach(returnName, type, beforeFor = {
+            forEach(returnName, typeMeta.type, beforeFor = {
                 addStatement("$it = new \$T${arrayDimension(deep--)}", baseType)
             }) {
-                val value = factory.create(baseType)
+                val value = factory.create(baseTypeMeta)
                         .generateDeserialize(bufferName, context, builder)
                 addStatement("$it = ${value.name}")
             }
         }
-        return AdapterCodeEntry.ValueName(returnName)
+        return TypeCodeGenerator.ValueName(returnName)
     }
 
     override fun generateGetSize(
             valueName: String,
-            context: AdapterCodeEntry.Context,
+            context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ): List<SizePart> {
-        return if (event && baseType.isPrimitive) {
+        return if (typeMeta.even && typeMeta.baseTypeMeta is TypeMeta.Primitive) {
             generateGetSizeCodePrimitiveEvenArray(valueName, context)
         } else {
             generateGetSizeCodeArray(valueName, context, builder)
@@ -73,14 +71,14 @@ class ArrayCodeEntry(
 
     private fun generateGetSizeCodeArray(
             valueName: String,
-            context: AdapterCodeEntry.Context,
+            context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ): List<SizePart> {
         val accumulator = context.generateValName()
         builder.apply {
             addStatement("int $accumulator = 0")
-            forEach(valueName, type) {
-                val parts = factory.create(baseType)
+            forEach(valueName, typeMeta.type) {
+                val parts = factory.create(baseTypeMeta)
                         .generateGetSize(it, context, builder)
                 parts.forEach { part ->
                     val expression = when (part) {
@@ -99,7 +97,7 @@ class ArrayCodeEntry(
 
     private fun generateGetSizeCodePrimitiveEvenArray(
             valueName: String,
-            context: AdapterCodeEntry.Context,
+            context: TypeCodeGenerator.Context,
     ): List<SizePart> {
         val size = baseType.getPrimitiveSize()
         val arrayDimension = { it: Int ->

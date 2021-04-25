@@ -12,7 +12,7 @@ public abstract class Key<T extends Key<?>> implements Comparable<T> {
     private final static byte STRING = 1;
     private final static byte INT = 2;
 
-    public static Key<?> read(ByteBuffer byteBuffer) throws Exception {
+    public static Key<?> read(ByteBuffer byteBuffer) throws IllegalArgumentException {
         final byte keyType = byteBuffer.readByte();
         if (keyType == STRING) {
             final int length = byteBuffer.readInt();
@@ -24,34 +24,9 @@ public abstract class Key<T extends Key<?>> implements Comparable<T> {
         }
     }
 
-    public int getSize() {
-        if (this instanceof String) {
-            final java.lang.String value = ((String) this).value;
-            return ByteBuffer.BYTE_BYTES +
-                    ByteBuffer.INTEGER_BYTES +
-                    ByteBufferHelper.getSize(value);
-        } else if (this instanceof Int) {
-            return ByteBuffer.BYTE_BYTES +
-                    ByteBuffer.INTEGER_BYTES;
-        } else {
-            throw new IllegalArgumentException("Unknown type of key - " + toString());
-        }
-    }
+    public abstract int getSize();
 
-    public void saveTo(ByteBuffer byteBuffer) throws Exception {
-        if (this instanceof String) {
-            final java.lang.String value = ((String) this).value;
-            byteBuffer.write(STRING);
-            byteBuffer.write(value.length());
-            byteBuffer.write(value);
-        } else if (this instanceof Int) {
-            final int value = ((Int) this).value;
-            byteBuffer.write(INT);
-            byteBuffer.write(value);
-        } else {
-            throw new IllegalArgumentException("Unknown type of key - " + toString());
-        }
-    }
+    public abstract void saveTo(ByteBuffer byteBuffer) throws Exception;
 
     @Override
     public int compareTo(@CheckForNull T key) {
@@ -67,15 +42,19 @@ public abstract class Key<T extends Key<?>> implements Comparable<T> {
     public static class String extends Key<String> {
 
         public final java.lang.String value;
+        private final int size;
 
         public String(java.lang.String value) {
             this.value = value;
+            this.size = ByteBuffer.BYTE_BYTES +
+                    ByteBuffer.INTEGER_BYTES +
+                    ByteBufferHelper.getSize(value);
         }
 
         @Override
         public int compareTo(@CheckForNull String key) {
             final int compare = super.compareTo(key);
-            return compare == 0 ? value.compareTo(key.value) : compare;
+            return compare == 0 && key != null ? value.compareTo(key.value) : compare;
         }
 
         @Override
@@ -95,20 +74,35 @@ public abstract class Key<T extends Key<?>> implements Comparable<T> {
         public java.lang.String toString() {
             return "String{value='" + value + '}';
         }
+
+        @Override
+        public int getSize() {
+            return size;
+        }
+
+        @Override
+        public void saveTo(ByteBuffer byteBuffer) {
+            byteBuffer.write(STRING);
+            byteBuffer.write(value.length());
+            byteBuffer.write(value);
+        }
     }
 
     public static class Int extends Key<Int> {
 
         public final int value;
+        private final int size;
 
         public Int(int value) {
             this.value = value;
+            this.size = ByteBuffer.BYTE_BYTES +
+                    ByteBuffer.INTEGER_BYTES;
         }
 
         @Override
         public int compareTo(@CheckForNull Int key) {
             final int compare = super.compareTo(key);
-            return compare == 0 ? Integer.compare(value, key.value) : compare;
+            return compare == 0 && key != null ? Integer.compare(value, key.value) : compare;
         }
 
         @Override
@@ -127,6 +121,17 @@ public abstract class Key<T extends Key<?>> implements Comparable<T> {
         @Override
         public java.lang.String toString() {
             return "Int{value=" + value + '}';
+        }
+
+        @Override
+        public int getSize() {
+            return size;
+        }
+
+        @Override
+        public void saveTo(ByteBuffer byteBuffer) {
+            byteBuffer.write(INT);
+            byteBuffer.write(value);
         }
     }
 }
