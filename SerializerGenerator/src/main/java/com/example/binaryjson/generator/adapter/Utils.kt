@@ -2,7 +2,10 @@ package com.example.binaryjson.generator.adapter
 
 import com.binarystore.adapter.Key
 import com.example.binaryjson.generator.Id
-import com.squareup.javapoet.*
+import com.squareup.javapoet.ArrayTypeName
+import com.squareup.javapoet.CodeBlock
+import com.squareup.javapoet.FieldSpec
+import com.squareup.javapoet.TypeSpec
 import javax.lang.model.element.Modifier
 
 val Id.keyClass
@@ -41,12 +44,4 @@ inline fun CodeBlock.Builder.forEach(
     repeat(deep) {
         endControlFlow()
     }
-}
-
-fun adapterMethod(name: String, builder: MethodSpec.Builder.() -> Unit): MethodSpec {
-    return MethodSpec.methodBuilder(name).apply {
-        addAnnotation(Override::class.java)
-        addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-        builder()
-    }.build()
 }

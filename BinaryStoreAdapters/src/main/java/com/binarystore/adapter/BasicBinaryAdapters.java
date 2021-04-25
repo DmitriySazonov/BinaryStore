@@ -8,8 +8,10 @@ import com.binarystore.adapter.boxed.IntBinaryAdapter;
 import com.binarystore.adapter.boxed.LongBinaryAdapter;
 import com.binarystore.adapter.boxed.ShortBinaryAdapter;
 import com.binarystore.adapter.collection.map.HashMapBinaryAdapter;
+import com.binarystore.adapter.collection.map.TreeMapBinaryAdapter;
 
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class BasicBinaryAdapters {
 
@@ -23,6 +25,7 @@ public class BasicBinaryAdapters {
         register.register(Double.class, DoubleBinaryAdapter.factory);
         register.register(String.class, StringBinaryAdapter.factory);
 
+        register.register(TreeMap.class, TreeMapBinaryAdapter.factory);
         register.register(HashMap.class, HashMapBinaryAdapter.factory);
     }
 }

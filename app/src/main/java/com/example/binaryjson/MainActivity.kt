@@ -7,14 +7,16 @@ import com.binarystore.BinaryAdapterManager
 import com.binarystore.adapter.BasicBinaryAdapters
 import com.binarystore.buffer.StaticByteBuffer
 import com.binarystore.meta.MetadataStoreInMemory
+import com.example.binaryjson.measure.JSONCompareMeasure
 
 class MainActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val metadataStore = MetadataStoreInMemory()
+       /* val metadataStore = MetadataStoreInMemory()
         val provider = BinaryAdapterManager(metadataStore).apply {
             BasicBinaryAdapters.registerInto(this)
             AdaptersRegistrator.registerInto(this)
@@ -30,6 +32,8 @@ class MainActivity : AppCompatActivity() {
         adapter.serialize(buffer, value)
         buffer.offset = 0
         val newValue = adapter.deserialize(buffer)
-        newValue.toString()
+        newValue.toString()*/
+
+        JSONCompareMeasure(this).start()
     }
 }
