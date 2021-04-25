@@ -1,6 +1,7 @@
 package com.binarystore.adapter;
 
 import com.binarystore.buffer.ByteBuffer;
+import com.binarystore.buffer.ByteBufferHelper;
 
 public final class StringBinaryAdapter extends BaseBinaryAdapter<String> {
 
@@ -13,13 +14,14 @@ public final class StringBinaryAdapter extends BaseBinaryAdapter<String> {
             new SingletonAdapterFactory<>(ID, new StringBinaryAdapter());
 
     @Override
-    public Key.Int id() {
+    public Key.Int key() {
         return ID;
     }
 
     @Override
     public int getSize(String value) {
-        return value == null ? NULL_SIZE : FULL_HEADER_SIZE + (value.length() * 2);
+        return value == null ? NULL_SIZE : FULL_HEADER_SIZE +
+                ByteBufferHelper.getSize(value);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.binaryjson.generator.adapter.types
 
 import com.example.binaryjson.generator.adapter.getPrimitiveSize
+import com.example.binaryjson.generator.simpleName
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.TypeName
 import java.util.*
@@ -23,9 +24,10 @@ class PrimitiveCodeEntry(
             context: AdapterCodeEntry.Context,
             builder: CodeBlock.Builder,
     ): AdapterCodeEntry.ValueName {
-        return AdapterCodeEntry.ValueName(
-                "${bufferName}.read${type.toString().capitalize(Locale.ROOT)}()"
-        )
+        val valueName = context.generateValName()
+        val deserializeCode = "${bufferName}.read${type.toString().capitalize(Locale.ROOT)}()"
+        builder.addStatement("final $type $valueName = $deserializeCode")
+        return AdapterCodeEntry.ValueName(valueName)
     }
 
     override fun generateGetSize(

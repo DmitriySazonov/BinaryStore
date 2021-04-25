@@ -1,6 +1,7 @@
 package com.binarystore.adapter;
 
 import com.binarystore.buffer.ByteBuffer;
+import com.binarystore.buffer.ByteBufferHelper;
 
 import java.util.Objects;
 
@@ -20,6 +21,20 @@ public abstract class Key<T extends Key<?>> implements Comparable<T> {
             return new Int(byteBuffer.readInt());
         } else {
             throw new IllegalArgumentException("Unknown id of key - " + keyType);
+        }
+    }
+
+    public int getSize() {
+        if (this instanceof String) {
+            final java.lang.String value = ((String) this).value;
+            return ByteBuffer.BYTE_BYTES +
+                    ByteBuffer.INTEGER_BYTES +
+                    ByteBufferHelper.getSize(value);
+        } else if (this instanceof Int) {
+            return ByteBuffer.BYTE_BYTES +
+                    ByteBuffer.INTEGER_BYTES;
+        } else {
+            throw new IllegalArgumentException("Unknown type of key - " + toString());
         }
     }
 

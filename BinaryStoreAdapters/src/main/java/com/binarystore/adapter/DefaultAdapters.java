@@ -9,4 +9,7 @@ public @interface DefaultAdapters {
     Key.Int FLOAT = new Key.Int(IdProvider.sId(6));
     Key.Int DOUBLE = new Key.Int(IdProvider.sId(7));
     Key.Int STRING = new Key.Int(IdProvider.sId(8));
+
+    Key.Int TREE_MAP = new Key.Int(IdProvider.sId(9));
+    Key.Int HASH_MAP = new Key.Int(IdProvider.sId(10));
 }

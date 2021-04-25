@@ -28,7 +28,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
         private BinaryAdapter<?> getAdapter(AdapterFactory.Context context) throws Exception {
             if (adapter == null) {
                 adapter = factory.create(context);
-                checkIdEqual(adapter.id(), factory.adapterKey());
+                checkIdEqual(adapter.key(), factory.adapterKey());
             }
             return adapter;
         }
@@ -52,7 +52,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     @Override
     public <T, B extends BinaryAdapter<T>> B createAdapter(AdapterFactory<T, B> factory) throws Exception {
         B adapter = factory.create(factoryContext);
-        checkIdEqual(adapter.id(), factory.adapterKey());
+        checkIdEqual(adapter.key(), factory.adapterKey());
         return adapter;
     }
 

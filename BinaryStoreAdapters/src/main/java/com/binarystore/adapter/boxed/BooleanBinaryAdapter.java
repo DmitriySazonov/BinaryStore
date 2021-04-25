@@ -18,7 +18,7 @@ public class BooleanBinaryAdapter extends BaseBinaryAdapter<Boolean> {
             new SingletonAdapterFactory<>(ID, new BooleanBinaryAdapter());
 
     @Override
-    public Key.Int id() {
+    public Key.Int key() {
         return ID;
     }
 

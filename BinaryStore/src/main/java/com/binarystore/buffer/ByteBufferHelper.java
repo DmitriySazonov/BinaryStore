@@ -1,6 +1,6 @@
 package com.binarystore.buffer;
 
-class ByteBufferHelper {
+public class ByteBufferHelper {
 
     private static final byte TRUE = 1;
     private static final byte FALSE = 0;
@@ -52,6 +52,10 @@ class ByteBufferHelper {
             bytes[j++] = (byte) (curChar);
             bytes[j++] = (byte) (curChar >>> 8);
         }
+    }
+
+    public static int getSize(final String value) {
+        return value.length() * ByteBuffer.CHAR_BYTES;
     }
 
     public static void write(final byte[] bytes, int offset, final byte[] value) {

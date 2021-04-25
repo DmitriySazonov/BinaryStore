@@ -29,14 +29,12 @@ fun generateDeserializeMethod(
         bufferName: String,
         codeBlock: CodeBlock,
 ): MethodSpec {
-    return MethodSpec.methodBuilder(DESERIALIZE_METHOD).apply {
-        addAnnotation(Override::class.java)
-        addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+    return adapterMethod(DESERIALIZE_METHOD) {
         addException(Exception::class.java)
         addParameter(ByteBuffer::class.java, bufferName)
         addCode(codeBlock)
         returns(valueType)
-    }.build()
+    }
 }
 
 fun generateSizeMethod(
@@ -44,13 +42,18 @@ fun generateSizeMethod(
         valueType: TypeName,
         codeBlock: CodeBlock,
 ): MethodSpec {
-    return MethodSpec.methodBuilder(GET_SIZE_METHOD)
-            .addAnnotation(Override::class.java)
-            .addException(Exception::class.java)
-            .addModifiers(Modifier.PUBLIC)
-            .addModifiers(Modifier.FINAL)
-            .addParameter(valueType, valueName)
-            .addCode(codeBlock)
-            .returns(TypeName.INT)
-            .build()
+    return adapterMethod(GET_SIZE_METHOD) {
+        addException(Exception::class.java)
+        addParameter(valueType, valueName)
+        addCode(codeBlock)
+        returns(TypeName.INT)
+    }
+}
+
+fun adapterMethod(name: String, builder: MethodSpec.Builder.() -> Unit): MethodSpec {
+    return MethodSpec.methodBuilder(name).apply {
+        addAnnotation(Override::class.java)
+        addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+        builder()
+    }.build()
 }
