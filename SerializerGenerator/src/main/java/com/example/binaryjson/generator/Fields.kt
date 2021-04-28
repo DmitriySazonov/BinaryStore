@@ -49,7 +49,7 @@ private fun TypeName.toMeta(): TypeMeta {
         this is ClassName -> TypeMeta.Class.Simple(this)
         this is ParameterizedTypeName -> TypeMeta.Class.Generic(this)
         this is ArrayTypeName -> TypeMeta.Array(this, even = false)
-        isPrimitive -> TypeMeta.Primitive(this)
+        isPrimitive || isBoxedPrimitive -> TypeMeta.Primitive(this)
         else -> throw IllegalArgumentException("Unknown type $this")
     }
 }

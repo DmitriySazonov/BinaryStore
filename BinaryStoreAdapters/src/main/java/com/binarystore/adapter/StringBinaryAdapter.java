@@ -3,7 +3,9 @@ package com.binarystore.adapter;
 import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.buffer.ByteBufferHelper;
 
-public final class StringBinaryAdapter extends BaseBinaryAdapter<String> {
+import javax.annotation.Nonnull;
+
+public final class StringBinaryAdapter extends AbstractBinaryAdapter<String> {
 
     private static final String EMPTY = "";
     private static final Key.Int ID = DefaultAdapters.STRING;
@@ -13,19 +15,20 @@ public final class StringBinaryAdapter extends BaseBinaryAdapter<String> {
     public static final AdapterFactory<String, StringBinaryAdapter> factory =
             new SingletonAdapterFactory<>(ID, new StringBinaryAdapter());
 
+    @Nonnull
     @Override
     public Key.Int key() {
         return ID;
     }
 
     @Override
-    public int getSize(String value) {
+    public int getSize(@Nonnull String value) {
         return value == null ? NULL_SIZE : FULL_HEADER_SIZE +
                 ByteBufferHelper.getSize(value);
     }
 
     @Override
-    public void serialize(ByteBuffer byteBuffer, String value) {
+    public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull String value) {
         if (value == null) {
             byteBuffer.write(false);
             return;
@@ -37,8 +40,9 @@ public final class StringBinaryAdapter extends BaseBinaryAdapter<String> {
         byteBuffer.write(value);
     }
 
+    @Nonnull
     @Override
-    public String deserialize(ByteBuffer byteBuffer) {
+    public String deserialize(@Nonnull ByteBuffer byteBuffer) {
         if (!byteBuffer.readBoolean()) return null;
         final int length = byteBuffer.readInt();
         if (length == 0) return EMPTY;

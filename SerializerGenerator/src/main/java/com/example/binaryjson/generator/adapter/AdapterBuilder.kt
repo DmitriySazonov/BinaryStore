@@ -11,6 +11,7 @@ import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator
 import com.example.binaryjson.generator.adapter.types.TypeCodeGeneratorFactory
 import com.squareup.javapoet.*
 import java.util.*
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -27,7 +28,9 @@ private const val ADAPTER_PROVIDER_FIELD = "adapterProvider"
 private const val VERSION_FIELD = "versionId"
 private const val ADAPTER_FIELD_SUFFIX = "Adapter"
 
-class AdapterBuilder {
+class AdapterBuilder(
+        private val env: ProcessingEnvironment
+) {
 
     private val context = object : TypeCodeGenerator.Context {
         val uniqueAdapterTypes = HashSet<ClassName>()
@@ -155,9 +158,7 @@ class AdapterBuilder {
             var primitiveSum = 0
             parts.forEach {
                 when (it) {
-                    is TypeCodeGenerator.SizePart.Constant -> {
-                        primitiveSum += it.size
-                    }
+                    is TypeCodeGenerator.SizePart.Constant -> primitiveSum += it.size
                     is TypeCodeGenerator.SizePart.Expression -> add("${it.expression}\n + ")
                 }
             }

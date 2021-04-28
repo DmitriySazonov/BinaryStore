@@ -4,6 +4,10 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.TypeName
 
+
+internal const val TRUE = (1).toByte()
+internal const val FALSE = (0).toByte()
+
 interface TypeCodeGenerator {
 
     interface Context {

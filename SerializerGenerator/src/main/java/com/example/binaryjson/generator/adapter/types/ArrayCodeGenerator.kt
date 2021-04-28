@@ -22,7 +22,7 @@ class ArrayCodeGenerator(
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ) {
-        builder.apply {
+        builder.checkForNullAndWrite(valueName, bufferName) {
             forEach(valueName, typeMeta.type, beforeFor = {
                 addStatement("${bufferName}.write(${it}.length)")
             }) {
@@ -66,7 +66,7 @@ class ArrayCodeGenerator(
             generateGetSizeCodePrimitiveEvenArray(valueName, context)
         } else {
             generateGetSizeCodeArray(valueName, context, builder)
-        }
+        } + SizePart.Constant(ByteBuffer.BYTE_BYTES) // whether value byte
     }
 
     private fun generateGetSizeCodeArray(

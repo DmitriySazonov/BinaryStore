@@ -18,15 +18,20 @@ class ClassCodeGenerator(
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ) {
-        val adapterName = if (metaType.staticType) {
-            context.getOrCreateAdapterFieldFor(metaType.type)
-        } else {
-            generateAdapterByClass(context, valueName, builder)
+        builder.checkForNullAndWrite(valueName, bufferName) {
+            val adapterName = if (metaType.staticType) {
+                context.getOrCreateAdapterFieldFor(metaType.type)
+            } else {
+                generateAdapterByClass(context, valueName, builder)
+            }
+            if (!metaType.staticType) {
+                addStatement("${adapterName}.${invoke_key()}.${invoke_saveTo(bufferName)}")
+            }
+            addStatement("${adapterName}.${
+                BinaryAdapterGeneratorHelper
+                        .invoke_serialize(valueName, bufferName)
+            }")
         }
-        if (!metaType.staticType) {
-            builder.addStatement("${adapterName}.${invoke_key()}.${invoke_saveTo(bufferName)}")
-        }
-        builder.addStatement("${adapterName}.serialize($bufferName, $valueName)")
     }
 
     override fun generateDeserialize(

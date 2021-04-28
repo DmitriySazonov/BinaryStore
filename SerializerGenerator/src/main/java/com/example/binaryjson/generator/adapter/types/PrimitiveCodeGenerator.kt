@@ -10,6 +10,7 @@ class PrimitiveCodeGenerator(
 ) : TypeCodeGenerator {
 
     private val type = typeMeta.type
+    private val isBoxed = typeMeta.type.isBoxedPrimitive
 
     override fun generateSerialize(
             valueName: String,
@@ -17,7 +18,13 @@ class PrimitiveCodeGenerator(
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ) {
-        builder.addStatement("${bufferName}.write(${valueName})")
+        if (isBoxed) {
+            builder.checkForNullAndWrite(valueName, bufferName) {
+                builder.addStatement("${bufferName}.write(${valueName})")
+            }
+        } else {
+            builder.addStatement("${bufferName}.write(${valueName})")
+        }
     }
 
     override fun generateDeserialize(
