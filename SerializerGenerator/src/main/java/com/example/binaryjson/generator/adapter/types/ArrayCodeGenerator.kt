@@ -37,15 +37,16 @@ class ArrayCodeGenerator(
             builder: CodeBlock.Builder,
     ): TypeCodeGenerator.ValueName {
         val returnName = context.generateValName()
-        builder.apply {
-            val arrayDefine = (0 until deep).joinToString("") { "[]" }
-            val arrayDimension = { deep: Int ->
-                (0 until deep).joinToString("") {
-                    if (it == 0) "[${bufferName}.readInt()]" else "[]"
-                }
+        val arrayDefine = (0 until deep).joinToString("") { "[]" }
+        val arrayDimension = { deep: Int ->
+            (0 until deep).joinToString("") {
+                if (it == 0) "[${bufferName}.readInt()]" else "[]"
             }
-            addStatement("\$T$arrayDefine $returnName", baseType)
-            var deep = deep
+        }
+        var deep = deep
+        builder.addStatement("\$T$arrayDefine $returnName", baseType)
+
+        builder.checkForNullInBuffer(bufferName, nonnullCode = {
             forEach(returnName, typeMeta.type, beforeFor = {
                 addStatement("$it = new \$T${arrayDimension(deep--)}", baseType)
             }) {
@@ -53,7 +54,9 @@ class ArrayCodeGenerator(
                         .generateDeserialize(bufferName, context, builder)
                 addStatement("$it = ${value.name}")
             }
-        }
+        }, nullCode = {
+            addStatement("$returnName = null")
+        })
         return TypeCodeGenerator.ValueName(returnName)
     }
 
@@ -62,21 +65,28 @@ class ArrayCodeGenerator(
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ): List<SizePart> {
-        return if (typeMeta.even && typeMeta.baseTypeMeta is TypeMeta.Primitive) {
-            generateGetSizeCodePrimitiveEvenArray(valueName, context)
-        } else {
-            generateGetSizeCodeArray(valueName, context, builder)
-        } + SizePart.Constant(ByteBuffer.BYTE_BYTES) // whether value byte
+        val accumulatorName = context.generateValName()
+        builder.addStatement("int $accumulatorName = 0")
+        builder.checkForNull(valueName, nonnullCode = {
+            if (typeMeta.even && typeMeta.baseTypeMeta is TypeMeta.Primitive) {
+                generateGetSizeCodePrimitiveEvenArray(valueName, accumulatorName, builder)
+            } else {
+                generateGetSizeCodeArray(valueName, accumulatorName, context, builder)
+            }
+        })
+        return listOf(
+                SizePart.Expression(accumulatorName),
+                SizePart.Constant(CHECK_FOR_NULL_SIZE)
+        )
     }
 
     private fun generateGetSizeCodeArray(
             valueName: String,
+            accumulatorName: String,
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
-    ): List<SizePart> {
-        val accumulator = context.generateValName()
+    ) {
         builder.apply {
-            addStatement("int $accumulator = 0")
             forEach(valueName, typeMeta.type) {
                 val parts = factory.create(baseTypeMeta)
                         .generateGetSize(it, context, builder)
@@ -85,20 +95,18 @@ class ArrayCodeGenerator(
                         is SizePart.Constant -> "${part.size}"
                         is SizePart.Expression -> part.expression
                     }
-                    addStatement("$accumulator += $expression")
+                    addStatement("$accumulatorName += $expression")
                 }
             }
+            addStatement("$accumulatorName += ${ByteBuffer.INTEGER_BYTES * deep}")
         }
-        return listOf(
-                SizePart.Expression(accumulator),
-                SizePart.Constant(ByteBuffer.INTEGER_BYTES * deep)
-        )
     }
 
     private fun generateGetSizeCodePrimitiveEvenArray(
             valueName: String,
-            context: TypeCodeGenerator.Context,
-    ): List<SizePart> {
+            accumulatorName: String,
+            builder: CodeBlock.Builder
+    ) {
         val size = baseType.getPrimitiveSize()
         val arrayDimension = { it: Int ->
             (0 until it).joinToString("") { "[0]" }
@@ -107,9 +115,6 @@ class ArrayCodeGenerator(
         repeat(deep) {
             expression += " * ${valueName}${arrayDimension(it)}.length"
         }
-        return listOf(
-                SizePart.Expression(expression),
-                SizePart.Constant(ByteBuffer.INTEGER_BYTES * deep)
-        )
+        builder.addStatement("$accumulatorName += $expression + ${ByteBuffer.INTEGER_BYTES * deep}")
     }
 }

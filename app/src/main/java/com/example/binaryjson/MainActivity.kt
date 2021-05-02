@@ -37,6 +37,6 @@ class MainActivity : AppCompatActivity() {
         val compare = ObjectComparator.compare(value, newValue)
         compare.toString()
 
-//        JSONCompareMeasure(this).start()
+        JSONCompareMeasure(this).start()
     }
 }

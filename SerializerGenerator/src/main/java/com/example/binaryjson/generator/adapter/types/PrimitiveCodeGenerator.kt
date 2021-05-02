@@ -1,9 +1,9 @@
 package com.example.binaryjson.generator.adapter.types
 
+import com.example.binaryjson.generator.BufferGeneratorHelper
 import com.example.binaryjson.generator.TypeMeta
 import com.example.binaryjson.generator.adapter.getPrimitiveSize
 import com.squareup.javapoet.CodeBlock
-import java.util.*
 
 class PrimitiveCodeGenerator(
         private val typeMeta: TypeMeta.Primitive,
@@ -33,8 +33,19 @@ class PrimitiveCodeGenerator(
             builder: CodeBlock.Builder,
     ): TypeCodeGenerator.ValueName {
         val valueName = context.generateValName()
-        val deserializeCode = "${bufferName}.read${type.toString().capitalize(Locale.ROOT)}()"
-        builder.addStatement("final $type $valueName = $deserializeCode")
+        val primitiveType = type.unbox()
+        val deserializeCode = bufferName +
+                ".${BufferGeneratorHelper.invoke_readByType(primitiveType)}"
+        if (isBoxed) {
+            builder.addStatement("final \$T $valueName", type)
+            builder.checkForNullInBuffer(bufferName, nonnullCode = {
+                addStatement("$valueName = $deserializeCode")
+            }, nullCode = {
+                addStatement("$valueName = null")
+            })
+        } else {
+            builder.addStatement("final $type $valueName = $deserializeCode")
+        }
         return TypeCodeGenerator.ValueName(valueName)
     }
 
@@ -44,6 +55,7 @@ class PrimitiveCodeGenerator(
             builder: CodeBlock.Builder,
     ): List<TypeCodeGenerator.SizePart> {
         return listOf(
+                TypeCodeGenerator.SizePart.Constant(if (isBoxed) CHECK_FOR_NULL_SIZE else 0),
                 TypeCodeGenerator.SizePart.Constant(type.getPrimitiveSize())
         )
     }
