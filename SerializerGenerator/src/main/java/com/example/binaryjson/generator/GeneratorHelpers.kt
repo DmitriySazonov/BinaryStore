@@ -50,6 +50,9 @@ object BufferGeneratorHelper {
     val clazz = ByteBuffer::class.java
     val type = ClassName.get(clazz)
 
+    const val TRUE_CONST = "TRUE"
+    const val FALSE_CONST = "FALSE"
+
     fun invoke_readByte(): String = "readByte()"
 
     fun invoke_readByType(typeName: TypeName): String =

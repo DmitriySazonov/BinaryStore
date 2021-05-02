@@ -2,6 +2,9 @@ package com.binarystore.buffer;
 
 public interface ByteBuffer {
 
+    byte TRUE = 1;
+    byte FALSE = 0;
+
     int BOOLEAN_BYTES = 1;
     int BYTE_BYTES = 1;
     int CHAR_BYTES = 2;
