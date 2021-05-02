@@ -8,6 +8,7 @@ import com.binarystore.buffer.StaticByteBuffer
 import com.binarystore.meta.MetadataStoreInMemory
 import com.example.binaryjson.MainActivity
 import com.example.binaryjson.benchmark.Benchmark
+import com.example.binaryjson.compare.ObjectComparator
 import com.example.binaryjson.test.StoryResponse
 import com.example.binaryjson.test.StoryResponseParser
 import org.json.JSONObject
@@ -81,6 +82,7 @@ class JSONCompareMeasure(context: Context) {
         String(this.json.toByteArray(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
         benchmark.end(CompareCaseSuite.TO_BYTE_ARRAY)
 
+        val compare = ObjectComparator.compare(response, desResponse)
         desResponse.toString()
     }
 }

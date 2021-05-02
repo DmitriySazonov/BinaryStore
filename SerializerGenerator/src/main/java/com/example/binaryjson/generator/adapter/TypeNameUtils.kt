@@ -7,7 +7,7 @@ import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
 
 fun TypeName.getPrimitiveSize(): Int {
-    return when (toString()) {
+    return when (unbox().toString()) {
         "boolean" -> ByteBuffer.BOOLEAN_BYTES
         "byte" -> ByteBuffer.BYTE_BYTES
         "short" -> ByteBuffer.SHORT_BYTES

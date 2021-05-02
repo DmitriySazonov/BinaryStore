@@ -1,43 +1,40 @@
 package com.binarystore.adapter.boxed;
 
+import com.binarystore.adapter.AbstractBinaryAdapter;
 import com.binarystore.adapter.AdapterFactory;
-import com.binarystore.adapter.BaseBinaryAdapter;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.SingletonAdapterFactory;
 import com.binarystore.buffer.ByteBuffer;
 
-public class FloatBinaryAdapter extends BaseBinaryAdapter<Float> {
+import javax.annotation.Nonnull;
+
+public class FloatBinaryAdapter extends AbstractBinaryAdapter<Float> {
 
     private static final Key.Int ID = DefaultAdapters.FLOAT;
 
-    private static final int NULL_SIZE = ByteBuffer.BOOLEAN_BYTES;
-    private static final int FULL_SIZE = NULL_SIZE + ByteBuffer.FLOAT_BYTES;
     public static final AdapterFactory<Float, FloatBinaryAdapter> factory =
             new SingletonAdapterFactory<>(ID, new FloatBinaryAdapter());
 
+    @Nonnull
     @Override
     public Key.Int key() {
         return ID;
     }
 
     @Override
-    public int getSize(Float value) throws Exception {
-        return value == null ? NULL_SIZE : FULL_SIZE;
+    public int getSize(@Nonnull Float value) throws Exception {
+        return ByteBuffer.FLOAT_BYTES;
     }
 
     @Override
-    public void serialize(ByteBuffer byteBuffer, Float value) throws Exception {
-        if (value != null) {
-            byteBuffer.write(true);
-            byteBuffer.write(value);
-        } else {
-            byteBuffer.write(false);
-        }
+    public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull Float value) throws Exception {
+        byteBuffer.write(value);
     }
 
+    @Nonnull
     @Override
-    public Float deserialize(ByteBuffer byteBuffer) throws Exception {
-        return byteBuffer.readBoolean() ? byteBuffer.readFloat() : null;
+    public Float deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception {
+        return byteBuffer.readFloat();
     }
 }

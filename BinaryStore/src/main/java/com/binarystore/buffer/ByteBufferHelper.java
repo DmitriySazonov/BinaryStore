@@ -2,8 +2,8 @@ package com.binarystore.buffer;
 
 public class ByteBufferHelper {
 
-    private static final byte TRUE = 1;
-    private static final byte FALSE = 0;
+    private static final byte TRUE = ByteBuffer.TRUE;
+    private static final byte FALSE = ByteBuffer.FALSE;
 
     public static void write(final byte[] bytes, int offset, final boolean value) {
         bytes[offset] = value ? TRUE : FALSE;

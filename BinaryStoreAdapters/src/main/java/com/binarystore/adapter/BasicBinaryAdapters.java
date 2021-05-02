@@ -23,6 +23,7 @@ public class BasicBinaryAdapters {
         register.register(Long.class, LongBinaryAdapter.factory);
         register.register(Float.class, FloatBinaryAdapter.factory);
         register.register(Double.class, DoubleBinaryAdapter.factory);
+
         register.register(String.class, StringBinaryAdapter.factory);
 
         register.register(TreeMap.class, TreeMapBinaryAdapter.factory);

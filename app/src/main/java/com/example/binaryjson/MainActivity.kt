@@ -7,6 +7,7 @@ import com.binarystore.BinaryAdapterManager
 import com.binarystore.adapter.BasicBinaryAdapters
 import com.binarystore.buffer.StaticByteBuffer
 import com.binarystore.meta.MetadataStoreInMemory
+import com.example.binaryjson.compare.ObjectComparator
 import com.example.binaryjson.measure.JSONCompareMeasure
 
 class MainActivity : AppCompatActivity() {
@@ -32,8 +33,10 @@ class MainActivity : AppCompatActivity() {
         adapter.serialize(buffer, value)
         buffer.offset = 0
         val newValue = adapter.deserialize(buffer)
-        newValue.toString()
 
-//        JSONCompareMeasure(this).start()
+        val compare = ObjectComparator.compare(value, newValue)
+        compare.toString()
+
+        JSONCompareMeasure(this).start()
     }
 }

@@ -12,6 +12,7 @@ import javax.annotation.processing.RoundEnvironment
 import javax.annotation.processing.SupportedAnnotationTypes
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
+import javax.lang.model.element.VariableElement
 import javax.tools.Diagnostic
 
 @SupportedAnnotationTypes(value = ["com.binarystore.Persistable"])
@@ -43,14 +44,16 @@ class BinaryAdapterGenerator : AbstractProcessor() {
 
     private fun processPersistable(roundEnv: RoundEnvironment): List<ClassName> {
         val clazz = Persistable::class.java
+        val adapterBuilder = AdapterBuilder(processingEnv)
         return roundEnv.getElementsAnnotatedWith(clazz).mapNotNull { element ->
             if (element !is TypeElement) return@mapNotNull null
-            val visitor = BinaryAdapterVisitor()
             try {
-                val collector = FieldsCollector(element)
-                element.accept(visitor, collector)
+                val collector = FieldsCollector(element, processingEnv)
+                processingEnv.elementUtils.getAllMembers(element).forEach {
+                    collector.addField(it as? VariableElement ?: return@forEach)
+                }
                 val metadata = element.getMetadata(collector.fields)
-                val javaFile = AdapterBuilder().build(metadata)
+                val javaFile = adapterBuilder.build(metadata)
                 FileHelper.write(processingEnv, javaFile)
                 ClassName.get(javaFile.packageName, javaFile.typeSpec.name)
             } catch (e: Throwable) {

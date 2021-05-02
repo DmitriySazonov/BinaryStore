@@ -2,13 +2,17 @@ package com.binarystore.adapter;
 
 import com.binarystore.buffer.ByteBuffer;
 
+import javax.annotation.Nonnull;
+
 public interface BinaryAdapter<T> {
 
+    @Nonnull
     Key<?> key();
 
-    int getSize(T value) throws Exception;
+    int getSize(@Nonnull T value) throws Exception;
 
-    void serialize(ByteBuffer byteBuffer, T value) throws Exception;
+    void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull T value) throws Exception;
 
-    T deserialize(ByteBuffer byteBuffer) throws Exception;
+    @Nonnull
+    T deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception;
 }

@@ -19,11 +19,13 @@ public class HashMapBinaryAdapter extends AbstractMapBinaryAdapter<HashMap> {
         super(provider);
     }
 
+    @Nonnull
     @Override
     protected HashMap<?, ?> createMap(int size) {
         return new HashMap<>(size, 1f);
     }
 
+    @Nonnull
     @Override
     public Key<?> key() {
         return KEY;
