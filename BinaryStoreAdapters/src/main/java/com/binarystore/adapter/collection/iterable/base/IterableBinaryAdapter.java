@@ -8,7 +8,7 @@ import com.binarystore.buffer.ByteBuffer;
 
 import javax.annotation.Nonnull;
 
-public abstract class IterableBinaryAdapter<T extends Iterable> extends AbstractCollectionBinaryAdapter<T> {
+public abstract class IterableBinaryAdapter<T extends Iterable<?>> extends AbstractCollectionBinaryAdapter<T> {
 
     private final BinaryAdapterProvider adapterProvider;
 
@@ -28,6 +28,8 @@ public abstract class IterableBinaryAdapter<T extends Iterable> extends Abstract
         adapterProvider = provider;
     }
 
+    abstract  int getCollectionSize();
+
     @Override
     public int getSize(@Nonnull T value) throws Exception {
         final Adapters adapters = new Adapters();
@@ -45,7 +47,25 @@ public abstract class IterableBinaryAdapter<T extends Iterable> extends Abstract
 
     @Override
     public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull T value) throws Exception {
-        super.serialize(byteBuffer, value);
+        int index = 0;
+        int collectionSize = getCollectionSize();
+        final Adapters adapters = new Adapters();
+        final int[] offsets = new int[collectionSize];
+        byteBuffer.write(collectionSize);
+        final int startOffset = byteBuffer.getOffset();
+        byteBuffer.moveOffset(collectionSize * ByteBuffer.INTEGER_BYTES);
+        for (Object element : value) {
+            offsets[index++] = byteBuffer.getOffset();
+            adapters.setValueClass(element.getClass());
+            adapters.lastValueAdapter.key().saveTo(byteBuffer);
+            adapters.lastValueAdapter.serialize(byteBuffer, element);
+        }
+        final int endOffset = byteBuffer.getOffset();
+        byteBuffer.setOffset(startOffset);
+        for (int offset : offsets) {
+            byteBuffer.write(offset);
+        }
+        byteBuffer.setOffset(endOffset);
     }
 
 
