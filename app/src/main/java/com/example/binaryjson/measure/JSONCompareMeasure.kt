@@ -57,7 +57,7 @@ class JSONCompareMeasure(context: Context) {
         benchmark.end(CompareCaseSuite.PARSE_FROM_JSON)
 
         benchmark.start(CompareCaseSuite.GET_ADAPTER)
-        val adapter = provider.getAdapterForClass(StoryResponse::class.java)!!
+        val adapter = provider.getAdapterForClass(StoryResponse::class.java, null)!!
         benchmark.end(CompareCaseSuite.GET_ADAPTER)
 
         benchmark.start(CompareCaseSuite.GET_SIZE)

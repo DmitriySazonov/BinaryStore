@@ -1,15 +1,17 @@
 package com.binarystore.adapter;
 
 public @interface DefaultAdapters {
-    Key.Int BOOLEAN = new Key.Int(IdProvider.sId(1));
-    Key.Int BYTE = new Key.Int(IdProvider.sId(2));
-    Key.Int SHORT = new Key.Int(IdProvider.sId(3));
-    Key.Int INT = new Key.Int(IdProvider.sId(4));
-    Key.Int LONG = new Key.Int(IdProvider.sId(5));
-    Key.Int FLOAT = new Key.Int(IdProvider.sId(6));
-    Key.Int DOUBLE = new Key.Int(IdProvider.sId(7));
-    Key.Int STRING = new Key.Int(IdProvider.sId(8));
+    Key.Byte BOOLEAN = new Key.Byte((byte) 1);
+    Key.Byte BYTE = new Key.Byte((byte) 2);
+    Key.Byte SHORT = new Key.Byte((byte) 3);
+    Key.Byte INT = new Key.Byte((byte) 4);
+    Key.Byte LONG = new Key.Byte((byte) 5);
+    Key.Byte FLOAT = new Key.Byte((byte) 6);
+    Key.Byte DOUBLE = new Key.Byte((byte) 7);
+    Key.Byte STRING = new Key.Byte((byte) 8);
 
-    Key.Int TREE_MAP = new Key.Int(IdProvider.sId(9));
-    Key.Int HASH_MAP = new Key.Int(IdProvider.sId(10));
+    Key.Byte TREE_MAP = new Key.Byte((byte) 9);
+    Key.Byte HASH_MAP = new Key.Byte((byte) 10);
+
+    Key.Byte NULL = new Key.Byte((byte) 11);
 }

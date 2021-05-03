@@ -40,7 +40,7 @@ object FullFlowMeasure {
         provider.resolveAllAdapters()
         benchmark.end(FullFlowCaseSuite.RESOLVE)
         benchmark.start(FullFlowCaseSuite.GET_ADAPTER)
-        val adapter = provider.getAdapterForClass(TestClass::class.java) ?: return
+        val adapter = provider.getAdapterForClass(TestClass::class.java, null)!!
         benchmark.end(FullFlowCaseSuite.GET_ADAPTER)
         val testClass = TestClass("Напишу ка я что-то по русски", "world")
         benchmark.start(FullFlowCaseSuite.GET_SIZE)

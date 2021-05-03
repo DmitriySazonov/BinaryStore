@@ -7,6 +7,7 @@ import com.binarystore.adapter.Key;
 
 import java.util.HashMap;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
@@ -15,8 +16,11 @@ public class HashMapBinaryAdapter extends AbstractMapBinaryAdapter<HashMap> {
     public static final Factory factory = new Factory();
     private static final Key<?> KEY = DefaultAdapters.HASH_MAP;
 
-    protected HashMapBinaryAdapter(BinaryAdapterProvider provider) {
-        super(provider);
+    protected HashMapBinaryAdapter(
+            @Nonnull BinaryAdapterProvider provider,
+            @CheckForNull MapSettings settings
+    ) {
+        super(provider, settings);
     }
 
     @Nonnull
@@ -41,7 +45,7 @@ public class HashMapBinaryAdapter extends AbstractMapBinaryAdapter<HashMap> {
         @Nonnull
         @Override
         public HashMapBinaryAdapter create(@Nonnull Context context) {
-            return new HashMapBinaryAdapter(context.provider);
+            return new HashMapBinaryAdapter(context.provider, context.get(MapSettings.class, null));
         }
     }
 }

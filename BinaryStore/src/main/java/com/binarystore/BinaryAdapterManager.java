@@ -5,6 +5,8 @@ import com.binarystore.adapter.AdapterFactoryRegister;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
+import com.binarystore.dependency.Dependencies;
+import com.binarystore.dependency.EmptyDependencies;
 import com.binarystore.meta.MetadataStore;
 
 import java.util.HashMap;
@@ -37,21 +39,24 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     private final HashMap<Key<?>, AdapterEntry> idToEntry = new HashMap<>();
     private final HashMap<Class<?>, AdapterEntry> classToEntry = new HashMap<>();
 
-    private final AdapterFactory.Context factoryContext;
+    private final AdapterFactory.Context defaultFactoryContext;
 
     public BinaryAdapterManager(MetadataStore metadataStore) {
-        factoryContext = new AdapterFactory.Context(this, metadataStore);
+        defaultFactoryContext = new AdapterFactory.Context(this, EmptyDependencies.instance);
     }
 
     public void resolveAllAdapters() throws Exception {
         for (Map.Entry<Class<?>, AdapterEntry> entry : classToEntry.entrySet()) {
-            entry.getValue().getAdapter(factoryContext);
+            entry.getValue().getAdapter(defaultFactoryContext);
         }
     }
 
     @Override
-    public <T, B extends BinaryAdapter<T>> B createAdapter(AdapterFactory<T, B> factory) throws Exception {
-        B adapter = factory.create(factoryContext);
+    public <T, B extends BinaryAdapter<T>> B createAdapter(
+            @Nonnull AdapterFactory<T, B> factory,
+            @CheckForNull Dependencies dependencies
+    ) throws Exception {
+        B adapter = factory.create(defaultFactoryContext);
         checkIdEqual(adapter.key(), factory.adapterKey());
         return adapter;
     }
@@ -59,9 +64,12 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     @Override
     @CheckForNull
     @SuppressWarnings("unchecked")
-    public <B extends BinaryAdapter<?>> B getAdapterByClass(Class<B> clazz) throws Exception {
+    public <B extends BinaryAdapter<?>> B getAdapterByClass(
+            @Nonnull Class<B> clazz,
+            @CheckForNull Dependencies dependencies
+    ) throws Exception {
         for (Map.Entry<?, AdapterEntry> entry : idToEntry.entrySet()) {
-            BinaryAdapter<?> adapter = entry.getValue().getAdapter(factoryContext);
+            BinaryAdapter<?> adapter = entry.getValue().getAdapter(defaultFactoryContext);
             if (clazz.isInstance(adapter)) {
                 return (B) adapter;
             }
@@ -82,16 +90,22 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     @Override
     @CheckForNull
     @SuppressWarnings("unchecked")
-    public <T> BinaryAdapter<T> getAdapterForClass(@Nonnull Class<T> clazz) throws Exception {
+    public <T> BinaryAdapter<T> getAdapterForClass(
+            @Nonnull Class<T> clazz,
+            @CheckForNull Dependencies dependencies
+    ) throws Exception {
         AdapterEntry entry = classToEntry.get(clazz);
-        return entry != null ? (BinaryAdapter<T>) entry.getAdapter(factoryContext) : null;
+        return entry != null ? (BinaryAdapter<T>) entry.getAdapter(defaultFactoryContext) : null;
     }
 
     @Override
     @CheckForNull
-    public BinaryAdapter<?> getAdapterByKey(Key<?> key) throws Exception {
+    public BinaryAdapter<?> getAdapterByKey(
+            @Nonnull Key<?> key,
+            @CheckForNull Dependencies dependencies
+    ) throws Exception {
         AdapterEntry entry = idToEntry.get(key);
-        return entry != null ? entry.getAdapter(factoryContext) : null;
+        return entry != null ? entry.getAdapter(defaultFactoryContext) : null;
     }
 
     private static void checkIdEqual(Key<?> adapterId, Key<?> factoryId) throws IllegalStateException {

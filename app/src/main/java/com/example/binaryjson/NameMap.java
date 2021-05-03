@@ -3,6 +3,7 @@ package com.example.binaryjson;
 import com.binarystore.InjectType;
 import com.binarystore.Persistable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -12,7 +13,7 @@ public class NameMap {
     int lastId = 0;
     int[] arr;
     Integer lastIdBox = 0;
-    Map<String, Integer> nameMap = new TreeMap<>();
+    Map<String, Integer> nameMap = new HashMap<>();
 
     public int getIdOrPut(final String name) {
         final Integer id = nameMap.get(name);

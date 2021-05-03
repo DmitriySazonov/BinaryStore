@@ -11,6 +11,7 @@ public abstract class Key<T extends Key<?>> implements Comparable<T> {
 
     private final static byte STRING = 1;
     private final static byte INT = 2;
+    private final static byte BYTE = 3;
 
     public static Key<?> read(ByteBuffer byteBuffer) throws IllegalArgumentException {
         final byte keyType = byteBuffer.readByte();
@@ -19,6 +20,8 @@ public abstract class Key<T extends Key<?>> implements Comparable<T> {
             return new String(byteBuffer.readString(length));
         } else if (keyType == INT) {
             return new Int(byteBuffer.readInt());
+        } else if (keyType == BYTE) {
+            return new Byte(byteBuffer.readByte());
         } else {
             throw new IllegalArgumentException("Unknown id of key - " + keyType);
         }
@@ -37,6 +40,55 @@ public abstract class Key<T extends Key<?>> implements Comparable<T> {
             return -1;
         }
         return 0;
+    }
+
+    /**
+     * Do not use. Reserve for inner adapters
+     */
+    public static class Byte extends Key<Byte> {
+
+        public final byte value;
+        private final int size;
+
+        Byte(byte value) {
+            this.value = value;
+            this.size = ByteBuffer.BYTE_BYTES * 2;
+        }
+
+        @Override
+        public int compareTo(@CheckForNull Byte key) {
+            final int compare = super.compareTo(key);
+            return compare == 0 && key != null ? java.lang.Byte.compare(value, key.value) : compare;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            final Byte key = (Byte) obj;
+            return value == key.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return value;
+        }
+
+        @Override
+        public java.lang.String toString() {
+            return "Byte{value=" + value + '}';
+        }
+
+        @Override
+        public int getSize() {
+            return size;
+        }
+
+        @Override
+        public void saveTo(ByteBuffer byteBuffer) {
+            byteBuffer.write(BYTE);
+            byteBuffer.write(value);
+        }
     }
 
     public static class String extends Key<String> {

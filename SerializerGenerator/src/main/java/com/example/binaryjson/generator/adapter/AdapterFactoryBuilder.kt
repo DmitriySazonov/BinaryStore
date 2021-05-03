@@ -74,8 +74,7 @@ object AdapterFactoryBuilder {
                     }.build()
             )
             val provider = "${FACTORY_CONTEXT_NAME}.provider"
-            val metadataStore = "${FACTORY_CONTEXT_NAME}.metadataStore"
-            addCode("return new \$T($provider, $metadataStore);", adapterClassName)
+            addCode("return new \$T($provider);", adapterClassName)
             returns(adapterClassName)
         }.build()
     }

@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 
 public class BooleanBinaryAdapter extends AbstractBinaryAdapter<Boolean> {
 
-    private static final Key.Int ID = DefaultAdapters.BOOLEAN;
+    private static final Key.Byte ID = DefaultAdapters.BOOLEAN;
 
     private static final byte TRUE = 1;
     private static final byte FALSE = 0;
@@ -20,7 +20,7 @@ public class BooleanBinaryAdapter extends AbstractBinaryAdapter<Boolean> {
 
     @Nonnull
     @Override
-    public Key.Int key() {
+    public Key.Byte key() {
         return ID;
     }
 
