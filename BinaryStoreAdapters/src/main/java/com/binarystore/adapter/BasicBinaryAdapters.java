@@ -16,6 +16,7 @@ import com.binarystore.adapter.map.LinkedHashMapBinaryAdapter;
 import com.binarystore.adapter.map.MapBinaryAdapter;
 import com.binarystore.adapter.map.TreeMapBinaryAdapter;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -49,5 +50,7 @@ public class BasicBinaryAdapters {
 
         register.register(Class.class, ClassBinaryAdapter.factory);
         register.register(Enum.class, EnumBinaryAdapter.factory);
+
+        register.register(ArrayList.class, ArrayListBinaryAdapter.factory);
     }
 }

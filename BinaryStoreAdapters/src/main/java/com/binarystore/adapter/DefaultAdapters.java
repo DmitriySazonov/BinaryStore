@@ -19,6 +19,7 @@ public @interface DefaultAdapters {
     Key.Byte ENUM_MAP = new Key.Byte((byte) 14);
     Key.Byte MAP = new Key.Byte((byte) 15);
 
+    Key.Byte ARRAY_LIST = new Key.Byte((byte) 20);
 
     Key.Byte NULL = new Key.Byte((byte) 100);
     Key.Byte CLASS = new Key.Byte((byte) 101);

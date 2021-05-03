@@ -1,22 +1,28 @@
 package com.binarystore.adapter.collection.iterable.base;
 
-import com.binarystore.adapter.AbstractCollectionBinaryAdapter;
+import com.binarystore.adapter.AbstractBinaryAdapter;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
+import com.binarystore.adapter.NullBinaryAdapter;
+import com.binarystore.adapter.collection.iterable.settings.CollectionSettings;
 import com.binarystore.buffer.ByteBuffer;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public abstract class IterableBinaryAdapter<T extends Iterable<?>> extends AbstractCollectionBinaryAdapter<T> {
+public abstract class IterableBinaryAdapter<T extends Iterable> extends AbstractBinaryAdapter<T> {
 
+    @Nonnull
+    private final CollectionSettings settings;
     private final BinaryAdapterProvider adapterProvider;
 
     protected class Adapters {
         Class<?> lastValueClass = null;
         BinaryAdapter<Object> lastValueAdapter = null;
 
-        void setValueClass(Class<?> valueClass) throws Exception {
+        void setValueClass(@CheckForNull Object value) throws Exception {
+            final Class<?> valueClass = value != null ? value.getClass() : null;
             if (valueClass != lastValueClass) {
                 lastValueClass = valueClass;
                 lastValueAdapter = getAdapterForClass(valueClass);
@@ -24,11 +30,15 @@ public abstract class IterableBinaryAdapter<T extends Iterable<?>> extends Abstr
         }
     }
 
-    protected IterableBinaryAdapter(final BinaryAdapterProvider provider) {
-        adapterProvider = provider;
+    protected IterableBinaryAdapter(
+            @Nonnull final BinaryAdapterProvider provider,
+            @CheckForNull final CollectionSettings settings
+    ) {
+        this.adapterProvider = provider;
+        this.settings = settings != null ? settings : CollectionSettings.defaultSettings;
     }
 
-    abstract  int getCollectionSize();
+    abstract int getCollectionSize(T collection);
 
     @Override
     public int getSize(@Nonnull T value) throws Exception {
@@ -48,7 +58,7 @@ public abstract class IterableBinaryAdapter<T extends Iterable<?>> extends Abstr
     @Override
     public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull T value) throws Exception {
         int index = 0;
-        int collectionSize = getCollectionSize();
+        int collectionSize = getCollectionSize(value);
         final Adapters adapters = new Adapters();
         final int[] offsets = new int[collectionSize];
         byteBuffer.write(collectionSize);
@@ -72,7 +82,12 @@ public abstract class IterableBinaryAdapter<T extends Iterable<?>> extends Abstr
     @Nonnull
     @SuppressWarnings("unchecked")
     protected BinaryAdapter<Object> getAdapterForKey(Key<?> key) throws Exception {
-        final BinaryAdapter<?> adapter = adapterProvider.getAdapterByKey(key);
+        final BinaryAdapter<?> adapter;
+        if (key.equals(NullBinaryAdapter.instance.key())) {
+            adapter = NullBinaryAdapter.instance;
+        } else {
+            adapter = adapterProvider.getAdapterByKey(key, null);
+        }
         if (adapter == null) {
             throw new IllegalArgumentException("Couldn't find adapter for class " + key);
         }
@@ -82,7 +97,12 @@ public abstract class IterableBinaryAdapter<T extends Iterable<?>> extends Abstr
     @Nonnull
     @SuppressWarnings("unchecked")
     protected BinaryAdapter<Object> getAdapterForClass(Class<?> clazz) throws Exception {
-        final BinaryAdapter<?> adapter = adapterProvider.getAdapterForClass(clazz);
+        final BinaryAdapter<?> adapter;
+        if (clazz == null) {
+            adapter = NullBinaryAdapter.instance;
+        } else {
+            adapter = adapterProvider.getAdapterForClass(clazz, null);
+        }
         if (adapter == null) {
             throw new IllegalArgumentException("Couldn't find adapter for class " + clazz);
         }

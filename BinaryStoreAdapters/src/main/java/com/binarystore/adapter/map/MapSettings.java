@@ -3,26 +3,24 @@ package com.binarystore.adapter.map;
 import com.binarystore.dependency.Property;
 
 import javax.annotation.CheckForNull;
+import com.binarystore.adapter.collection.UnknownItemStrategy;
+
 import javax.annotation.Nonnull;
 
 public final class MapSettings {
 
     public static MapSettings defaultSettings = new MapSettings(
-            ItemStrategy.SKIP, ItemStrategy.SKIP
+            UnknownItemStrategy.SKIP, UnknownItemStrategy.SKIP
     );
 
-    public enum ItemStrategy {
-        SKIP, THROW_EXCEPTION
-    }
-
     @Nonnull
-    public final ItemStrategy unknownItemStrategy;
+    public final UnknownItemStrategy unknownItemStrategy;
     @Nonnull
-    public final ItemStrategy exceptionItemStrategy;
+    public final UnknownItemStrategy exceptionItemStrategy;
 
     public MapSettings(
-            @Nonnull ItemStrategy unknownItemStrategy,
-            @Nonnull ItemStrategy exceptionItemStrategy
+            @Nonnull UnknownItemStrategy unknownItemStrategy,
+            @Nonnull UnknownItemStrategy exceptionItemStrategy
     ) {
         this.unknownItemStrategy = unknownItemStrategy;
         this.exceptionItemStrategy = exceptionItemStrategy;
