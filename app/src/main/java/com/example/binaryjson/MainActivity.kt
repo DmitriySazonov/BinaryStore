@@ -22,12 +22,14 @@ class MainActivity : AppCompatActivity() {
             BasicBinaryAdapters.registerInto(this)
             AdaptersRegistrator.registerInto(this)
         }
-        val adapter = provider.getAdapterForClass(NameMap::class.java)!!
+        val adapter = provider.getAdapterForClass(NameMap::class.java, null)!!
         val value = NameMap()
         value.lastId = 4
         repeat(10) {
             value.nameMap["key - $it"] = it
         }
+        value.nameMap[null] = 123
+        value.nameMap["123"] = null
         val size = adapter.getSize(value)
         val buffer = StaticByteBuffer(size)
         adapter.serialize(buffer, value)

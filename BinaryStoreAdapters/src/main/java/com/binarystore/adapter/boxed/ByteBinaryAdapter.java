@@ -11,14 +11,14 @@ import javax.annotation.Nonnull;
 
 public class ByteBinaryAdapter extends AbstractBinaryAdapter<Byte> {
 
-    private static final Key.Int ID = DefaultAdapters.BYTE;
+    private static final Key.Byte ID = DefaultAdapters.BYTE;
 
     public static final AdapterFactory<Byte, ByteBinaryAdapter> factory =
             new SingletonAdapterFactory<>(ID, new ByteBinaryAdapter());
 
     @Nonnull
     @Override
-    public Key.Int key() {
+    public Key.Byte key() {
         return ID;
     }
 

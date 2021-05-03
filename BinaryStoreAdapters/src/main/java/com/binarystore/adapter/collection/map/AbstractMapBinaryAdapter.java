@@ -1,35 +1,40 @@
 package com.binarystore.adapter.collection.map;
 
-import com.binarystore.adapter.AbstractCollectionBinaryAdapter;
+import com.binarystore.adapter.AbstractBinaryAdapter;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
+import com.binarystore.adapter.NullBinaryAdapter;
 import com.binarystore.buffer.ByteBuffer;
 
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractCollectionBinaryAdapter<T> {
+public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBinaryAdapter<T> {
 
     private class Adapters {
-        Class<?> lastKeyClass = null;
-        Class<?> lastValueClass = null;
         Key<?> lastKeyKey = null;
         Key<?> lastValueKey = null;
         BinaryAdapter<Object> lastKeyAdapter = null;
         BinaryAdapter<Object> lastValueAdapter = null;
 
-        void setKeyClass(Class<?> keyClass) throws Exception {
+        private Class<?> lastKeyClass = null;
+        private Class<?> lastValueClass = null;
+
+        void setKeyClass(@CheckForNull Object key) throws Exception {
+            final Class<?> keyClass = key != null ? key.getClass() : null;
             if (keyClass != lastKeyClass) {
                 lastKeyClass = keyClass;
                 lastKeyAdapter = getAdapterForClass(keyClass);
             }
         }
 
-        void setValueClass(Class<?> valueClass) throws Exception {
+        void setValueClass(@CheckForNull Object value) throws Exception {
+            final Class<?> valueClass = value != null ? value.getClass() : null;
             if (valueClass != lastValueClass) {
                 lastValueClass = valueClass;
                 lastValueAdapter = getAdapterForClass(valueClass);
@@ -51,10 +56,17 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractCo
         }
     }
 
+    @Nonnull
+    private final MapSettings settings;
+    @Nonnull
     private final BinaryAdapterProvider adapterProvider;
 
-    protected AbstractMapBinaryAdapter(final BinaryAdapterProvider provider) {
-        adapterProvider = provider;
+    protected AbstractMapBinaryAdapter(
+            @Nonnull final BinaryAdapterProvider provider,
+            @CheckForNull final MapSettings settings
+    ) {
+        this.adapterProvider = provider;
+        this.settings = settings != null ? settings : MapSettings.defaultSettings;
     }
 
     @Nonnull
@@ -62,13 +74,13 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractCo
 
     @Override
     @SuppressWarnings("unchecked")
-    public int getSize(@Nonnull T value, @Nonnull Settings settings) throws Exception {
+    public int getSize(@Nonnull T value) throws Exception {
         final Adapters adapters = new Adapters();
         int accumulator = key().getSize();
         final Set<Map.Entry> entries = value.entrySet();
         for (Map.Entry entry : entries) {
-            adapters.setKeyClass(entry.getKey().getClass());
-            adapters.setValueClass(entry.getValue().getClass());
+            adapters.setKeyClass(entry.getKey());
+            adapters.setValueClass(entry.getValue());
             accumulator += adapters.lastKeyAdapter.key().getSize();
             accumulator += adapters.lastValueAdapter.key().getSize();
             accumulator += adapters.lastKeyAdapter.getSize(entry.getKey());
@@ -81,7 +93,7 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractCo
 
     @Override
     @SuppressWarnings("unchecked")
-    public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull T value, @Nonnull Settings settings) throws Exception {
+    public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull T value) throws Exception {
         int index = 0;
         final Adapters adapters = new Adapters();
         final int[] offsets = new int[value.size()];
@@ -91,8 +103,8 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractCo
         final Set<Map.Entry> entries = value.entrySet();
         for (Map.Entry entry : entries) {
             offsets[index++] = byteBuffer.getOffset();
-            adapters.setKeyClass(entry.getKey().getClass());
-            adapters.setValueClass(entry.getValue().getClass());
+            adapters.setKeyClass(entry.getKey());
+            adapters.setValueClass(entry.getValue());
             adapters.lastKeyAdapter.key().saveTo(byteBuffer);
             adapters.lastValueAdapter.key().saveTo(byteBuffer);
             adapters.lastKeyAdapter.serialize(byteBuffer, entry.getKey());
@@ -109,7 +121,7 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractCo
     @Override
     @SuppressWarnings("unchecked")
     @Nonnull
-    public T deserialize(@Nonnull ByteBuffer byteBuffer, @Nonnull Settings settings) throws Exception {
+    public T deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception {
         final Adapters adapters = new Adapters();
         final int size = byteBuffer.readInt();
         final int startDataOffset = byteBuffer.readInt();
@@ -129,8 +141,13 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractCo
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    private BinaryAdapter<Object> getAdapterForKey(Key<?> key) throws Exception {
-        final BinaryAdapter<?> adapter = adapterProvider.getAdapterByKey(key);
+    private BinaryAdapter<Object> getAdapterForKey(@Nonnull Key<?> key) throws Exception {
+        final BinaryAdapter<?> adapter;
+        if (key.equals(NullBinaryAdapter.instance.key())) {
+            adapter = NullBinaryAdapter.instance;
+        } else {
+            adapter = adapterProvider.getAdapterByKey(key, null);
+        }
         if (adapter == null) {
             throw new IllegalArgumentException("Couldn't find adapter for class " + key);
         }
@@ -139,8 +156,13 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractCo
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    private BinaryAdapter<Object> getAdapterForClass(Class<?> clazz) throws Exception {
-        final BinaryAdapter<?> adapter = adapterProvider.getAdapterForClass(clazz);
+    private BinaryAdapter<Object> getAdapterForClass(@CheckForNull Class<?> clazz) throws Exception {
+        final BinaryAdapter<?> adapter;
+        if (clazz == null) {
+            adapter = NullBinaryAdapter.instance;
+        } else {
+            adapter = adapterProvider.getAdapterForClass(clazz, null);
+        }
         if (adapter == null) {
             throw new IllegalArgumentException("Couldn't find adapter for class " + clazz);
         }

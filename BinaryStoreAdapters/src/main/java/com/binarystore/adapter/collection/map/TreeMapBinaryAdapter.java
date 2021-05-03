@@ -7,6 +7,7 @@ import com.binarystore.adapter.Key;
 
 import java.util.TreeMap;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
@@ -15,8 +16,11 @@ public class TreeMapBinaryAdapter extends AbstractMapBinaryAdapter<TreeMap> {
     public static final Factory factory = new Factory();
     private static final Key<?> KEY = DefaultAdapters.TREE_MAP;
 
-    protected TreeMapBinaryAdapter(BinaryAdapterProvider provider) {
-        super(provider);
+    protected TreeMapBinaryAdapter(
+            @Nonnull BinaryAdapterProvider provider,
+            @CheckForNull MapSettings settings
+    ) {
+        super(provider, settings);
     }
 
     @Nonnull
@@ -42,7 +46,7 @@ public class TreeMapBinaryAdapter extends AbstractMapBinaryAdapter<TreeMap> {
         @Nonnull
         @Override
         public TreeMapBinaryAdapter create(@Nonnull Context context) {
-            return new TreeMapBinaryAdapter(context.provider);
+            return new TreeMapBinaryAdapter(context.provider, context.get(MapSettings.class, null));
         }
     }
 }

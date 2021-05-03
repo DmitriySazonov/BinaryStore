@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 public final class StringBinaryAdapter extends AbstractBinaryAdapter<String> {
 
     private static final String EMPTY = "";
-    private static final Key.Int ID = DefaultAdapters.STRING;
+    private static final Key.Byte ID = DefaultAdapters.STRING;
 
     private static final int NULL_SIZE = com.binarystore.buffer.ByteBuffer.BOOLEAN_BYTES;
     private static final int FULL_HEADER_SIZE = NULL_SIZE + ByteBuffer.INTEGER_BYTES;
@@ -17,7 +17,7 @@ public final class StringBinaryAdapter extends AbstractBinaryAdapter<String> {
 
     @Nonnull
     @Override
-    public Key.Int key() {
+    public Key.Byte key() {
         return ID;
     }
 

@@ -39,10 +39,10 @@ object AdapterProviderGeneratorHelper {
     val type = ClassName.get(clazz)
 
     fun invoke_getAdapterForClass(classExpression: String): String =
-            "getAdapterForClass($classExpression)"
+            "getAdapterForClass($classExpression, null)"
 
     fun invoke_getAdapterByKey(keyExpression: String): String =
-            "getAdapterByKey($keyExpression)"
+            "getAdapterByKey($keyExpression, null)"
 }
 
 object BufferGeneratorHelper {

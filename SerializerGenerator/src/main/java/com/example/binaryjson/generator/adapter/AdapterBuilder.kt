@@ -3,7 +3,6 @@ package com.example.binaryjson.generator.adapter
 import com.binarystore.InjectType
 import com.binarystore.adapter.BinaryAdapter
 import com.binarystore.adapter.BinaryAdapterProvider
-import com.binarystore.meta.MetadataStore
 import com.example.binaryjson.generator.AdapterProviderGeneratorHelper
 import com.example.binaryjson.generator.Field
 import com.example.binaryjson.generator.TypeMetadata
@@ -23,7 +22,6 @@ private const val BUFFER_NAME = "byteBuffer"
 private const val GET_KEY_METHOD = "key"
 
 private const val VALUE = "value"
-private const val META_STORE_FIELD = "metadataStore"
 private const val ADAPTER_PROVIDER_FIELD = "adapterProvider"
 private const val VERSION_FIELD = "versionId"
 private const val ADAPTER_FIELD_SUFFIX = "Adapter"
@@ -89,8 +87,6 @@ class AdapterBuilder(
             val uniqueTypes = context.uniqueAdapterTypes
 
             addField(generateVersionField(metadata.versionId))
-            addField(MetadataStore::class.java, META_STORE_FIELD,
-                    Modifier.PRIVATE, Modifier.FINAL)
             addField(BinaryAdapterProvider::class.java, ADAPTER_PROVIDER_FIELD,
                     Modifier.PRIVATE, Modifier.FINAL)
             addFields(generateAdapterField(uniqueTypes))
@@ -122,17 +118,15 @@ class AdapterBuilder(
 
     private fun generateConstructor(fields: Collection<ClassName>): MethodSpec {
         val providerName = "provider"
-        val metaStoreName = "metadataStore"
         return MethodSpec.constructorBuilder().apply {
             addException(Exception::class.java)
             addParameter(BinaryAdapterProvider::class.java, providerName)
-            addParameter(MetadataStore::class.java, metaStoreName)
 
             fields.forEach {
-                addStatement("${adapterFiledName(it)} = " +
-                        "${providerName}.getAdapterForClass(\$T.class)", it)
+                addStatement("${adapterFiledName(it)} = ${providerName}." +
+                        AdapterProviderGeneratorHelper
+                                .invoke_getAdapterForClass("\$T.class"), it)
             }
-            addStatement("this.$META_STORE_FIELD = $metaStoreName")
             addStatement("this.$ADAPTER_PROVIDER_FIELD = $providerName")
         }.build()
     }
