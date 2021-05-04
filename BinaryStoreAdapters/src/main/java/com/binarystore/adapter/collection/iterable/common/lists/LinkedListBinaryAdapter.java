@@ -10,10 +10,11 @@ import java.util.LinkedList;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("rawtypes")
 public class LinkedListBinaryAdapter extends CollectionBinaryAdapter<LinkedList> {
 
     public static final Factory factory = new Factory();
-    private static final Key<?> KEY = DefaultAdapters.ARRAY_LIST;
+    private static final Key<?> KEY = DefaultAdapters.LINKED_LIST;
 
     protected LinkedListBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,

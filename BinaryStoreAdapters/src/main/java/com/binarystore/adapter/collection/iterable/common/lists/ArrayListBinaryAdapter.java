@@ -6,10 +6,13 @@ import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.collection.iterable.base.CollectionBinaryAdapter;
 import com.binarystore.adapter.collection.iterable.settings.CollectionSettings;
+
 import java.util.ArrayList;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("rawtypes")
 public class ArrayListBinaryAdapter extends CollectionBinaryAdapter<ArrayList> {
 
     public static final Factory factory = new Factory();

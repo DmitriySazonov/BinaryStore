@@ -16,12 +16,20 @@ import com.binarystore.adapter.map.LinkedHashMapBinaryAdapter;
 import com.binarystore.adapter.map.MapBinaryAdapter;
 import com.binarystore.adapter.map.TreeMapBinaryAdapter;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Stack;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -52,5 +60,13 @@ public class BasicBinaryAdapters {
         register.register(Enum.class, EnumBinaryAdapter.factory);
 
         register.register(ArrayList.class, ArrayListBinaryAdapter.factory);
+        register.register(LinkedList.class, LinkedListBinaryAdapter.factory);
+        register.register(Stack.class, StackBinaryAdapter.factory);
+        register.register(Vector.class, VectorBinaryAdapter.factory);
+        register.register(ArrayDeque.class, ArrayDequeBinaryAdapter.factory);
+        register.register(PriorityQueue.class, PriorityQueueBinaryAdapter.factory);
+        register.register(HashSet.class, HashSetBinaryAdapter.factory);
+        register.register(LinkedHashSet.class, LinkedHashSetBinaryAdapter.factory);
+        register.register(TreeSet.class, TreeSetBinaryAdapter.factory);
     }
 }
