@@ -1,5 +1,6 @@
 package com.example.binaryjson.generator.adapter.types
 
+import com.binarystore.adapter.Key
 import com.example.binaryjson.generator.*
 import com.example.binaryjson.generator.BinaryAdapterGeneratorHelper.invoke_key
 import com.example.binaryjson.generator.KeyGeneratorHelper.invoke_getSize
@@ -92,13 +93,29 @@ class ClassCodeGenerator(
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ): String {
-        val expression = context.generateAdapterForClassExpression(
-                classExpression = InlineExpression("(Class<\$T>) ${value.name}.getClass()"),
-                properties = properties
-        )
+        val classExpression = "${value.name}.getClass()"
+
         val name = context.generateValName()
-        builder.addStatement("final \$T $name = $expression",
-                context.getAdapterTypeNameFor(metaType.type), metaType.type)
+        val adapterTypeName = context.getAdapterTypeNameFor(metaType.type)
+        if (context is ArrayContext) {
+            val lastClass = context.generateValName()
+            val adapterExpression = context.generateAdapterForClassExpression(
+                    classExpression = InlineExpression(lastClass),
+                    properties = properties
+            )
+            context.outerBuilder.addStatement("\$T $name = null", adapterTypeName)
+            context.outerBuilder.addStatement("\$T<\$T> $lastClass = null", Class::class.java, metaType.type)
+            builder.generateIf("$lastClass != $classExpression", positiveCode = {
+                addStatement("$lastClass = (Class<\$T>) $classExpression", metaType.type)
+                addStatement("$name = $adapterExpression", metaType.type)
+            })
+        } else {
+            val expression = context.generateAdapterForClassExpression(
+                    classExpression = InlineExpression("(Class<\$T>) $classExpression"),
+                    properties = properties
+            )
+            builder.addStatement("final \$T $name = $expression", adapterTypeName, metaType.type)
+        }
         return name
     }
 
@@ -134,9 +151,27 @@ class ClassCodeGenerator(
         val invokeRead = KeyGeneratorHelper.invoke_read(bufferName)
         builder.addStatement("final \$T $keyName = \$T.$invokeRead",
                 keyType, keyType)
-        return context.generateAdapterByKeyExpression(
-                keyExpression = InlineExpression(keyName),
-                properties = properties
-        )
+
+        return if (context is ArrayContext) {
+            val adapterTypeName = context.getAdapterTypeNameFor(metaType.type)
+            val lastKeyName = context.generateValName()
+            val adapterName = context.generateValName()
+            val adapterByKeyExpression = context.generateAdapterByKeyExpression(
+                    keyExpression = InlineExpression(lastKeyName),
+                    properties = properties
+            )
+            context.outerBuilder.addStatement("\$T $lastKeyName = null", Key::class.java)
+            context.outerBuilder.addStatement("\$T $adapterName = null", adapterTypeName)
+            builder.generateIf("!$keyName.equals($lastKeyName)", positiveCode = {
+                addStatement("$lastKeyName = $keyName")
+                addStatement("$adapterName = (\$T) $adapterByKeyExpression", adapterTypeName)
+            })
+            adapterName
+        } else {
+            context.generateAdapterByKeyExpression(
+                    keyExpression = InlineExpression(keyName),
+                    properties = properties
+            )
+        }
     }
 }

@@ -5,8 +5,8 @@ import com.binarystore.adapter.AdapterFactoryRegister;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
-import com.binarystore.dependency.Properties;
 import com.binarystore.dependency.EmptyProperties;
+import com.binarystore.dependency.Properties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,7 +94,12 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
             @CheckForNull Properties properties
     ) throws Exception {
         AdapterEntry entry = classToEntry.get(clazz);
-        return entry != null ? (BinaryAdapter<T>) entry.getAdapter(defaultFactoryContext) : null;
+        BinaryAdapter<T> adapter = entry != null ?
+                (BinaryAdapter<T>) entry.getAdapter(defaultFactoryContext) : null;
+        if (adapter == null && clazz.isEnum() && clazz != Enum.class) {
+            adapter = (BinaryAdapter<T>) getAdapterForClass(Enum.class, properties);
+        }
+        return adapter;
     }
 
     @Override

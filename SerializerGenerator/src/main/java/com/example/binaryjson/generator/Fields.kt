@@ -39,17 +39,18 @@ sealed class TypeMeta {
     class Array(
             override val type: ArrayTypeName,
             val even: Boolean,
-            val baseTypeMeta: TypeMeta = type.baseType.toMeta(),
+            isStaticType: Boolean,
     ) : TypeMeta() {
         val deep = type.deep
+        val baseTypeMeta: TypeMeta = type.baseType.toMeta(isStaticType)
     }
 }
 
-private fun TypeName.toMeta(): TypeMeta {
+private fun TypeName.toMeta(isStaticType: Boolean): TypeMeta {
     return when {
-        this is ClassName -> TypeMeta.Class.Simple(this)
+        this is ClassName -> TypeMeta.Class.Simple(this, isStaticType)
         this is ParameterizedTypeName -> TypeMeta.Class.Generic(this)
-        this is ArrayTypeName -> TypeMeta.Array(this, even = false)
+        this is ArrayTypeName -> TypeMeta.Array(this, even = false, isStaticType)
         isPrimitive || isBoxedPrimitive -> TypeMeta.Primitive(this)
         else -> throw IllegalArgumentException("Unknown type $this")
     }

@@ -18,8 +18,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        MapTest.start()
+        MapTest.start()
 
-        JSONCompareMeasure(this).start()
+//        JSONCompareMeasure(this).start()
     }
 }

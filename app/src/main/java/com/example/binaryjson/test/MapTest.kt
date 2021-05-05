@@ -1,11 +1,13 @@
 package com.example.binaryjson.test
 
 import com.binarystore.buffer.StaticByteBuffer
+import com.example.binaryjson.EnumTest
 import com.example.binaryjson.TestClass
 import com.example.binaryjson.TestClassJava
 import com.example.binaryjson.benchmark.Benchmark
 import com.example.binaryjson.compare.ObjectComparator
 import com.example.binaryjson.createDefaultBinaryAdapterManager
+import java.util.*
 
 object MapTest {
 
@@ -21,6 +23,11 @@ object MapTest {
             TestClass() to TestClassJava()
     )
 
+    val enumMap = EnumMap<EnumTest, String>(EnumTest::class.java).apply {
+        put(EnumTest.ENUM, "enum")
+        put(EnumTest.TEST, "test")
+    }
+
     object CaseSuite : Benchmark.CaseSuite() {
         val SERIALIZE = case("serialize")
         val DESERIALIZE = case("deserialize")
@@ -29,6 +36,7 @@ object MapTest {
 
     fun start() {
 
+        val map = enumMap
         val benchmark = Benchmark(CaseSuite)
         repeat(1) {
             val provider = createDefaultBinaryAdapterManager()

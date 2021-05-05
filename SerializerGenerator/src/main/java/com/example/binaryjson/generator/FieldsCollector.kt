@@ -56,16 +56,14 @@ class FieldsCollector(
     private fun createTypeMeta(variable: VariableElement): TypeMeta {
         val name = variable.simpleName.toString()
         val type = ClassName.get(variable.asType())
-        staticTypesHelper.isStaticType(variable)
+        val isStaticType = staticTypesHelper.isStaticType(variable)
         return when {
             type.isPrimitive || type.isBoxedPrimitive -> TypeMeta.Primitive(type)
-            type is ClassName -> TypeMeta.Class.Simple(type,
-                    staticTypesHelper.isStaticType(variable))
-            type is ParameterizedTypeName -> TypeMeta.Class.Generic(type,
-                    staticTypesHelper.isStaticType(variable))
+            type is ClassName -> TypeMeta.Class.Simple(type, isStaticType)
+            type is ParameterizedTypeName -> TypeMeta.Class.Generic(type, isStaticType)
             type is ArrayTypeName -> {
                 val even = variable.getArrayAnnotation()?.even ?: true
-                TypeMeta.Array(type, even)
+                TypeMeta.Array(type, even, isStaticType)
             }
             else -> throw IllegalArgumentException("Unknown filed($name) type($type)")
         }

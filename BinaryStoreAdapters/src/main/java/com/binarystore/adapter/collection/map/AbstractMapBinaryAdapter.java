@@ -153,8 +153,8 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
         byteBuffer.write(version);
         final int startOffset = byteBuffer.getOffset();
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for size
-        serializeAdditionalMeta(byteBuffer, value); // see in heir
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for offset to meta
+        serializeAdditionalMeta(byteBuffer, value); // see in heir
         final Set<Map.Entry> entries = value.entrySet();
         for (Map.Entry entry : entries) {
             final int offset = byteBuffer.getOffset();
@@ -202,8 +202,8 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
             throw new VersionException(this.version, version);
         }
         final int size = byteBuffer.readInt();
-        final T map = createMap(size, byteBuffer);
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // skip offest to meta
+        final T map = createMap(size, byteBuffer);
         final Map<Object, Object> mutableMap = (Map<Object, Object>) map;
         for (int i = 0; i < size; i++) {
             final Key entryKey = Key.read(byteBuffer);

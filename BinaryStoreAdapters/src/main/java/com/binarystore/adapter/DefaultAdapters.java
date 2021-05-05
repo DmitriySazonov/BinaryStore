@@ -21,4 +21,5 @@ public @interface DefaultAdapters {
 
     Key.Byte NULL = new Key.Byte((byte) 100);
     Key.Byte CLASS = new Key.Byte((byte) 101);
+    Key.Byte ENUM = new Key.Byte((byte) 102);
 }

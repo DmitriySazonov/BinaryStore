@@ -45,5 +45,6 @@ public class BasicBinaryAdapters {
 
 
         register.register(Class.class, ClassBinaryAdapter.factory);
+        register.register(Enum.class, EnumBinaryAdapter.factory);
     }
 }
