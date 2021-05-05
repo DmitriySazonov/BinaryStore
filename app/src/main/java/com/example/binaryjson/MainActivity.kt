@@ -9,6 +9,7 @@ import com.binarystore.buffer.StaticByteBuffer
 import com.binarystore.meta.MetadataStoreInMemory
 import com.example.binaryjson.compare.ObjectComparator
 import com.example.binaryjson.measure.JSONCompareMeasure
+import com.example.binaryjson.test.MapTest
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,27 +18,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val metadataStore = MetadataStoreInMemory()
-        val provider = BinaryAdapterManager(metadataStore).apply {
-            BasicBinaryAdapters.registerInto(this)
-            AdaptersRegistrator.registerInto(this)
-        }
-        val adapter = provider.getAdapterForClass(NameMap::class.java, null)!!
-        val value = NameMap()
-        value.lastId = 4
-        repeat(10) {
-            value.nameMap["key - $it"] = it
-        }
-        value.nameMap[null] = 123
-        value.nameMap["123"] = null
-        val size = adapter.getSize(value)
-        val buffer = StaticByteBuffer(size)
-        adapter.serialize(buffer, value)
-        buffer.offset = 0
-        val newValue = adapter.deserialize(buffer)
-
-        val compare = ObjectComparator.compare(value, newValue)
-        compare.toString()
+//        MapTest.start()
 
         JSONCompareMeasure(this).start()
     }

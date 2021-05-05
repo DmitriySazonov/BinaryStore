@@ -1,11 +1,9 @@
 package com.example.binaryjson.generator.adapter.types
 
-import com.example.binaryjson.generator.BinaryAdapterGeneratorHelper
+import com.example.binaryjson.generator.*
 import com.example.binaryjson.generator.BinaryAdapterGeneratorHelper.invoke_key
-import com.example.binaryjson.generator.KeyGeneratorHelper
 import com.example.binaryjson.generator.KeyGeneratorHelper.invoke_getSize
 import com.example.binaryjson.generator.KeyGeneratorHelper.invoke_saveTo
-import com.example.binaryjson.generator.TypeMeta
 import com.squareup.javapoet.CodeBlock
 
 class ClassCodeGenerator(
@@ -13,86 +11,90 @@ class ClassCodeGenerator(
 ) : TypeCodeGenerator {
 
     override fun generateSerialize(
-            valueName: String,
-            bufferName: String,
+            value: ValueName,
+            buffer: BufferName,
+            properties: PropertiesName?,
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ) {
-        builder.checkForNullAndWrite(valueName, bufferName) {
+        builder.checkForNullAndWrite(value, buffer) {
             val adapterName = if (metaType.staticType) {
                 context.getOrCreateAdapterFieldFor(metaType.type)
             } else {
-                generateAdapterByClass(context, valueName, builder)
+                generateAdapterByClass(value, properties, context, builder)
             }
             if (!metaType.staticType) {
-                addStatement("${adapterName}.${invoke_key()}.${invoke_saveTo(bufferName)}")
+                addStatement("${adapterName}.${invoke_key()}.${invoke_saveTo(buffer)}")
             }
             addStatement("${adapterName}.${
                 BinaryAdapterGeneratorHelper
-                        .invoke_serialize(valueName, bufferName)
+                        .invoke_serialize(value, buffer)
             }")
         }
     }
 
     override fun generateDeserialize(
-            bufferName: String,
+            buffer: BufferName,
+            properties: PropertiesName?,
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
-    ): TypeCodeGenerator.ValueName {
+    ): TypeCodeGenerator.DeserializeResult {
         val valueName = context.generateValName()
         builder.addStatement("final \$T $valueName", metaType.type)
-        builder.checkForNullInBuffer(bufferName, nonnullCode = {
-            generateNonNullBranchDeserialize(valueName, bufferName, context, builder)
+        builder.checkForNullInBuffer(buffer, nonnullCode = {
+            generateNonNullBranchDeserialize(valueName, buffer, properties, context, builder)
         }, nullCode = {
             addStatement("$valueName = null")
         })
-        return TypeCodeGenerator.ValueName(valueName)
+        return TypeCodeGenerator.DeserializeResult(valueName)
     }
 
     override fun generateGetSize(
-            valueName: String,
+            value: ValueName,
+            properties: PropertiesName?,
+            accumulator: AccumulatorName,
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ): List<TypeCodeGenerator.SizePart> {
-        val accumulatorName = context.generateValName()
-        builder.addStatement("int $accumulatorName = 0")
-        builder.checkForNull(valueName, nonnullCode = {
-            generateNonnullBranchGetSize(valueName, accumulatorName, context, builder)
+        builder.checkForNull(value, nonnullCode = {
+            generateNonnullBranchGetSize(value, properties, accumulator, context, builder)
         })
         return listOf(
-                TypeCodeGenerator.SizePart.Constant(CHECK_FOR_NULL_SIZE),
-                TypeCodeGenerator.SizePart.Expression(accumulatorName)
+                TypeCodeGenerator.SizePart.Constant(CHECK_FOR_NULL_SIZE)
         )
     }
 
     private fun generateNonnullBranchGetSize(
-            valueName: String,
-            accumulatorName: String,
+            value: ValueName,
+            properties: PropertiesName?,
+            accumulator: AccumulatorName,
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder
     ) {
         val adapterName = if (metaType.staticType) {
             context.getOrCreateAdapterFieldFor(metaType.type)
         } else {
-            generateAdapterByClass(context, valueName, builder)
+            generateAdapterByClass(value, properties, context, builder)
         }
 
         val getSizeExpression = "${adapterName}." + BinaryAdapterGeneratorHelper
-                .invoke_getSize(valueName)
+                .invoke_getSize(value)
         if (!metaType.staticType) {
             val keySizeExpression = "${adapterName}.${invoke_key()}.${invoke_getSize()}"
-            builder.addStatement("$accumulatorName += $keySizeExpression")
+            builder.addStatement("${accumulator.name} += $keySizeExpression")
         }
-        builder.addStatement("$accumulatorName += $getSizeExpression")
+        builder.addStatement("${accumulator.name} += $getSizeExpression")
     }
 
     private fun generateAdapterByClass(
+            value: ValueName,
+            properties: PropertiesName?,
             context: TypeCodeGenerator.Context,
-            valueName: String,
             builder: CodeBlock.Builder,
     ): String {
         val expression = context.generateAdapterForClassExpression(
-                classExpression = "(Class<\$T>) ${valueName}.getClass()"
+                classExpression = InlineExpression("(Class<\$T>) ${value.name}.getClass()"),
+                properties = properties
         )
         val name = context.generateValName()
         builder.addStatement("final \$T $name = $expression",
@@ -101,27 +103,29 @@ class ClassCodeGenerator(
     }
 
     private fun generateNonNullBranchDeserialize(
-            valueName: String,
-            bufferName: String,
+            value: String,
+            buffer: BufferName,
+            properties: PropertiesName?,
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder
     ) {
         val adapterName = if (metaType.staticType) {
             context.getOrCreateAdapterFieldFor(metaType.type)
         } else {
-            generateAdapterByKeyFromBuffer(bufferName, context, builder)
+            generateAdapterByKeyFromBuffer(buffer, properties, context, builder)
         }
         val deserializeCode = "$adapterName." + BinaryAdapterGeneratorHelper
-                .invoke_deserialize(bufferName)
+                .invoke_deserialize(buffer)
         if (metaType.staticType) {
-            builder.addStatement("$valueName = $deserializeCode")
+            builder.addStatement("$value = $deserializeCode")
         } else {
-            builder.addStatement("$valueName = (\$T) $deserializeCode", metaType.type)
+            builder.addStatement("$value = (\$T) $deserializeCode", metaType.type)
         }
     }
 
     private fun generateAdapterByKeyFromBuffer(
-            bufferName: String,
+            bufferName: BufferName,
+            properties: PropertiesName?,
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder
     ): String {
@@ -130,6 +134,9 @@ class ClassCodeGenerator(
         val invokeRead = KeyGeneratorHelper.invoke_read(bufferName)
         builder.addStatement("final \$T $keyName = \$T.$invokeRead",
                 keyType, keyType)
-        return context.generateAdapterByKeyExpression(keyExpression = keyName)
+        return context.generateAdapterByKeyExpression(
+                keyExpression = InlineExpression(keyName),
+                properties = properties
+        )
     }
 }

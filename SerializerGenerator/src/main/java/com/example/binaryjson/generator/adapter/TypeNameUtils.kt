@@ -7,6 +7,7 @@ import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
 
 fun TypeName.getPrimitiveSize(): Int {
+    TypeName.CHAR
     return when (unbox().toString()) {
         "boolean" -> ByteBuffer.BOOLEAN_BYTES
         "byte" -> ByteBuffer.BYTE_BYTES
@@ -15,6 +16,7 @@ fun TypeName.getPrimitiveSize(): Int {
         "long" -> ByteBuffer.LONG_BYTES
         "float" -> ByteBuffer.FLOAT_BYTES
         "double" -> ByteBuffer.DOUBLE_BYTES
+        "char" -> ByteBuffer.CHAR_BYTES
         else -> throw IllegalArgumentException("unknown primitive type $this")
     }
 }

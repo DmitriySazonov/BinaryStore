@@ -5,9 +5,8 @@ import com.binarystore.adapter.AdapterFactoryRegister;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
-import com.binarystore.dependency.Dependencies;
-import com.binarystore.dependency.EmptyDependencies;
-import com.binarystore.meta.MetadataStore;
+import com.binarystore.dependency.Properties;
+import com.binarystore.dependency.EmptyProperties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,8 +40,8 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
 
     private final AdapterFactory.Context defaultFactoryContext;
 
-    public BinaryAdapterManager(MetadataStore metadataStore) {
-        defaultFactoryContext = new AdapterFactory.Context(this, EmptyDependencies.instance);
+    public BinaryAdapterManager() {
+        defaultFactoryContext = new AdapterFactory.Context(this, EmptyProperties.instance);
     }
 
     public void resolveAllAdapters() throws Exception {
@@ -54,7 +53,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     @Override
     public <T, B extends BinaryAdapter<T>> B createAdapter(
             @Nonnull AdapterFactory<T, B> factory,
-            @CheckForNull Dependencies dependencies
+            @CheckForNull Properties properties
     ) throws Exception {
         B adapter = factory.create(defaultFactoryContext);
         checkIdEqual(adapter.key(), factory.adapterKey());
@@ -66,7 +65,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     @SuppressWarnings("unchecked")
     public <B extends BinaryAdapter<?>> B getAdapterByClass(
             @Nonnull Class<B> clazz,
-            @CheckForNull Dependencies dependencies
+            @CheckForNull Properties properties
     ) throws Exception {
         for (Map.Entry<?, AdapterEntry> entry : idToEntry.entrySet()) {
             BinaryAdapter<?> adapter = entry.getValue().getAdapter(defaultFactoryContext);
@@ -92,7 +91,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     @SuppressWarnings("unchecked")
     public <T> BinaryAdapter<T> getAdapterForClass(
             @Nonnull Class<T> clazz,
-            @CheckForNull Dependencies dependencies
+            @CheckForNull Properties properties
     ) throws Exception {
         AdapterEntry entry = classToEntry.get(clazz);
         return entry != null ? (BinaryAdapter<T>) entry.getAdapter(defaultFactoryContext) : null;
@@ -102,7 +101,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     @CheckForNull
     public BinaryAdapter<?> getAdapterByKey(
             @Nonnull Key<?> key,
-            @CheckForNull Dependencies dependencies
+            @CheckForNull Properties properties
     ) throws Exception {
         AdapterEntry entry = idToEntry.get(key);
         return entry != null ? entry.getAdapter(defaultFactoryContext) : null;

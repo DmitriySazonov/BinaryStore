@@ -1,8 +1,10 @@
 package com.example.binaryjson.generator.adapter.types
 
+import com.example.binaryjson.generator.*
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.TypeName
+
 
 interface TypeCodeGenerator {
 
@@ -17,42 +19,52 @@ interface TypeCodeGenerator {
          * Generate expression for getting adapter by key
          * @return expression
          * */
-        fun generateAdapterByKeyExpression(keyExpression: String): String
+        fun generateAdapterByKeyExpression(
+                keyExpression: InlineExpression,
+                properties: PropertiesName?
+        ): String
 
 
         /**
          * Generate expression for getting adapter for class
          * @return expression
          * */
-        fun generateAdapterForClassExpression(classExpression: String): String
+        fun generateAdapterForClassExpression(
+                classExpression: InlineExpression,
+                properties: PropertiesName?
+        ): String
 
         fun getAdapterTypeNameFor(className: ClassName): TypeName
 
         fun generateValName(): String
     }
 
-    class ValueName(val name: String)
-
     sealed class SizePart {
         class Expression(val expression: String) : SizePart()
         class Constant(val size: Int) : SizePart()
     }
 
+    inline class DeserializeResult(val expression: String)
+
     fun generateSerialize(
-            valueName: String,
-            bufferName: String,
+            value: ValueName,
+            buffer: BufferName,
+            properties: PropertiesName?,
             context: Context,
             builder: CodeBlock.Builder,
     )
 
     fun generateDeserialize(
-            bufferName: String,
+            buffer: BufferName,
+            properties: PropertiesName?,
             context: Context,
             builder: CodeBlock.Builder,
-    ): ValueName
+    ): DeserializeResult
 
     fun generateGetSize(
-            valueName: String,
+            value: ValueName,
+            properties: PropertiesName?,
+            accumulator: AccumulatorName,
             context: Context,
             builder: CodeBlock.Builder,
     ): List<SizePart>

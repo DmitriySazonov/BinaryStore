@@ -3,7 +3,10 @@ package com.example.binaryjson.generator.adapter
 import com.binarystore.buffer.ByteBuffer
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
+import java.lang.reflect.Type
+import javax.annotation.Nonnull
 import javax.lang.model.element.Modifier
 
 private const val GET_SIZE_METHOD = "getSize"
@@ -17,10 +20,10 @@ fun generateSerializeMethod(
         codeBlock: CodeBlock,
 ): MethodSpec {
     return adapterMethod(SERIALIZE_METHOD) {
-        addParameter(ByteBuffer::class.java, bufferName)
-        addParameter(valueType, valueName)
-        addCode(codeBlock)
         addException(Exception::class.java)
+        addNonNullParam(ByteBuffer::class.java, bufferName)
+        addNonNullParam(valueType, valueName)
+        addCode(codeBlock)
     }
 }
 
@@ -31,7 +34,8 @@ fun generateDeserializeMethod(
 ): MethodSpec {
     return adapterMethod(DESERIALIZE_METHOD) {
         addException(Exception::class.java)
-        addParameter(ByteBuffer::class.java, bufferName)
+        addAnnotation(Nonnull::class.java)
+        addNonNullParam(ByteBuffer::class.java, bufferName)
         addCode(codeBlock)
         returns(valueType)
     }
@@ -44,7 +48,7 @@ fun generateSizeMethod(
 ): MethodSpec {
     return adapterMethod(GET_SIZE_METHOD) {
         addException(Exception::class.java)
-        addParameter(valueType, valueName)
+        addNonNullParam(valueType, valueName)
         addCode(codeBlock)
         returns(TypeName.INT)
     }
@@ -56,4 +60,15 @@ fun adapterMethod(name: String, builder: MethodSpec.Builder.() -> Unit): MethodS
         addModifiers(Modifier.PUBLIC, Modifier.FINAL)
         builder()
     }.build()
+}
+
+private fun MethodSpec.Builder.addNonNullParam(typeName: TypeName, name: String) {
+    ParameterSpec.builder(typeName, name).apply {
+        addModifiers(Modifier.FINAL)
+        addAnnotation(Nonnull::class.java)
+    }.build().also(::addParameter)
+}
+
+private fun MethodSpec.Builder.addNonNullParam(type: Type, name: String) {
+    addNonNullParam(TypeName.get(type), name)
 }

@@ -22,6 +22,8 @@ public interface ByteBuffer {
 
     void moveOffset(final int offset);
 
+    void write(final char value);
+
     void write(final boolean value);
 
     void write(final byte value);
@@ -39,6 +41,8 @@ public interface ByteBuffer {
     void write(final byte[] value);
 
     void write(final String value);
+
+    char readChar();
 
     byte readByte();
 

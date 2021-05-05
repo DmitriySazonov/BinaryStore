@@ -19,3 +19,8 @@ dependencies {
     implementation project(":BinaryStore")
     implementation "com.squareup:javapoet:$javapoet"
 }
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xinline-classes"]
+    }
+}

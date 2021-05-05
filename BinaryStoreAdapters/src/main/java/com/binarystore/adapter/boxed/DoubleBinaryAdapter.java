@@ -9,7 +9,7 @@ import com.binarystore.buffer.ByteBuffer;
 
 import javax.annotation.Nonnull;
 
-public class DoubleBinaryAdapter extends AbstractBinaryAdapter<Double> {
+public final class DoubleBinaryAdapter extends AbstractBinaryAdapter<Double> {
 
     private static final Key.Byte ID = DefaultAdapters.DOUBLE;
 

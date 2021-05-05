@@ -36,6 +36,13 @@ public class DynamicByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public void write(final char value) {
+        checkFreeSpace(CHAR_BYTES);
+        ByteBufferHelper.write(bytes, offset, value);
+        offset += CHAR_BYTES;
+    }
+
+    @Override
     public void write(final boolean value) {
         checkFreeSpace(BOOLEAN_BYTES);
         ByteBufferHelper.write(bytes, offset, value);
@@ -96,6 +103,13 @@ public class DynamicByteBuffer implements ByteBuffer {
         checkFreeSpace(CHAR_BYTES * value.length());
         ByteBufferHelper.write(bytes, offset, value);
         offset += CHAR_BYTES * value.length();
+    }
+
+    @Override
+    public char readChar() {
+        int oldOffset = offset;
+        offset += CHAR_BYTES;
+        return ByteBufferHelper.readChar(bytes, oldOffset);
     }
 
     @Override
@@ -164,6 +178,5 @@ public class DynamicByteBuffer implements ByteBuffer {
         boolean hasFreeSpace = bytes.length - offset >= needSpace;
         if (hasFreeSpace) return;
         bytes = Arrays.copyOf(bytes, bytes.length * 2);
-        this.bytes = bytes;
     }
 }

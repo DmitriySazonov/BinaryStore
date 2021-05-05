@@ -33,16 +33,18 @@ public class StaticByteBuffer implements ByteBuffer {
 
     @Override
     public void setOffset(final int offset) {
-        if (offset > end) {
-            absoluteOffset = end;
-        } else {
-            absoluteOffset = Math.max(offset, start);
-        }
+        absoluteOffset = offset;
     }
 
     @Override
     public void moveOffset(final int offset) {
         setOffset(absoluteOffset + offset);
+    }
+
+    @Override
+    public void write(final char value) {
+        ByteBufferHelper.write(bytes, absoluteOffset, value);
+        absoluteOffset += CHAR_BYTES;
     }
 
     @Override
@@ -97,6 +99,13 @@ public class StaticByteBuffer implements ByteBuffer {
     public void write(final String value) {
         ByteBufferHelper.write(bytes, absoluteOffset, value);
         absoluteOffset += CHAR_BYTES * value.length();
+    }
+
+    @Override
+    public char readChar() {
+        int oldOffset = absoluteOffset;
+        absoluteOffset += CHAR_BYTES;
+        return ByteBufferHelper.readChar(bytes, oldOffset);
     }
 
     @Override

@@ -1,28 +1,27 @@
 package com.binarystore.adapter;
 
-import com.binarystore.dependency.Dependencies;
-import com.binarystore.meta.MetadataStore;
+import com.binarystore.dependency.Properties;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 public interface AdapterFactory<T, A extends BinaryAdapter<T>> {
-    final class Context implements Dependencies {
+    final class Context implements Properties {
         public final BinaryAdapterProvider provider;
-        private final Dependencies optionalDependencies;
+        private final Properties optionalProperties;
 
         public Context(
                 @Nonnull BinaryAdapterProvider provider,
-                @Nonnull Dependencies dependencies
+                @Nonnull Properties properties
         ) {
             this.provider = provider;
-            this.optionalDependencies = dependencies;
+            this.optionalProperties = properties;
         }
 
         @CheckForNull
         @Override
         public <T> T get(@Nonnull Class<T> tClass, @CheckForNull String name) {
-            return optionalDependencies.get(tClass, name);
+            return optionalProperties.get(tClass, name);
         }
     }
 

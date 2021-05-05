@@ -9,6 +9,7 @@ import com.squareup.javapoet.TypeName
 class Field(
         val name: String,
         val typeMeta: TypeMeta,
+        val properties: List<ClassName>?,
 )
 
 sealed class TypeMeta {

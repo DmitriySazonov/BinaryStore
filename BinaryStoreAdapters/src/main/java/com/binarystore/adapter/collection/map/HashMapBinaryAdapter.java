@@ -1,13 +1,12 @@
 package com.binarystore.adapter.collection.map;
 
-import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
+import com.binarystore.buffer.ByteBuffer;
 
 import java.util.HashMap;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
@@ -18,14 +17,14 @@ public class HashMapBinaryAdapter extends AbstractMapBinaryAdapter<HashMap> {
 
     protected HashMapBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
-            @CheckForNull MapSettings settings
+            @Nonnull MapSettings settings
     ) {
         super(provider, settings);
     }
 
     @Nonnull
     @Override
-    protected HashMap<?, ?> createMap(int size) {
+    protected HashMap<?, ?> createMap(int size, @Nonnull ByteBuffer buffer) {
         return new HashMap<>(size, 1f);
     }
 
@@ -35,17 +34,19 @@ public class HashMapBinaryAdapter extends AbstractMapBinaryAdapter<HashMap> {
         return KEY;
     }
 
-    private static class Factory implements AdapterFactory<HashMap, HashMapBinaryAdapter> {
+    private static class Factory extends MapFactory<HashMap, HashMapBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
             return HashMapBinaryAdapter.KEY;
         }
 
-        @Nonnull
         @Override
-        public HashMapBinaryAdapter create(@Nonnull Context context) {
-            return new HashMapBinaryAdapter(context.provider, context.get(MapSettings.class, null));
+        protected HashMapBinaryAdapter create(
+                @Nonnull BinaryAdapterProvider provider,
+                @Nonnull MapSettings settings
+        ) {
+            return new HashMapBinaryAdapter(provider, settings);
         }
     }
 }

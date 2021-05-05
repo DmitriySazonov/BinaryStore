@@ -5,6 +5,11 @@ public class ByteBufferHelper {
     private static final byte TRUE = ByteBuffer.TRUE;
     private static final byte FALSE = ByteBuffer.FALSE;
 
+    public static void write(final byte[] bytes, int offset, final char value) {
+        bytes[offset++] = (byte) (value);
+        bytes[offset] = (byte) (value >>> 8);
+    }
+
     public static void write(final byte[] bytes, int offset, final boolean value) {
         bytes[offset] = value ? TRUE : FALSE;
     }
@@ -62,6 +67,10 @@ public class ByteBufferHelper {
         System.arraycopy(value, 0, bytes, offset, value.length);
     }
 
+    public static char readChar(final byte[] bytes, int offset) {
+        return (char) (((bytes[offset++] & 0xFF)) | ((bytes[offset] & 0xFF) << 8));
+    }
+
     public static byte readByte(final byte[] bytes, int offset) {
         return bytes[offset];
     }
@@ -115,7 +124,6 @@ public class ByteBufferHelper {
 
     public static String readString(final byte[] bytes, final int offset, final int length) {
         final char[] chars = new char[length];
-        final int end = offset + length;
         for (int i = 0, j = offset; i < length; i++) {
             chars[i] = (char) (((bytes[j++] & 0xFF)) | ((bytes[j++] & 0xFF) << 8));
         }

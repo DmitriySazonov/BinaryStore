@@ -4,46 +4,79 @@ import com.binarystore.buffer.ByteBuffer
 import com.example.binaryjson.generator.BufferGeneratorHelper
 import com.example.binaryjson.generator.BufferGeneratorHelper.FALSE_CONST
 import com.example.binaryjson.generator.BufferGeneratorHelper.TRUE_CONST
+import com.example.binaryjson.generator.BufferName
+import com.example.binaryjson.generator.ValueName
 import com.squareup.javapoet.CodeBlock
 
 const val CHECK_FOR_NULL_SIZE = ByteBuffer.BYTE_BYTES
 
 fun CodeBlock.Builder.checkForNullAndWrite(
-        valueName: String,
-        bufferName: String,
+        value: ValueName,
+        buffer: BufferName,
         code: CodeBlock.Builder.() -> Unit,
 ) {
-    beginControlFlow("if ($valueName != null)")
-    addStatement("${bufferName}.write(\$T.$TRUE_CONST)", BufferGeneratorHelper.type)
-
-    code()
-
-    nextControlFlow("else")
-    addStatement("${bufferName}.write(\$T.$FALSE_CONST)", BufferGeneratorHelper.type)
-    endControlFlow()
+    generateIf(
+            expression = "${value.name} != null",
+            positiveCode = {
+                val expression = BufferGeneratorHelper.invoke_write(buffer,
+                        ValueName("\$T.$TRUE_CONST"))
+                addStatement(expression, BufferGeneratorHelper.type)
+                code()
+            },
+            negativeCode = {
+                val expression = BufferGeneratorHelper.invoke_write(buffer,
+                        ValueName("\$T.$FALSE_CONST"))
+                addStatement(expression, BufferGeneratorHelper.type)
+            }
+    )
 }
 
 fun CodeBlock.Builder.checkForNull(
-        valueName: String,
+        valueName: ValueName,
         nonnullCode: (CodeBlock.Builder.() -> Unit)? = null,
         nullCode: (CodeBlock.Builder.() -> Unit)? = null
 ) {
-    beginControlFlow("if (${valueName} != null)")
-    nonnullCode?.invoke(this)
-    nextControlFlow("else")
-    nullCode?.invoke(this)
-    endControlFlow()
+    generateIf(
+            expression = "${valueName.name} != null",
+            invertedExpression = "${valueName.name} == null",
+            positiveCode = nonnullCode,
+            negativeCode = nullCode
+    )
 }
 
 fun CodeBlock.Builder.checkForNullInBuffer(
-        bufferName: String,
+        buffer: BufferName,
         nonnullCode: CodeBlock.Builder.() -> Unit,
         nullCode: CodeBlock.Builder.() -> Unit
 ) {
     val readByte = BufferGeneratorHelper.invoke_readByte()
-    beginControlFlow("if (${bufferName}.$readByte == ${ByteBuffer.TRUE})")
-    nonnullCode()
-    nextControlFlow("else")
-    nullCode()
-    endControlFlow()
+    generateIf("${buffer.name}.$readByte == ${ByteBuffer.TRUE}",
+            positiveCode = nonnullCode, negativeCode = nullCode)
+}
+
+fun CodeBlock.Builder.generateIf(
+        expression: String,
+        invertedExpression: String = "!($expression)",
+        positiveCode: (CodeBlock.Builder.() -> Unit)? = null,
+        negativeCode: (CodeBlock.Builder.() -> Unit)? = null
+) {
+    when {
+        positiveCode != null && negativeCode != null -> {
+            beginControlFlow("if ($expression)")
+            positiveCode.invoke(this)
+            nextControlFlow("else")
+            negativeCode.invoke(this)
+            endControlFlow()
+        }
+        positiveCode != null && negativeCode == null -> {
+            beginControlFlow("if ($expression)")
+            positiveCode.invoke(this)
+            endControlFlow()
+        }
+        positiveCode == null && negativeCode != null -> {
+            beginControlFlow("if ($invertedExpression)")
+            negativeCode.invoke(this)
+            endControlFlow()
+        }
+    }
 }

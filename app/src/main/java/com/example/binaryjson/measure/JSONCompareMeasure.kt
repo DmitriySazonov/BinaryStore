@@ -1,14 +1,10 @@
 package com.example.binaryjson.measure
 
 import android.content.Context
-import com.binarystore.AdaptersRegistrator
-import com.binarystore.BinaryAdapterManager
-import com.binarystore.adapter.BasicBinaryAdapters
 import com.binarystore.buffer.StaticByteBuffer
-import com.binarystore.meta.MetadataStoreInMemory
-import com.example.binaryjson.MainActivity
 import com.example.binaryjson.benchmark.Benchmark
 import com.example.binaryjson.compare.ObjectComparator
+import com.example.binaryjson.createDefaultBinaryAdapterManager
 import com.example.binaryjson.test.StoryResponse
 import com.example.binaryjson.test.StoryResponseParser
 import org.json.JSONObject
@@ -33,19 +29,16 @@ class JSONCompareMeasure(context: Context) {
     private val json = String(context.assets.open("get_stories.json").readBytes())
 
     fun start() {
+        test(Benchmark(CompareCaseSuite)) // warm up
         val benchmark = Benchmark(CompareCaseSuite)
-        val count = 100
+        val count = 1
         repeat(count) { test(benchmark) }
         benchmark.print()
     }
 
     private fun test(benchmark: Benchmark) {
         benchmark.start(CompareCaseSuite.CONFIGURE)
-        val metadataStore = MetadataStoreInMemory()
-        val provider = BinaryAdapterManager(metadataStore).apply {
-            BasicBinaryAdapters.registerInto(this)
-            AdaptersRegistrator.registerInto(this)
-        }
+        val provider = createDefaultBinaryAdapterManager()
         benchmark.end(CompareCaseSuite.CONFIGURE)
 
         benchmark.start(CompareCaseSuite.CREATE_JSON_OBJ)

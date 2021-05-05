@@ -1,32 +1,67 @@
 package com.binarystore.adapter.collection.map;
 
+import com.binarystore.dependency.Property;
+
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 public final class MapSettings {
 
     public static MapSettings defaultSettings = new MapSettings(
-            UnknownItemStrategy.SKIP,
-            false,
-            false
+            ItemStrategy.SKIP, ItemStrategy.SKIP
     );
 
-    public enum UnknownItemStrategy {
+    public enum ItemStrategy {
         SKIP, THROW_EXCEPTION
     }
 
     @Nonnull
-    public final UnknownItemStrategy unknownItemStrategy;
-    public final boolean isAllowNullKey;
-    public final boolean isAllowNullValue;
+    public final ItemStrategy unknownItemStrategy;
+    @Nonnull
+    public final ItemStrategy exceptionItemStrategy;
 
     public MapSettings(
-            @Nonnull UnknownItemStrategy unknownItemStrategy,
-            boolean isAllowNullKey,
-            boolean isAllowNullValue
+            @Nonnull ItemStrategy unknownItemStrategy,
+            @Nonnull ItemStrategy exceptionItemStrategy
     ) {
         this.unknownItemStrategy = unknownItemStrategy;
+        this.exceptionItemStrategy = exceptionItemStrategy;
+    }
 
-        this.isAllowNullKey = isAllowNullKey;
-        this.isAllowNullValue = isAllowNullValue;
+    public abstract static class AbstractProperty implements Property<MapSettings> {
+
+        @CheckForNull
+        @Override
+        public String name() {
+            return null;
+        }
+
+        @Nonnull
+        @Override
+        public Class<MapSettings> typeClass() {
+            return MapSettings.class;
+        }
+    }
+
+    public final static class SkipItemSettingProperty extends AbstractProperty {
+
+        private static final MapSettings settings = new MapSettings(ItemStrategy.SKIP,
+                ItemStrategy.SKIP);
+
+        @Override
+        public MapSettings provide() {
+            return settings;
+        }
+    }
+
+    public final static class CrashExceptionSettingProperty extends AbstractProperty {
+
+        private static final MapSettings settings = new MapSettings(ItemStrategy.THROW_EXCEPTION,
+                ItemStrategy.THROW_EXCEPTION);
+
+        @Override
+        public MapSettings provide() {
+            return settings;
+        }
     }
 }

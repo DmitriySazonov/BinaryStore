@@ -5,17 +5,17 @@ import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
 import com.binarystore.buffer.ByteBuffer;
 
-import java.util.TreeMap;
+import java.util.LinkedHashMap;
 
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class TreeMapBinaryAdapter extends AbstractMapBinaryAdapter<TreeMap> {
+public class LinkedHashMapBinaryAdapter extends AbstractMapBinaryAdapter<LinkedHashMap> {
 
     public static final Factory factory = new Factory();
-    private static final Key<?> KEY = DefaultAdapters.TREE_MAP;
+    private static final Key<?> KEY = DefaultAdapters.LINKED_HASH_MAP;
 
-    protected TreeMapBinaryAdapter(
+    protected LinkedHashMapBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
             @Nonnull MapSettings settings
     ) {
@@ -24,9 +24,8 @@ public class TreeMapBinaryAdapter extends AbstractMapBinaryAdapter<TreeMap> {
 
     @Nonnull
     @Override
-    @SuppressWarnings("SortedCollectionWithNonComparableKeys")
-    protected TreeMap<?, ?> createMap(int size, @Nonnull ByteBuffer buffer) {
-        return new TreeMap<>();
+    protected LinkedHashMap createMap(int size, @Nonnull ByteBuffer buffer) {
+        return new LinkedHashMap(size, 1f);
     }
 
     @Nonnull
@@ -35,19 +34,19 @@ public class TreeMapBinaryAdapter extends AbstractMapBinaryAdapter<TreeMap> {
         return KEY;
     }
 
-    private static class Factory extends MapFactory<TreeMap, TreeMapBinaryAdapter> {
+    private static class Factory extends MapFactory<LinkedHashMap, LinkedHashMapBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
-            return TreeMapBinaryAdapter.KEY;
+            return KEY;
         }
 
         @Override
-        protected TreeMapBinaryAdapter create(
+        protected LinkedHashMapBinaryAdapter create(
                 @Nonnull BinaryAdapterProvider provider,
                 @Nonnull MapSettings settings
         ) {
-            return new TreeMapBinaryAdapter(provider, settings);
+            return new LinkedHashMapBinaryAdapter(provider, settings);
         }
     }
 }

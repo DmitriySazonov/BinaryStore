@@ -15,8 +15,8 @@ object KeyGeneratorHelper {
     val clazz = Key::class.java
     val type = ClassName.get(clazz)
 
-    fun invoke_saveTo(bufferName: String): String = "saveTo($bufferName)"
-    fun invoke_read(bufferName: String): String = "read($bufferName)"
+    fun invoke_saveTo(bufferName: BufferName): String = "saveTo(${bufferName.name})"
+    fun invoke_read(bufferName: BufferName): String = "read(${bufferName.name})"
     fun invoke_getSize(): String = "getSize()"
 }
 
@@ -27,10 +27,11 @@ object BinaryAdapterGeneratorHelper {
 
     fun invoke_key(): String = "key()"
 
-    fun invoke_deserialize(bufferName: String): String = "deserialize($bufferName)"
-    fun invoke_serialize(valueName: String, bufferName: String): String =
-            "serialize($bufferName, $valueName)"
-    fun invoke_getSize(valueName: String): String = "getSize($valueName)"
+    fun invoke_deserialize(bufferName: BufferName): String = "deserialize(${bufferName.name})"
+    fun invoke_serialize(valueName: ValueName, bufferName: BufferName): String =
+            "serialize(${bufferName.name}, ${valueName.name})"
+
+    fun invoke_getSize(valueName: ValueName): String = "getSize(${valueName.name})"
 }
 
 object AdapterProviderGeneratorHelper {
@@ -38,11 +39,15 @@ object AdapterProviderGeneratorHelper {
     val clazz = BinaryAdapterProvider::class.java
     val type = ClassName.get(clazz)
 
-    fun invoke_getAdapterForClass(classExpression: String): String =
-            "getAdapterForClass($classExpression, null)"
+    fun invoke_getAdapterForClass(
+            classExpression: InlineExpression,
+            properties: PropertiesName?
+    ): String = "getAdapterForClass(${classExpression.expression}, ${properties?.name})"
 
-    fun invoke_getAdapterByKey(keyExpression: String): String =
-            "getAdapterByKey($keyExpression, null)"
+    fun invoke_getAdapterByKey(
+            keyExpression: InlineExpression,
+            properties: PropertiesName?
+    ): String = "getAdapterByKey(${keyExpression.expression}, ${properties?.name})"
 }
 
 object BufferGeneratorHelper {
@@ -52,6 +57,9 @@ object BufferGeneratorHelper {
 
     const val TRUE_CONST = "TRUE"
     const val FALSE_CONST = "FALSE"
+
+    fun invoke_write(buffer: BufferName, value: ValueName): String =
+            "${buffer.name}.write(${value.name})"
 
     fun invoke_readByte(): String = "readByte()"
 

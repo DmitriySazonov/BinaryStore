@@ -5,7 +5,7 @@ import com.binarystore.buffer.ByteBuffer;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public class NullBinaryAdapter implements BinaryAdapter<NullBinaryAdapter.Null> {
+public final class NullBinaryAdapter implements BinaryAdapter<NullBinaryAdapter.Null> {
 
     private static final Key.Byte ID = DefaultAdapters.NULL;
 
@@ -39,8 +39,9 @@ public class NullBinaryAdapter implements BinaryAdapter<NullBinaryAdapter.Null> 
 
     }
 
+    @Nonnull
     @Override
-    @CheckForNull
+    @SuppressWarnings("ConstantConditions")
     public Null deserialize(@CheckForNull ByteBuffer byteBuffer) throws Exception {
         return null;
     }

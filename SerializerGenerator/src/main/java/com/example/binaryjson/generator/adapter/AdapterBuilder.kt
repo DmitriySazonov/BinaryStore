@@ -3,13 +3,12 @@ package com.example.binaryjson.generator.adapter
 import com.binarystore.InjectType
 import com.binarystore.adapter.BinaryAdapter
 import com.binarystore.adapter.BinaryAdapterProvider
-import com.example.binaryjson.generator.AdapterProviderGeneratorHelper
-import com.example.binaryjson.generator.Field
-import com.example.binaryjson.generator.TypeMetadata
+import com.example.binaryjson.generator.*
 import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator
 import com.example.binaryjson.generator.adapter.types.TypeCodeGeneratorFactory
 import com.squareup.javapoet.*
 import java.util.*
+import javax.annotation.Nonnull
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 import kotlin.collections.HashMap
@@ -40,17 +39,23 @@ class AdapterBuilder(
             return adapterFiledName(type)
         }
 
-        override fun generateAdapterByKeyExpression(keyExpression: String): String {
+        override fun generateAdapterByKeyExpression(
+                keyExpression: InlineExpression,
+                properties: PropertiesName?
+        ): String {
             return "${ADAPTER_PROVIDER_FIELD}.${
                 AdapterProviderGeneratorHelper
-                        .invoke_getAdapterByKey(keyExpression)
+                        .invoke_getAdapterByKey(keyExpression, properties)
             }"
         }
 
-        override fun generateAdapterForClassExpression(classExpression: String): String {
+        override fun generateAdapterForClassExpression(
+                classExpression: InlineExpression,
+                properties: PropertiesName?
+        ): String {
             return "${ADAPTER_PROVIDER_FIELD}.${
                 AdapterProviderGeneratorHelper
-                        .invoke_getAdapterForClass(classExpression)
+                        .invoke_getAdapterForClass(classExpression, properties)
             }"
         }
 
@@ -95,7 +100,7 @@ class AdapterBuilder(
             addMethod(sizeMethod)
             addMethod(serializeMethod)
             addMethod(deserializeMethod)
-            addMethod(generateGetIdMethod(metadata))
+            addMethod(generateGetKeyMethod(metadata))
 
             AdapterFactoryBuilder.inject(this, adapterClassName, metadata, ID_FIELD_NAME)
         }.build()
@@ -125,7 +130,10 @@ class AdapterBuilder(
             fields.forEach {
                 addStatement("${adapterFiledName(it)} = ${providerName}." +
                         AdapterProviderGeneratorHelper
-                                .invoke_getAdapterForClass("\$T.class"), it)
+                                .invoke_getAdapterForClass(
+                                        classExpression = InlineExpression("\$T.class"),
+                                        properties = null
+                                ), it)
             }
             addStatement("this.$ADAPTER_PROVIDER_FIELD = $providerName")
         }.build()
@@ -143,12 +151,19 @@ class AdapterBuilder(
     }
 
     private fun generateSizeCode(fields: List<Field>): CodeBlock {
+        val accumulator = "accumulator_${context.generateValName()}"
         return CodeBlock.builder().apply {
+            addStatement("int $accumulator = 0")
             val parts = fields.map {
-                TypeCodeGeneratorFactory.create(it.typeMeta)
-                        .generateGetSize("${VALUE}.${it.name}", context, this)
+                TypeCodeGeneratorFactory.create(it.typeMeta).generateGetSize(
+                        value = ValueName("${VALUE}.${it.name}"),
+                        properties = null,
+                        accumulator = AccumulatorName(accumulator),
+                        context = context,
+                        builder = this
+                )
             }.flatten()
-            add("return ")
+            add("return $accumulator + ")
             var primitiveSum = 0
             parts.forEach {
                 when (it) {
@@ -163,8 +178,13 @@ class AdapterBuilder(
     private fun generateSerializeCode(metadata: TypeMetadata): CodeBlock {
         return CodeBlock.builder().apply {
             metadata.fields.map {
-                TypeCodeGeneratorFactory.create(it.typeMeta).generateSerialize("${VALUE}.${it.name}",
-                        BUFFER_NAME, context, this)
+                TypeCodeGeneratorFactory.create(it.typeMeta).generateSerialize(
+                        value = ValueName("${VALUE}.${it.name}"),
+                        buffer = BufferName(BUFFER_NAME),
+                        properties = null,
+                        context = context,
+                        builder = this
+                )
             }
         }.build()
     }
@@ -174,7 +194,12 @@ class AdapterBuilder(
         return CodeBlock.builder().apply {
             metadata.fields.forEach {
                 fieldToValue[it] = TypeCodeGeneratorFactory.create(it.typeMeta)
-                        .generateDeserialize(BUFFER_NAME, context, this).name
+                        .generateDeserialize(
+                                buffer = BufferName(BUFFER_NAME),
+                                properties = null,
+                                context = context,
+                                builder = this
+                        ).expression
             }
             when (metadata.injectType) {
                 InjectType.ASSIGNMENT -> generateDeserializeAssignmentCode(fieldToValue, metadata)
@@ -207,8 +232,9 @@ class AdapterBuilder(
         add("\n);\n")
     }
 
-    private fun generateGetIdMethod(metadata: TypeMetadata): MethodSpec {
+    private fun generateGetKeyMethod(metadata: TypeMetadata): MethodSpec {
         return adapterMethod(GET_KEY_METHOD) {
+            addAnnotation(Nonnull::class.java)
             addStatement("return $ID_FIELD_NAME")
             returns(metadata.id.keyClass)
         }

@@ -3,11 +3,11 @@ package com.binarystore.dependency;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public class EmptyDependencies implements Dependencies {
+public class EmptyProperties implements Properties {
 
-    public static final EmptyDependencies instance = new EmptyDependencies();
+    public static final EmptyProperties instance = new EmptyProperties();
 
-    private EmptyDependencies() {
+    private EmptyProperties() {
 
     }
 

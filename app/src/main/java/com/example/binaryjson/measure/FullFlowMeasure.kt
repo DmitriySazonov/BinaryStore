@@ -1,12 +1,9 @@
 package com.example.binaryjson.measure
 
-import com.binarystore.AdaptersRegistrator
-import com.binarystore.BinaryAdapterManager
-import com.binarystore.adapter.BasicBinaryAdapters
 import com.binarystore.buffer.StaticByteBuffer
-import com.binarystore.meta.MetadataStoreInMemory
 import com.example.binaryjson.TestClass
 import com.example.binaryjson.benchmark.Benchmark
+import com.example.binaryjson.createDefaultBinaryAdapterManager
 
 object FullFlowMeasure {
 
@@ -30,11 +27,7 @@ object FullFlowMeasure {
     private fun test(benchmark: Benchmark) {
 
         benchmark.start(FullFlowCaseSuite.CONFIGURE)
-        val metadataStore = MetadataStoreInMemory()
-        val provider = BinaryAdapterManager(metadataStore).apply {
-            BasicBinaryAdapters.registerInto(this)
-            AdaptersRegistrator.registerInto(this)
-        }
+        val provider = createDefaultBinaryAdapterManager()
         benchmark.end(FullFlowCaseSuite.CONFIGURE)
         benchmark.start(FullFlowCaseSuite.RESOLVE)
         provider.resolveAllAdapters()
