@@ -1,4 +1,4 @@
-package com.binarystore.adapter.collection.map;
+package com.binarystore.adapter.map;
 
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;

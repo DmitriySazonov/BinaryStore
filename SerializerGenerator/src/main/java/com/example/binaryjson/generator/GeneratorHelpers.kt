@@ -6,6 +6,7 @@ import com.binarystore.adapter.BinaryAdapter
 import com.binarystore.adapter.BinaryAdapterProvider
 import com.binarystore.adapter.Key
 import com.binarystore.buffer.ByteBuffer
+import com.binarystore.dependency.MultiProperties
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import java.util.*
@@ -65,4 +66,13 @@ object BufferGeneratorHelper {
 
     fun invoke_readByType(typeName: TypeName): String =
             "read${typeName.toString().capitalize(Locale.ROOT)}()"
+}
+
+object MultiPropertiesGeneratorHelper {
+
+    val clazz = MultiProperties::class.java
+    val type = ClassName.get(clazz)
+
+    fun invoke_addNewProperty(expression: InlineExpression): String =
+            "addProperty(${expression.expression})"
 }

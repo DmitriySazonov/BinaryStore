@@ -1,11 +1,10 @@
-package com.binarystore;
+package com.binarystore.manager;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.AdapterFactoryRegister;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
-import com.binarystore.dependency.EmptyProperties;
 import com.binarystore.dependency.Properties;
 
 import java.util.HashMap;
@@ -20,16 +19,40 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
         final Class<?> clazz;
         final AdapterFactory<?, ?> factory;
         private BinaryAdapter<?> adapter = null;
+        private HashMap<Properties, BinaryAdapter<?>> customAdapters = new HashMap<>();
 
         <T> AdapterEntry(Class<T> clazz, AdapterFactory<T, ? extends BinaryAdapter<T>> factory) {
             this.clazz = clazz;
             this.factory = factory;
         }
 
-        private BinaryAdapter<?> getAdapter(AdapterFactory.Context context) throws Exception {
+        private BinaryAdapter<?> getAdapter(@Nonnull AdapterFactoryContext context) throws Exception {
             if (adapter == null) {
                 adapter = factory.create(context);
                 checkIdEqual(adapter.key(), factory.adapterKey());
+            }
+            return adapter;
+        }
+
+        private BinaryAdapter<?> getAdapter(
+                @Nonnull AdapterFactoryContext context,
+                @CheckForNull Properties properties
+        ) throws Exception {
+            if (properties == null) {
+                return getAdapter(context);
+            } else {
+                return getCustomAdapter(context, properties);
+            }
+        }
+
+        private BinaryAdapter<?> getCustomAdapter(
+                @Nonnull AdapterFactoryContext context,
+                @Nonnull Properties properties
+        ) throws Exception {
+            BinaryAdapter<?> adapter = customAdapters.get(properties);
+            if (adapter == null) {
+                adapter = factory.create(context.wrap(properties));
+                customAdapters.put(properties, adapter);
             }
             return adapter;
         }
@@ -38,10 +61,10 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     private final HashMap<Key<?>, AdapterEntry> idToEntry = new HashMap<>();
     private final HashMap<Class<?>, AdapterEntry> classToEntry = new HashMap<>();
 
-    private final AdapterFactory.Context defaultFactoryContext;
+    private final AdapterFactoryContext defaultFactoryContext;
 
     public BinaryAdapterManager() {
-        defaultFactoryContext = new AdapterFactory.Context(this, EmptyProperties.instance);
+        defaultFactoryContext = new AdapterFactoryContext(this, null);
     }
 
     public void resolveAllAdapters() throws Exception {
@@ -68,7 +91,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
             @CheckForNull Properties properties
     ) throws Exception {
         for (Map.Entry<?, AdapterEntry> entry : idToEntry.entrySet()) {
-            BinaryAdapter<?> adapter = entry.getValue().getAdapter(defaultFactoryContext);
+            BinaryAdapter<?> adapter = entry.getValue().getAdapter(defaultFactoryContext, properties);
             if (clazz.isInstance(adapter)) {
                 return (B) adapter;
             }
@@ -95,7 +118,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
     ) throws Exception {
         AdapterEntry entry = classToEntry.get(clazz);
         BinaryAdapter<T> adapter = entry != null ?
-                (BinaryAdapter<T>) entry.getAdapter(defaultFactoryContext) : null;
+                (BinaryAdapter<T>) entry.getAdapter(defaultFactoryContext, properties) : null;
         if (adapter == null && clazz.isEnum() && clazz != Enum.class) {
             adapter = (BinaryAdapter<T>) getAdapterForClass(Enum.class, properties);
         }
@@ -109,7 +132,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
             @CheckForNull Properties properties
     ) throws Exception {
         AdapterEntry entry = idToEntry.get(key);
-        return entry != null ? entry.getAdapter(defaultFactoryContext) : null;
+        return entry != null ? entry.getAdapter(defaultFactoryContext, properties) : null;
     }
 
     private static void checkIdEqual(Key<?> adapterId, Key<?> factoryId) throws IllegalStateException {

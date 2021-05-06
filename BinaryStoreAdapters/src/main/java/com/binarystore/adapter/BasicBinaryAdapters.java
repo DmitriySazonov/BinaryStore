@@ -8,12 +8,12 @@ import com.binarystore.adapter.boxed.FloatBinaryAdapter;
 import com.binarystore.adapter.boxed.IntBinaryAdapter;
 import com.binarystore.adapter.boxed.LongBinaryAdapter;
 import com.binarystore.adapter.boxed.ShortBinaryAdapter;
-import com.binarystore.adapter.collection.map.ConcurrentHashMapBinaryAdapter;
-import com.binarystore.adapter.collection.map.ConcurrentSkipListMapBinaryAdapter;
-import com.binarystore.adapter.collection.map.EnumMapBinaryAdapter;
-import com.binarystore.adapter.collection.map.HashMapBinaryAdapter;
-import com.binarystore.adapter.collection.map.LinkedHashMapBinaryAdapter;
-import com.binarystore.adapter.collection.map.TreeMapBinaryAdapter;
+import com.binarystore.adapter.map.ConcurrentHashMapBinaryAdapter;
+import com.binarystore.adapter.map.ConcurrentSkipListMapBinaryAdapter;
+import com.binarystore.adapter.map.EnumMapBinaryAdapter;
+import com.binarystore.adapter.map.HashMapBinaryAdapter;
+import com.binarystore.adapter.map.LinkedHashMapBinaryAdapter;
+import com.binarystore.adapter.map.TreeMapBinaryAdapter;
 
 import java.util.EnumMap;
 import java.util.HashMap;

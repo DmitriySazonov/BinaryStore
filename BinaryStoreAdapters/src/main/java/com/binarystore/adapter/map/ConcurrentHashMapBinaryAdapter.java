@@ -1,21 +1,21 @@
-package com.binarystore.adapter.collection.map;
+package com.binarystore.adapter.map;
 
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
 import com.binarystore.buffer.ByteBuffer;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class HashMapBinaryAdapter extends AbstractMapBinaryAdapter<HashMap> {
+public class ConcurrentHashMapBinaryAdapter extends AbstractMapBinaryAdapter<ConcurrentHashMap> {
 
     public static final Factory factory = new Factory();
-    private static final Key<?> KEY = DefaultAdapters.HASH_MAP;
+    private static final Key<?> KEY = DefaultAdapters.CONCURRENT_HASH_MAP;
 
-    protected HashMapBinaryAdapter(
+    protected ConcurrentHashMapBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
             @Nonnull MapSettings settings
     ) {
@@ -24,8 +24,8 @@ public class HashMapBinaryAdapter extends AbstractMapBinaryAdapter<HashMap> {
 
     @Nonnull
     @Override
-    protected HashMap<?, ?> createMap(int size, @Nonnull ByteBuffer buffer) {
-        return new HashMap<>(size, 1f);
+    protected ConcurrentHashMap createMap(int size, @Nonnull ByteBuffer buffer) {
+        return new ConcurrentHashMap(size, 1f);
     }
 
     @Nonnull
@@ -34,19 +34,19 @@ public class HashMapBinaryAdapter extends AbstractMapBinaryAdapter<HashMap> {
         return KEY;
     }
 
-    private static class Factory extends MapFactory<HashMap, HashMapBinaryAdapter> {
+    private static class Factory extends MapFactory<ConcurrentHashMap, ConcurrentHashMapBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
-            return HashMapBinaryAdapter.KEY;
+            return KEY;
         }
 
         @Override
-        protected HashMapBinaryAdapter create(
+        protected ConcurrentHashMapBinaryAdapter create(
                 @Nonnull BinaryAdapterProvider provider,
                 @Nonnull MapSettings settings
         ) {
-            return new HashMapBinaryAdapter(provider, settings);
+            return new ConcurrentHashMapBinaryAdapter(provider, settings);
         }
     }
 }

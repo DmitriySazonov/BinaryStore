@@ -3,16 +3,14 @@ package com.example.binaryjson.generator.adapter
 import com.binarystore.InjectType
 import com.binarystore.adapter.BinaryAdapter
 import com.binarystore.adapter.BinaryAdapterProvider
+import com.binarystore.dependency.SingletonProperties
 import com.example.binaryjson.generator.*
 import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator
 import com.example.binaryjson.generator.adapter.types.TypeCodeGeneratorFactory
 import com.squareup.javapoet.*
-import java.util.*
 import javax.annotation.Nonnull
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 private const val ADAPTER_SUFFIX = "BinaryAdapter"
 private const val ID_FIELD_NAME = "ID"
@@ -25,50 +23,19 @@ private const val ADAPTER_PROVIDER_FIELD = "adapterProvider"
 private const val VERSION_FIELD = "versionId"
 private const val ADAPTER_FIELD_SUFFIX = "Adapter"
 
+private const val CUSTOM_PROPERTY_SUFFIX = "Properties"
+
 class AdapterBuilder(
         private val env: ProcessingEnvironment
 ) {
 
-    private val context = object : TypeCodeGenerator.Context {
-        val uniqueAdapterTypes = HashSet<ClassName>()
-        private val valueName = "var"
-        private var valueOrder = 0
-
-        override fun getOrCreateAdapterFieldFor(type: ClassName): String {
-            uniqueAdapterTypes.add(type)
-            return adapterFiledName(type)
-        }
-
-        override fun generateAdapterByKeyExpression(
-                keyExpression: InlineExpression,
-                properties: PropertiesName?
-        ): String {
-            return "${ADAPTER_PROVIDER_FIELD}.${
-                AdapterProviderGeneratorHelper
-                        .invoke_getAdapterByKey(keyExpression, properties)
-            }"
-        }
-
-        override fun generateAdapterForClassExpression(
-                classExpression: InlineExpression,
-                properties: PropertiesName?
-        ): String {
-            return "${ADAPTER_PROVIDER_FIELD}.${
-                AdapterProviderGeneratorHelper
-                        .invoke_getAdapterForClass(classExpression, properties)
-            }"
-        }
-
-        override fun getAdapterTypeNameFor(className: ClassName): TypeName {
-            return ParameterizedTypeName.get(ClassName.get(BinaryAdapter::class.java), className)
-        }
-
-        override fun generateValName(): String {
-            return "$valueName${valueOrder++}"
-        }
-    }
+    private class GeneratedField(
+            val filedSpec: FieldSpec,
+            val initializeBlock: CodeBlock
+    )
 
     fun build(metadata: TypeMetadata): JavaFile {
+        val context = AdapterBuilderContext(ADAPTER_FIELD_SUFFIX, ADAPTER_PROVIDER_FIELD)
         val fields = metadata.fields
         val valueType = TypeName.get(metadata.element.asType())
         val (classPrefix, packageName) = getPrefixAndPackage(metadata.element)
@@ -83,20 +50,23 @@ class AdapterBuilder(
             addOriginatingElement(metadata.element)
             addSuperinterface(getAdapterInterfaceType(metadata.element))
 
-            val sizeMethod = generateSizeMethod(VALUE, valueType, generateSizeCode(fields))
+            val customProperties = generateCustomPropertiesFields(context, fields)
+            val sizeMethod = generateSizeMethod(VALUE, valueType, generateSizeCode(context, fields))
             val serializeMethod = generateSerializeMethod(VALUE, valueType, BUFFER_NAME,
-                    generateSerializeCode(metadata))
+                    generateSerializeCode(context, metadata))
             val deserializeMethod = generateDeserializeMethod(valueType, BUFFER_NAME,
-                    generateDeserializeCode(metadata))
+                    generateDeserializeCode(context, metadata))
 
             val uniqueTypes = context.uniqueAdapterTypes
 
             addField(generateVersionField(metadata.versionId))
             addField(BinaryAdapterProvider::class.java, ADAPTER_PROVIDER_FIELD,
                     Modifier.PRIVATE, Modifier.FINAL)
-            addFields(generateAdapterField(uniqueTypes))
+            addFields(customProperties.map { it.filedSpec })
+            addFields(generateAdapterField(context, uniqueTypes))
 
-            addMethod(generateConstructor(uniqueTypes))
+            addMethod(generateConstructor(context, uniqueTypes,
+                    customProperties.map { it.initializeBlock }))
             addMethod(sizeMethod)
             addMethod(serializeMethod)
             addMethod(deserializeMethod)
@@ -121,14 +91,20 @@ class AdapterBuilder(
         }.build()
     }
 
-    private fun generateConstructor(fields: Collection<ClassName>): MethodSpec {
+    private fun generateConstructor(
+            context: AdapterBuilderContext,
+            fields: Collection<ClassName>,
+            customFieldsInitializes: List<CodeBlock>
+    ): MethodSpec {
         val providerName = "provider"
         return MethodSpec.constructorBuilder().apply {
             addException(Exception::class.java)
             addParameter(BinaryAdapterProvider::class.java, providerName)
 
+            customFieldsInitializes.forEach { addCode(it) }
+
             fields.forEach {
-                addStatement("${adapterFiledName(it)} = ${providerName}." +
+                addStatement("${context.adapterFiledName(it)} = ${providerName}." +
                         AdapterProviderGeneratorHelper
                                 .invoke_getAdapterForClass(
                                         classExpression = InlineExpression("\$T.class"),
@@ -139,9 +115,9 @@ class AdapterBuilder(
         }.build()
     }
 
-    private fun generateAdapterField(fields: Collection<ClassName>): List<FieldSpec> {
+    private fun generateAdapterField(context: AdapterBuilderContext, fields: Collection<ClassName>): List<FieldSpec> {
         return fields.map { type ->
-            val name = adapterFiledName(type)
+            val name = context.adapterFiledName(type)
             val adapterType = ParameterizedTypeName.get(
                     ClassName.get(BinaryAdapter::class.java),
                     type
@@ -150,14 +126,60 @@ class AdapterBuilder(
         }
     }
 
-    private fun generateSizeCode(fields: List<Field>): CodeBlock {
+    private fun getPropertyForField(context: AdapterBuilderContext, field: Field): PropertiesName? {
+        return context.fieldToProperty[field.name]
+    }
+
+    private fun generateCustomPropertiesFields(
+            context: AdapterBuilderContext,
+            fields: List<Field>
+    ): List<GeneratedField> {
+        return fields.filter {
+            !it.properties.isNullOrEmpty()
+        }.mapNotNull {
+            val properties = it.properties ?: return@mapNotNull null
+            val propertiesName = PropertiesName("${it.name}$CUSTOM_PROPERTY_SUFFIX")
+            context.fieldToProperty[it.name] = propertiesName
+            if (properties.size == 1) {
+                generateSingleProperty(propertiesName, properties.first())
+            } else {
+                generateMultiProperty(propertiesName, properties)
+            }
+        }
+    }
+
+    private fun generateMultiProperty(name: PropertiesName, properties: List<TypeName>): GeneratedField {
+        val addPropertyInvoke = MultiPropertiesGeneratorHelper
+                .invoke_addNewProperty(InlineExpression("new \$T()"))
+        val fieldType = MultiPropertiesGeneratorHelper.type
+        val spec = FieldSpec.builder(fieldType, name.name,
+                Modifier.PRIVATE, Modifier.FINAL).build()
+
+        val initializer = CodeBlock.builder().apply {
+            addStatement("${name.name} = new \$T()", fieldType)
+            properties.forEach {
+                addStatement("${name.name}.$addPropertyInvoke", it)
+            }
+        }.build()
+        return GeneratedField(spec, initializer)
+    }
+
+    private fun generateSingleProperty(name: PropertiesName, property: TypeName): GeneratedField {
+        val spec = FieldSpec.builder(SingletonProperties::class.java, name.name,
+                Modifier.PRIVATE, Modifier.FINAL).build()
+        val initializer = CodeBlock.of("${name.name} = new \$T(new \$T()); \n",
+                SingletonProperties::class.java, property)
+        return GeneratedField(spec, initializer)
+    }
+
+    private fun generateSizeCode(context: AdapterBuilderContext, fields: List<Field>): CodeBlock {
         val accumulator = "accumulator_${context.generateValName()}"
         return CodeBlock.builder().apply {
             addStatement("int $accumulator = 0")
             val parts = fields.map {
                 TypeCodeGeneratorFactory.create(it.typeMeta).generateGetSize(
                         value = ValueName("${VALUE}.${it.name}"),
-                        properties = null,
+                        properties = getPropertyForField(context, it),
                         accumulator = AccumulatorName(accumulator),
                         context = context,
                         builder = this
@@ -175,13 +197,13 @@ class AdapterBuilder(
         }.build()
     }
 
-    private fun generateSerializeCode(metadata: TypeMetadata): CodeBlock {
+    private fun generateSerializeCode(context: AdapterBuilderContext, metadata: TypeMetadata): CodeBlock {
         return CodeBlock.builder().apply {
             metadata.fields.map {
                 TypeCodeGeneratorFactory.create(it.typeMeta).generateSerialize(
                         value = ValueName("${VALUE}.${it.name}"),
                         buffer = BufferName(BUFFER_NAME),
-                        properties = null,
+                        properties = getPropertyForField(context, it),
                         context = context,
                         builder = this
                 )
@@ -189,14 +211,14 @@ class AdapterBuilder(
         }.build()
     }
 
-    private fun generateDeserializeCode(metadata: TypeMetadata): CodeBlock {
+    private fun generateDeserializeCode(context: AdapterBuilderContext, metadata: TypeMetadata): CodeBlock {
         val fieldToValue = HashMap<Field, String>()
         return CodeBlock.builder().apply {
             metadata.fields.forEach {
                 fieldToValue[it] = TypeCodeGeneratorFactory.create(it.typeMeta)
                         .generateDeserialize(
                                 buffer = BufferName(BUFFER_NAME),
-                                properties = null,
+                                properties = getPropertyForField(context, it),
                                 context = context,
                                 builder = this
                         ).expression
@@ -238,10 +260,5 @@ class AdapterBuilder(
             addStatement("return $ID_FIELD_NAME")
             returns(metadata.id.keyClass)
         }
-    }
-
-    private fun adapterFiledName(type: ClassName): String {
-        return "${type.simpleName()}${ADAPTER_FIELD_SUFFIX}"
-                .decapitalize(Locale.getDefault())
     }
 }

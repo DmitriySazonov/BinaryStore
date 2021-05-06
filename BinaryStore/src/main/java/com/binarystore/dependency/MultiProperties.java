@@ -6,7 +6,7 @@ import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public class PropertiesResolver implements Properties {
+public final class MultiProperties implements Properties {
 
     private final HashMap<Class<?>, Property<?>> classDependencyMap = new HashMap<>();
 

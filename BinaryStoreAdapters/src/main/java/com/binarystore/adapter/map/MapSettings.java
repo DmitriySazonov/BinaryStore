@@ -1,4 +1,4 @@
-package com.binarystore.adapter.collection.map;
+package com.binarystore.adapter.map;
 
 import com.binarystore.dependency.Property;
 
@@ -54,7 +54,7 @@ public final class MapSettings {
         }
     }
 
-    public final static class CrashExceptionSettingProperty extends AbstractProperty {
+    public final static class ThrowExceptionSettingProperty extends AbstractProperty {
 
         private static final MapSettings settings = new MapSettings(ItemStrategy.THROW_EXCEPTION,
                 ItemStrategy.THROW_EXCEPTION);

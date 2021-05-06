@@ -54,7 +54,7 @@ public final class ClassBinaryAdapter extends AbstractBinaryAdapter<Class> {
         @Override
         public ClassBinaryAdapter create(@Nonnull Context context) throws Exception {
             BinaryAdapter<String> adapter =
-                    context.provider.getAdapterForClass(String.class, null);
+                    context.getAdapterProvider().getAdapterForClass(String.class, null);
             return adapter != null ? new ClassBinaryAdapter(adapter) : new ClassBinaryAdapter();
         }
     }

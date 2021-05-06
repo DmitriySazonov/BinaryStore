@@ -60,9 +60,9 @@ public final class EnumBinaryAdapter extends AbstractBinaryAdapter<Enum> {
         @Nonnull
         @Override
         public EnumBinaryAdapter create(@Nonnull Context context) throws Exception {
-            final BinaryAdapter<String> stringBinaryAdapter = context.provider
+            final BinaryAdapter<String> stringBinaryAdapter = context.getAdapterProvider()
                     .getAdapterForClass(String.class, null);
-            final BinaryAdapter<Class> classBinaryAdapter = context.provider
+            final BinaryAdapter<Class> classBinaryAdapter = context.getAdapterProvider()
                     .getAdapterForClass(Class.class, null);
             return new EnumBinaryAdapter(
                     stringBinaryAdapter != null ? stringBinaryAdapter : new StringBinaryAdapter(),

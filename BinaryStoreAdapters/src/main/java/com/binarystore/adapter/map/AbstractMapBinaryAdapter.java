@@ -1,4 +1,4 @@
-package com.binarystore.adapter.collection.map;
+package com.binarystore.adapter.map;
 
 import com.binarystore.VersionException;
 import com.binarystore.adapter.AbstractBinaryAdapter;
@@ -6,7 +6,7 @@ import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.NullBinaryAdapter;
-import com.binarystore.adapter.collection.map.MapSettings.ItemStrategy;
+import com.binarystore.adapter.map.MapSettings.ItemStrategy;
 import com.binarystore.buffer.ByteBuffer;
 
 import java.util.Map;

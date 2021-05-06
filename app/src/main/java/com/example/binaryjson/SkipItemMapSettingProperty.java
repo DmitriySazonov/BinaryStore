@@ -1,6 +1,6 @@
 package com.example.binaryjson;
 
-import com.binarystore.adapter.collection.map.MapSettings;
+import com.binarystore.adapter.map.MapSettings;
 import com.binarystore.dependency.Property;
 
 import javax.annotation.CheckForNull;

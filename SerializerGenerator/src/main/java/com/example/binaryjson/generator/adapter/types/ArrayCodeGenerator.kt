@@ -7,6 +7,13 @@ import com.example.binaryjson.generator.adapter.getPrimitiveSize
 import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator.SizePart
 import com.squareup.javapoet.CodeBlock
 
+/**
+ * Отдельная реализация EnumMap
+ * Генерация прокидывания пропертей 
+ * Поддержка интерфейса Map
+ * */
+
+
 class ArrayContext(
         val outerBuilder: CodeBlock.Builder,
         context: TypeCodeGenerator.Context

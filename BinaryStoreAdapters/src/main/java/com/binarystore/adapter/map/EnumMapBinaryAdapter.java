@@ -1,4 +1,4 @@
-package com.binarystore.adapter.collection.map;
+package com.binarystore.adapter.map;
 
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
@@ -24,11 +24,12 @@ public class EnumMapBinaryAdapter extends AbstractMapBinaryAdapter<EnumMap> {
 
     protected EnumMapBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
-            @Nonnull MapSettings settings,
-            @Nonnull BinaryAdapter<Class> classBinaryAdapter
-    ) {
+            @Nonnull MapSettings settings
+    ) throws Exception {
         super(provider, settings);
-        this.classBinaryAdapter = classBinaryAdapter;
+        final BinaryAdapter<Class> adapter =
+                provider.getAdapterForClass(Class.class, null);
+        this.classBinaryAdapter = adapter != null ? adapter : new ClassBinaryAdapter();
     }
 
     @Nonnull
@@ -80,10 +81,7 @@ public class EnumMapBinaryAdapter extends AbstractMapBinaryAdapter<EnumMap> {
                 @Nonnull BinaryAdapterProvider provider,
                 @Nonnull MapSettings settings
         ) throws Exception {
-            final BinaryAdapter<Class> adapter =
-                    provider.getAdapterForClass(Class.class, null);
-            return new EnumMapBinaryAdapter(provider, settings,
-                    adapter != null ? adapter : new ClassBinaryAdapter());
+            return new EnumMapBinaryAdapter(provider, settings);
         }
     }
 }

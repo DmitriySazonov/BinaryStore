@@ -73,7 +73,7 @@ object AdapterFactoryBuilder {
                         addAnnotation(Nonnull::class.java)
                     }.build()
             )
-            val provider = "${FACTORY_CONTEXT_NAME}.provider"
+            val provider = "${FACTORY_CONTEXT_NAME}.getAdapterProvider()"
             addCode("return new \$T($provider);", adapterClassName)
             returns(adapterClassName)
         }.build()

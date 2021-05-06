@@ -1,21 +1,21 @@
-package com.binarystore.adapter.collection.map;
+package com.binarystore.adapter.map;
 
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
 import com.binarystore.buffer.ByteBuffer;
 
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class TreeMapBinaryAdapter extends AbstractMapBinaryAdapter<TreeMap> {
+public class ConcurrentSkipListMapBinaryAdapter extends AbstractMapBinaryAdapter<ConcurrentSkipListMap> {
 
     public static final Factory factory = new Factory();
-    private static final Key<?> KEY = DefaultAdapters.TREE_MAP;
+    private static final Key<?> KEY = DefaultAdapters.CONCURRENT_SKI_LIST_MAP;
 
-    protected TreeMapBinaryAdapter(
+    protected ConcurrentSkipListMapBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
             @Nonnull MapSettings settings
     ) {
@@ -24,9 +24,8 @@ public class TreeMapBinaryAdapter extends AbstractMapBinaryAdapter<TreeMap> {
 
     @Nonnull
     @Override
-    @SuppressWarnings("SortedCollectionWithNonComparableKeys")
-    protected TreeMap<?, ?> createMap(int size, @Nonnull ByteBuffer buffer) {
-        return new TreeMap<>();
+    protected ConcurrentSkipListMap createMap(int size, @Nonnull ByteBuffer buffer) {
+        return new ConcurrentSkipListMap();
     }
 
     @Nonnull
@@ -35,19 +34,19 @@ public class TreeMapBinaryAdapter extends AbstractMapBinaryAdapter<TreeMap> {
         return KEY;
     }
 
-    private static class Factory extends MapFactory<TreeMap, TreeMapBinaryAdapter> {
+    private static class Factory extends MapFactory<ConcurrentSkipListMap, ConcurrentSkipListMapBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
-            return TreeMapBinaryAdapter.KEY;
+            return KEY;
         }
 
         @Override
-        protected TreeMapBinaryAdapter create(
+        protected ConcurrentSkipListMapBinaryAdapter create(
                 @Nonnull BinaryAdapterProvider provider,
                 @Nonnull MapSettings settings
         ) {
-            return new TreeMapBinaryAdapter(provider, settings);
+            return new ConcurrentSkipListMapBinaryAdapter(provider, settings);
         }
     }
 }

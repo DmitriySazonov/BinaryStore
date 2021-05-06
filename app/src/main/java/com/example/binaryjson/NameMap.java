@@ -3,7 +3,7 @@ package com.example.binaryjson;
 import com.binarystore.InjectType;
 import com.binarystore.Persistable;
 import com.binarystore.ProvideProperties;
-import com.binarystore.ProvideProperty;
+import com.binarystore.adapter.map.MapSettings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,9 @@ public class NameMap {
     int[] arr;
     Integer lastIdBox = 0;
 
-    @ProvideProperties(properties = {SkipItemMapSettingProperty.class})
-    Map<String, Object> nameMap = new HashMap<>();
+    @ProvideProperties(properties = {
+            MapSettings.SkipItemSettingProperty.class,
+    })
+    public Map<String, Object> nameMap = new HashMap<>();
     String russianText = "Привет мир";
 }
