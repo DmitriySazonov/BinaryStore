@@ -1,4 +1,4 @@
-package com.binarystore.adapter.map;
+package com.binarystore.adapter.collection.map;
 
 import com.binarystore.VersionException;
 import com.binarystore.adapter.AbstractBinaryAdapter;
@@ -6,7 +6,7 @@ import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.NullBinaryAdapter;
-import com.binarystore.adapter.map.MapSettings.ItemStrategy;
+import com.binarystore.adapter.collection.UnknownItemStrategy;
 import com.binarystore.buffer.ByteBuffer;
 
 import java.util.Map;
@@ -128,7 +128,7 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
                 itemSize += adapters.lastKeyAdapter.getSize(entryKey);
                 itemSize += adapters.lastValueAdapter.getSize(entryValue);
             } catch (Throwable throwable) {
-                if (settings.exceptionItemStrategy == ItemStrategy.THROW_EXCEPTION) {
+                if (settings.exceptionItemStrategy == UnknownItemStrategy.THROW_EXCEPTION) {
                     throw new IllegalStateException("Fail getSize for key " + entryKey);
                 }
                 continue;
@@ -177,7 +177,7 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
                 adapters.lastValueAdapter.serialize(byteBuffer, entryValue);
                 offsets[index++] = offset;
             } catch (Throwable throwable) {
-                if (settings.exceptionItemStrategy == ItemStrategy.THROW_EXCEPTION) {
+                if (settings.exceptionItemStrategy == UnknownItemStrategy.THROW_EXCEPTION) {
                     throw new IllegalStateException("Fail serialization for key " + entryKey);
                 }
                 byteBuffer.setOffset(offset);
@@ -227,14 +227,14 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
     }
 
     private boolean checkForNull(@CheckForNull BinaryAdapter<?> adapter, @Nonnull Object key) {
-        if (adapter == null && settings.unknownItemStrategy == ItemStrategy.THROW_EXCEPTION) {
+        if (adapter == null && settings.unknownItemStrategy == UnknownItemStrategy.THROW_EXCEPTION) {
             throw new IllegalArgumentException("Couldn't find adapter for class " + key.getClass());
         }
         return adapter == null;
     }
 
     private boolean checkForNull(@CheckForNull BinaryAdapter<?> adapter, @Nonnull Key<?> key) {
-        if (adapter == null && settings.unknownItemStrategy == ItemStrategy.THROW_EXCEPTION) {
+        if (adapter == null && settings.unknownItemStrategy == UnknownItemStrategy.THROW_EXCEPTION) {
             throw new IllegalArgumentException("Couldn't find adapter for class " + key);
         }
         return adapter == null;

@@ -43,8 +43,8 @@ public final class MapSettings {
 
     public final static class SkipItemSettingProperty extends AbstractProperty {
 
-        private static final MapSettings settings = new MapSettings(ItemStrategy.SKIP,
-                ItemStrategy.SKIP);
+        private static final MapSettings settings = new MapSettings(UnknownItemStrategy.SKIP,
+                UnknownItemStrategy.SKIP);
 
         @Override
         public MapSettings provide() {
@@ -54,8 +54,8 @@ public final class MapSettings {
 
     public final static class ThrowExceptionSettingProperty extends AbstractProperty {
 
-        private static final MapSettings settings = new MapSettings(ItemStrategy.THROW_EXCEPTION,
-                ItemStrategy.THROW_EXCEPTION);
+        private static final MapSettings settings = new MapSettings(UnknownItemStrategy.THROW_EXCEPTION,
+                UnknownItemStrategy.THROW_EXCEPTION);
 
         @Override
         public MapSettings provide() {
