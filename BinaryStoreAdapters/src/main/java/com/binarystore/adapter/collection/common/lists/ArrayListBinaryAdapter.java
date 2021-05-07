@@ -1,11 +1,11 @@
-package com.binarystore.adapter.collection.iterable.common.lists;
+package com.binarystore.adapter.collection.common.lists;
 
-import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
-import com.binarystore.adapter.collection.iterable.base.CollectionBinaryAdapter;
-import com.binarystore.adapter.collection.iterable.settings.CollectionSettings;
+import com.binarystore.adapter.collection.CollectionBinaryAdapter;
+import com.binarystore.adapter.collection.CollectionFactory;
+import com.binarystore.adapter.collection.CollectionSettings;
 
 import java.util.ArrayList;
 
@@ -36,17 +36,20 @@ public class ArrayListBinaryAdapter extends CollectionBinaryAdapter<ArrayList> {
         return KEY;
     }
 
-    private static class Factory implements AdapterFactory<ArrayList, ArrayListBinaryAdapter> {
+    private static class Factory extends CollectionFactory<ArrayList, ArrayListBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
-            return ArrayListBinaryAdapter.KEY;
+            return KEY;
         }
 
         @Nonnull
         @Override
-        public ArrayListBinaryAdapter create(@Nonnull Context context) {
-            return new ArrayListBinaryAdapter(context.provider, context.get(CollectionSettings.class, null));
+        public ArrayListBinaryAdapter create(
+                @Nonnull BinaryAdapterProvider provider,
+                @Nonnull CollectionSettings settings
+        ) {
+            return new ArrayListBinaryAdapter(provider, settings);
         }
     }
 

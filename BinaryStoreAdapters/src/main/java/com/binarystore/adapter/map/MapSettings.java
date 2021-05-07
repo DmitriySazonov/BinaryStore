@@ -3,7 +3,7 @@ package com.binarystore.adapter.map;
 import com.binarystore.dependency.Property;
 
 import javax.annotation.CheckForNull;
-import com.binarystore.adapter.collection.UnknownItemStrategy;
+import com.binarystore.adapter.UnknownItemStrategy;
 
 import javax.annotation.Nonnull;
 

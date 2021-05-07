@@ -1,13 +1,12 @@
-package com.binarystore.adapter.collection.iterable.settings;
+package com.binarystore.adapter.collection;
 
-import com.binarystore.adapter.collection.UnknownItemStrategy;
-import com.binarystore.adapter.collection.map.MapSettings;
+import com.binarystore.adapter.UnknownItemStrategy;
 import com.binarystore.dependency.Property;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public class CollectionSettings {
+public final class CollectionSettings {
 
     public static CollectionSettings defaultSettings = new CollectionSettings(
             UnknownItemStrategy.SKIP, UnknownItemStrategy.SKIP

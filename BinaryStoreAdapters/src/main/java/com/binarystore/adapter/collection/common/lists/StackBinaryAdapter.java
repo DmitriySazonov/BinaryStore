@@ -1,11 +1,11 @@
-package com.binarystore.adapter.collection.iterable.common.lists;
+package com.binarystore.adapter.collection.common.lists;
 
-import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
-import com.binarystore.adapter.collection.iterable.base.CollectionBinaryAdapter;
-import com.binarystore.adapter.collection.iterable.settings.CollectionSettings;
+import com.binarystore.adapter.collection.CollectionBinaryAdapter;
+import com.binarystore.adapter.collection.CollectionFactory;
+import com.binarystore.adapter.collection.CollectionSettings;
 
 import java.util.Stack;
 
@@ -36,7 +36,7 @@ public class StackBinaryAdapter extends CollectionBinaryAdapter<Stack> {
         return KEY;
     }
 
-    private static class Factory implements AdapterFactory<Stack, StackBinaryAdapter> {
+    private static class Factory extends CollectionFactory<Stack, StackBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
@@ -45,8 +45,11 @@ public class StackBinaryAdapter extends CollectionBinaryAdapter<Stack> {
 
         @Nonnull
         @Override
-        public StackBinaryAdapter create(@Nonnull Context context) {
-            return new StackBinaryAdapter(context.provider, context.get(CollectionSettings.class, null));
+        public StackBinaryAdapter create(
+                @Nonnull BinaryAdapterProvider provider,
+                @Nonnull CollectionSettings settings
+        ) {
+            return new StackBinaryAdapter(provider, settings);
         }
     }
 

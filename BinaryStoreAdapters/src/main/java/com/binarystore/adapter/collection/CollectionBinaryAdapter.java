@@ -1,17 +1,19 @@
-package com.binarystore.adapter.collection.iterable.base;
+package com.binarystore.adapter.collection;
 
 import com.binarystore.adapter.AbstractBinaryAdapter;
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.NullBinaryAdapter;
-import com.binarystore.adapter.collection.UnknownItemStrategy;
-import com.binarystore.adapter.collection.iterable.settings.CollectionSettings;
+import com.binarystore.adapter.UnknownItemStrategy;
 import com.binarystore.buffer.ByteBuffer;
+
 import java.util.Collection;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("rawtypes")
 public abstract class CollectionBinaryAdapter<T extends Collection> extends AbstractBinaryAdapter<T> {
 
     @Nonnull

@@ -1,4 +1,4 @@
-package com.binarystore.adapter.collection;
+package com.binarystore.adapter;
 
 public enum UnknownItemStrategy {
     SKIP, THROW_EXCEPTION
