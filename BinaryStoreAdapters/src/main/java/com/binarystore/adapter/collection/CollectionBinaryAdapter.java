@@ -75,13 +75,14 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
     @Override
     public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull T value) throws Exception {
         int index = 0;
-        //TODO
-        int collectionSize = 0;
+        int collectionSize = value.size();
         final Adapters adapters = new Adapters();
         final int[] offsets = new int[collectionSize];
         byteBuffer.write(collectionSize);
         final int startOffset = byteBuffer.getOffset();
-        byteBuffer.moveOffset(collectionSize * ByteBuffer.INTEGER_BYTES);
+        byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for size
+        byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for offset to meta
+        serializeAdditionalMeta(byteBuffer, value); // see in heir
         for (Object element : value) {
             offsets[index++] = byteBuffer.getOffset();
             if (checkForNull(adapters.lastValueAdapter, value)) {
@@ -98,12 +99,14 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
             adapters.lastValueAdapter.key().saveTo(byteBuffer);
             adapters.lastValueAdapter.serialize(byteBuffer, element);
         }
-        final int endOffset = byteBuffer.getOffset();
+        final int endDataOffset = byteBuffer.getOffset();
         byteBuffer.setOffset(startOffset);
-        for (int offset : offsets) {
-            byteBuffer.write(offset);
+        byteBuffer.write(index); // write actual size of map
+        byteBuffer.write(endDataOffset); // write offset to start of meta
+        byteBuffer.setOffset(endDataOffset); // move to the end to write meta
+        for (int i = 0; i < index; i++) {
+            byteBuffer.write(offsets[i]);
         }
-        byteBuffer.setOffset(endOffset);
     }
 
     @Nonnull
@@ -117,9 +120,14 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
         final Collection<Object> mutableCollection = (Collection<Object>) collection;
         byteBuffer.setOffset(startDataOffset);
         for (int i = 0; i < size; i++) {
-            adapters.setValueClass(Key.read(byteBuffer));
+            final Key valueKey = Key.read(byteBuffer);
+            adapters.setValueClass(valueKey);
+            if (checkForNull(adapters.lastValueAdapter, valueKey)) {
+                continue;
+            }
             mutableCollection.add(adapters.lastValueAdapter.deserialize(byteBuffer));
         }
+        byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES * size);
         return collection;
     }
 
@@ -143,21 +151,6 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
             throw new IllegalArgumentException("Couldn't find adapter for class " + key);
         }
         return adapter == null;
-    }
-
-    @Nonnull
-    @SuppressWarnings("unchecked")
-    protected BinaryAdapter<Object> getAdapterForKey(Key<?> key) throws Exception {
-        final BinaryAdapter<?> adapter;
-        if (key.equals(NullBinaryAdapter.instance.key())) {
-            adapter = NullBinaryAdapter.instance;
-        } else {
-            adapter = adapterProvider.getAdapterByKey(key, null);
-        }
-        if (adapter == null) {
-            throw new IllegalArgumentException("Couldn't find adapter for class " + key);
-        }
-        return (BinaryAdapter<Object>) adapter;
     }
 
     @Nonnull
