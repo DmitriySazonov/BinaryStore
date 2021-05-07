@@ -20,7 +20,7 @@ class ClassCodeGenerator(
     ) {
         builder.checkForNullAndWrite(value, buffer) {
             val adapterName = if (metaType.staticType) {
-                context.getOrCreateAdapterFieldFor(metaType.type)
+                context.getOrCreateAdapterFieldFor(metaType.type, properties)
             } else {
                 generateAdapterByClass(value, properties, context, builder)
             }
@@ -73,7 +73,7 @@ class ClassCodeGenerator(
             builder: CodeBlock.Builder
     ) {
         val adapterName = if (metaType.staticType) {
-            context.getOrCreateAdapterFieldFor(metaType.type)
+            context.getOrCreateAdapterFieldFor(metaType.type, properties)
         } else {
             generateAdapterByClass(value, properties, context, builder)
         }
@@ -127,7 +127,7 @@ class ClassCodeGenerator(
             builder: CodeBlock.Builder
     ) {
         val adapterName = if (metaType.staticType) {
-            context.getOrCreateAdapterFieldFor(metaType.type)
+            context.getOrCreateAdapterFieldFor(metaType.type, properties)
         } else {
             generateAdapterByKeyFromBuffer(buffer, properties, context, builder)
         }

@@ -34,6 +34,9 @@ public final class AdapterFactoryContext implements AdapterFactory.Context {
     }
 
     public AdapterFactoryContext wrap(@Nonnull Properties properties) {
+        if (properties == optionalProperties) {
+            return this;
+        }
         return new AdapterFactoryContext(provider, this, properties);
     }
 

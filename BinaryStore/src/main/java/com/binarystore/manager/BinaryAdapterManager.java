@@ -19,7 +19,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
         final Class<?> clazz;
         final AdapterFactory<?, ?> factory;
         private BinaryAdapter<?> adapter = null;
-        private HashMap<Properties, BinaryAdapter<?>> customAdapters = new HashMap<>();
+        private final HashMap<Properties, BinaryAdapter<?>> customAdapters = new HashMap<>();
 
         <T> AdapterEntry(Class<T> clazz, AdapterFactory<T, ? extends BinaryAdapter<T>> factory) {
             this.clazz = clazz;
@@ -38,7 +38,7 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
                 @Nonnull AdapterFactoryContext context,
                 @CheckForNull Properties properties
         ) throws Exception {
-            if (properties == null) {
+            if (properties == null || context == properties) {
                 return getAdapter(context);
             } else {
                 return getCustomAdapter(context, properties);

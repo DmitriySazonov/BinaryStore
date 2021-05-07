@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 public final class EnumBinaryAdapter extends AbstractBinaryAdapter<Enum> {
 
     public static final Factory factory = new Factory();
-    private static final Key.Byte KEY = DefaultAdapters.ENUM;
+    public static final Key.Byte KEY = DefaultAdapters.ENUM;
 
     @Nonnull
     private final BinaryAdapter<String> stringBinaryAdapter;

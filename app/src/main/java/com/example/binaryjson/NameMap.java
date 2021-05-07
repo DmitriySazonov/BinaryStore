@@ -19,5 +19,11 @@ public class NameMap {
             MapSettings.SkipItemSettingProperty.class,
     })
     public Map<String, Object> nameMap = new HashMap<>();
+
+    @ProvideProperties(properties = {
+            MapSettings.ThrowExceptionSettingProperty.class,
+    })
     String russianText = "Привет мир";
+    String russianText2 = "Привет мир";
+    String russianText3 = "Привет мир";
 }

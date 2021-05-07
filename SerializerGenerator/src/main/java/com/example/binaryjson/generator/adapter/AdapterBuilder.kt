@@ -93,7 +93,7 @@ class AdapterBuilder(
 
     private fun generateConstructor(
             context: AdapterBuilderContext,
-            fields: Collection<ClassName>,
+            fields: Collection<StaticAdapterEntry>,
             customFieldsInitializes: List<CodeBlock>
     ): MethodSpec {
         val providerName = "provider"
@@ -104,23 +104,26 @@ class AdapterBuilder(
             customFieldsInitializes.forEach { addCode(it) }
 
             fields.forEach {
-                addStatement("${context.adapterFiledName(it)} = ${providerName}." +
-                        AdapterProviderGeneratorHelper
-                                .invoke_getAdapterForClass(
-                                        classExpression = InlineExpression("\$T.class"),
-                                        properties = null
-                                ), it)
+                val adapterForClass = AdapterProviderGeneratorHelper.invoke_getAdapterForClass(
+                        classExpression = InlineExpression("\$T.class"),
+                        properties = it.propertiesName
+                )
+                addStatement("${context.adapterFiledName(it)} = $providerName.$adapterForClass",
+                        it.className)
             }
             addStatement("this.$ADAPTER_PROVIDER_FIELD = $providerName")
         }.build()
     }
 
-    private fun generateAdapterField(context: AdapterBuilderContext, fields: Collection<ClassName>): List<FieldSpec> {
-        return fields.map { type ->
-            val name = context.adapterFiledName(type)
+    private fun generateAdapterField(
+            context: AdapterBuilderContext,
+            fields: Collection<StaticAdapterEntry>
+    ): List<FieldSpec> {
+        return fields.map { entry ->
+            val name = context.adapterFiledName(entry)
             val adapterType = ParameterizedTypeName.get(
                     ClassName.get(BinaryAdapter::class.java),
-                    type
+                    entry.className
             )
             FieldSpec.builder(adapterType, name, Modifier.PRIVATE, Modifier.FINAL).build()
         }

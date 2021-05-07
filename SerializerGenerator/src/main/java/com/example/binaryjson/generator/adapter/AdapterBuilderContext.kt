@@ -12,6 +12,10 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
+data class StaticAdapterEntry(
+        val className: ClassName,
+        val propertiesName: PropertiesName?
+)
 
 class AdapterBuilderContext(
         private val adapterFieldSuffix: String,
@@ -19,18 +23,20 @@ class AdapterBuilderContext(
 ) : TypeCodeGenerator.Context {
 
     val fieldToProperty = HashMap<String, PropertiesName>()
-    val uniqueAdapterTypes = HashSet<ClassName>()
+    val uniqueAdapterTypes = HashSet<StaticAdapterEntry>()
     private val valueName = "var"
     private var valueOrder = 0
 
-    fun adapterFiledName(type: ClassName): String {
+    fun adapterFiledName(adapterEntry: StaticAdapterEntry): String {
+        val (type, properties) = adapterEntry
         return "${type.simpleName()}${adapterFieldSuffix}"
-                .decapitalize(Locale.getDefault())
+                .decapitalize(Locale.getDefault()) + (properties?.run { "_$name" } ?: "")
     }
 
-    override fun getOrCreateAdapterFieldFor(type: ClassName): String {
-        uniqueAdapterTypes.add(type)
-        return adapterFiledName(type)
+    override fun getOrCreateAdapterFieldFor(type: ClassName, properties: PropertiesName?): String {
+        val entry = StaticAdapterEntry(type, properties)
+        uniqueAdapterTypes.add(entry)
+        return adapterFiledName(entry)
     }
 
     override fun generateAdapterByKeyExpression(

@@ -17,6 +17,7 @@ public @interface DefaultAdapters {
     Key.Byte CONCURRENT_HASH_MAP = new Key.Byte((byte) 12);
     Key.Byte CONCURRENT_SKI_LIST_MAP = new Key.Byte((byte) 13);
     Key.Byte ENUM_MAP = new Key.Byte((byte) 14);
+    Key.Byte MAP = new Key.Byte((byte) 15);
 
 
     Key.Byte NULL = new Key.Byte((byte) 100);

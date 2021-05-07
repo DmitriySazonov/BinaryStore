@@ -19,12 +19,13 @@ import javax.annotation.Nonnull;
 public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBinaryAdapter<T> {
 
     private class Adapters {
-        Key<?> lastKeyKey = null;
-        Key<?> lastValueKey = null;
         @CheckForNull
         BinaryAdapter<Object> lastKeyAdapter = null;
         @CheckForNull
         BinaryAdapter<Object> lastValueAdapter = null;
+
+        private Key<?> lastKeyKey = null;
+        private Key<?> lastValueKey = null;
 
         private Class<?> lastKeyClass = null;
         private Class<?> lastValueClass = null;
@@ -104,7 +105,7 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
 
     @Override
     @SuppressWarnings("unchecked")
-    public final int getSize(@Nonnull T value) throws Exception {
+    public int getSize(@Nonnull T value) throws Exception {
         final Adapters adapters = new Adapters();
         final Set<Map.Entry> entries = value.entrySet();
         int actualSize = 0;
@@ -146,7 +147,7 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
 
     @Override
     @SuppressWarnings("unchecked")
-    public final void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull T value) throws Exception {
+    public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull T value) throws Exception {
         int index = 0;
         final Adapters adapters = new Adapters();
         final int[] offsets = new int[value.size()];
@@ -195,7 +196,7 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
     @Override
     @SuppressWarnings("unchecked")
     @Nonnull
-    public final T deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception {
+    public T deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception {
         final Adapters adapters = new Adapters();
         final byte version = byteBuffer.readByte();
         if (this.version != version) {

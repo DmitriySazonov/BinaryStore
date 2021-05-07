@@ -5,18 +5,19 @@ import com.example.binaryjson.*
 import com.example.binaryjson.benchmark.Benchmark
 import com.example.binaryjson.compare.ObjectComparator
 import java.util.*
+import kotlin.collections.HashMap
 
 object MapTest {
 
     val map = hashMapOf(
-         /*   null to null,
-            "test" to "test",
-            arrayOf(1, 2) to arrayOf(4, 5),
-            1 to 2,
-            4f to 5f,
-            6.toDouble() to 7.toDouble(),
-            'q' to 'r',
-            hashMapOf("nested" to "map") to hashMapOf("should" to "work"),*/
+            /*   null to null,
+               "test" to "test",
+               arrayOf(1, 2) to arrayOf(4, 5),
+               1 to 2,
+               4f to 5f,
+               6.toDouble() to 7.toDouble(),
+               'q' to 'r',
+               hashMapOf("nested" to "map") to hashMapOf("should" to "work"),*/
             TestClass() to NameMap().apply {
                 nameMap["sdfsd"] = 2
                 nameMap["sdfsd"] = arrayOf(4, 5)
@@ -24,8 +25,11 @@ object MapTest {
     )
 
     val enumMap = EnumMap<EnumTest, String>(EnumTest::class.java).apply {
-        put(EnumTest.ENUM, "enum")
-        put(EnumTest.TEST, "test")
+        fillMap()
+    }
+
+    val hashMapWIthEnum = HashMap<EnumTest, String>().apply {
+        fillMap()
     }
 
     object CaseSuite : Benchmark.CaseSuite() {
@@ -36,11 +40,12 @@ object MapTest {
 
     fun start() {
 
-        val map = map
+        val map = mapOf("Singleton" to "map")
         val benchmark = Benchmark(CaseSuite)
         repeat(1) {
             val provider = createDefaultBinaryAdapterManager()
-            val adapter = provider.getAdapterForClass(map.javaClass, null)!!
+            provider.register(EnumTest::class.java, EnumTestBinaryAdapter.Factory())
+            val adapter = provider.getAdapterForClass(Map::class.java, null)!!
             benchmark.start(CaseSuite.GET_SIZE)
             val size = adapter.getSize(map)
             benchmark.end(CaseSuite.GET_SIZE)
@@ -57,5 +62,11 @@ object MapTest {
             compare.toString()
         }
         benchmark.print()
+    }
+
+    private fun MutableMap<EnumTest, String>.fillMap() {
+        EnumTest.values().forEach {
+            put(it, it.name)
+        }
     }
 }

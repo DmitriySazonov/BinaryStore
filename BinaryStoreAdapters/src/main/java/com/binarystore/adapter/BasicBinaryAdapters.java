@@ -13,11 +13,13 @@ import com.binarystore.adapter.map.ConcurrentSkipListMapBinaryAdapter;
 import com.binarystore.adapter.map.EnumMapBinaryAdapter;
 import com.binarystore.adapter.map.HashMapBinaryAdapter;
 import com.binarystore.adapter.map.LinkedHashMapBinaryAdapter;
+import com.binarystore.adapter.map.MapBinaryAdapter;
 import com.binarystore.adapter.map.TreeMapBinaryAdapter;
 
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -42,6 +44,7 @@ public class BasicBinaryAdapters {
         register.register(ConcurrentHashMap.class, ConcurrentHashMapBinaryAdapter.factory);
         register.register(ConcurrentSkipListMap.class, ConcurrentSkipListMapBinaryAdapter.factory);
         register.register(EnumMap.class, EnumMapBinaryAdapter.factory);
+        register.register(Map.class, MapBinaryAdapter.factory);
 
 
         register.register(Class.class, ClassBinaryAdapter.factory);

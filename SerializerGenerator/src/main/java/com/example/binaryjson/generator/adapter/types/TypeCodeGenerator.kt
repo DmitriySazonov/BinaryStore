@@ -13,7 +13,7 @@ interface TypeCodeGenerator {
          * Generate BinaryAdapter field in class for type
          * @return name of generated adapter
          * */
-        fun getOrCreateAdapterFieldFor(type: ClassName): String
+        fun getOrCreateAdapterFieldFor(type: ClassName, properties: PropertiesName?): String
 
         /**
          * Generate expression for getting adapter by key
