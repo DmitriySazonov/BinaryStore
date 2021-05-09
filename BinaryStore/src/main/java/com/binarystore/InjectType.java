@@ -1,5 +1,5 @@
 package com.binarystore;
 
 public enum InjectType {
-    CONSTRUCTOR, ASSIGNMENT
+    CONSTRUCTOR, ASSIGNMENT, AUTO
 }

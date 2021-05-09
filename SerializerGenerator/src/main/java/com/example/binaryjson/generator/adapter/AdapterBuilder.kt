@@ -229,6 +229,7 @@ class AdapterBuilder(
             when (metadata.injectType) {
                 InjectType.ASSIGNMENT -> generateDeserializeAssignmentCode(fieldToValue, metadata)
                 InjectType.CONSTRUCTOR -> generateDeserializeConstructorCode(fieldToValue, metadata)
+                InjectType.AUTO -> generateDeserializeAutoCode(fieldToValue, metadata)
             }
         }.build()
     }
@@ -248,8 +249,42 @@ class AdapterBuilder(
             fieldToValue: Map<Field, String>,
             metadata: TypeMetadata,
     ) {
-        add("return new \$T(\n", metadata.element)
-        metadata.fields.map {
+        val constructor = metadata.findFullMatchConstructor()
+                ?: throw BadConstructorException(metadata.type)
+        generateNewObjectCode(VALUE, metadata.type, constructor,
+                fieldToValue.mapKeys { it.key.toConstructorParam() })
+        addStatement("return $VALUE")
+    }
+
+    private fun CodeBlock.Builder.generateDeserializeAutoCode(
+            fieldToValue: Map<Field, String>,
+            metadata: TypeMetadata
+    ) {
+        val constructor = metadata.findMostAppropriateConstructor()
+        val mutableFieldsToValue = fieldToValue.mapKeys {
+            it.key.toConstructorParam()
+        }.toMutableMap()
+        generateNewObjectCode(VALUE, metadata.type, constructor, mutableFieldsToValue)
+        constructor.params.forEach(mutableFieldsToValue::remove)
+
+        mutableFieldsToValue.forEach {
+            addStatement("${VALUE}.${it.key.name} = ${it.value}")
+        }
+        add("return $VALUE;")
+    }
+
+    private fun CodeBlock.Builder.generateNewObjectCode(
+            valueName: String,
+            typeName: TypeName,
+            constructor: Constructor,
+            fieldToValue: Map<Constructor.Param, String>
+    ) {
+        if (constructor.params.isEmpty()) {
+            addStatement("\$T $valueName = new \$T()", typeName, typeName)
+            return
+        }
+        add("\$T $valueName = new \$T(\n", typeName, typeName)
+        constructor.params.map {
             CodeBlock.of(fieldToValue[it])
         }.also {
             add(CodeBlock.join(it, ",\n"))
@@ -263,5 +298,9 @@ class AdapterBuilder(
             addStatement("return $ID_FIELD_NAME")
             returns(metadata.id.keyClass)
         }
+    }
+
+    private fun Field.toConstructorParam(): Constructor.Param {
+        return Constructor.Param(name, typeMeta.type)
     }
 }

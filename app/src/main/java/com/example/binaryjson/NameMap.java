@@ -8,7 +8,7 @@ import com.binarystore.adapter.map.MapSettings;
 import java.util.HashMap;
 import java.util.Map;
 
-@Persistable(id = "NameMap", inject = InjectType.ASSIGNMENT)
+@Persistable(id = "NameMap", inject = InjectType.AUTO)
 public class NameMap {
 
     int lastId = 0;
@@ -26,4 +26,15 @@ public class NameMap {
     String russianText = "Привет мир";
     String russianText2 = "Привет мир";
     String russianText3 = "Привет мир";
+
+    NameMap(
+            int[] arr,
+            int lastId
+    ) {
+        this.lastId = lastId;
+    }
+
+    public NameMap() {
+
+    }
 }
