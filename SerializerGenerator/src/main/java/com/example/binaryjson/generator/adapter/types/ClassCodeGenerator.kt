@@ -40,7 +40,7 @@ class ClassCodeGenerator(
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ): TypeCodeGenerator.DeserializeResult {
-        val valueName = context.generateValName()
+        val valueName = context.getUniqueValName()
         builder.addStatement("final \$T $valueName", metaType.type)
         builder.checkForNullInBuffer(buffer, nonnullCode = {
             generateNonNullBranchDeserialize(valueName, buffer, properties, context, builder)
@@ -95,10 +95,10 @@ class ClassCodeGenerator(
     ): String {
         val classExpression = "${value.name}.getClass()"
 
-        val name = context.generateValName()
+        val name = context.getUniqueValName()
         val adapterTypeName = context.getAdapterTypeNameFor(metaType.type)
         if (context is ArrayContext) {
-            val lastClass = context.generateValName()
+            val lastClass = context.getUniqueValName()
             val adapterExpression = context.generateAdapterForClassExpression(
                     classExpression = InlineExpression(lastClass),
                     properties = properties
@@ -146,7 +146,7 @@ class ClassCodeGenerator(
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder
     ): String {
-        val keyName = context.generateValName()
+        val keyName = context.getUniqueValName()
         val keyType = KeyGeneratorHelper.type
         val invokeRead = KeyGeneratorHelper.invoke_read(bufferName)
         builder.addStatement("final \$T $keyName = \$T.$invokeRead",
@@ -154,8 +154,8 @@ class ClassCodeGenerator(
 
         return if (context is ArrayContext) {
             val adapterTypeName = context.getAdapterTypeNameFor(metaType.type)
-            val lastKeyName = context.generateValName()
-            val adapterName = context.generateValName()
+            val lastKeyName = context.getUniqueValName()
+            val adapterName = context.getUniqueValName()
             val adapterByKeyExpression = context.generateAdapterByKeyExpression(
                     keyExpression = InlineExpression(lastKeyName),
                     properties = properties

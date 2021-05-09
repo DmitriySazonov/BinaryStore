@@ -36,7 +36,7 @@ interface TypeCodeGenerator {
 
         fun getAdapterTypeNameFor(className: ClassName): TypeName
 
-        fun generateValName(): String
+        fun getUniqueValName(base: String? = null): String
     }
 
     sealed class SizePart {

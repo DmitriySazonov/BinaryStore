@@ -176,7 +176,7 @@ class AdapterBuilder(
     }
 
     private fun generateSizeCode(context: AdapterBuilderContext, fields: List<Field>): CodeBlock {
-        val accumulator = "accumulator_${context.generateValName()}"
+        val accumulator = "accumulator_${context.getUniqueValName()}"
         return CodeBlock.builder().apply {
             addStatement("int $accumulator = 0")
             val parts = fields.map {

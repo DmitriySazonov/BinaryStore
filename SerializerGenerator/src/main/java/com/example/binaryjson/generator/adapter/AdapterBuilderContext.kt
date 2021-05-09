@@ -24,8 +24,9 @@ class AdapterBuilderContext(
 
     val fieldToProperty = HashMap<String, PropertiesName>()
     val uniqueAdapterTypes = HashSet<StaticAdapterEntry>()
-    private val valueName = "var"
-    private var valueOrder = 0
+
+    private val existentValues = HashMap<String, Int>()
+    private var varCount = 0
 
     fun adapterFiledName(adapterEntry: StaticAdapterEntry): String {
         val (type, properties) = adapterEntry
@@ -63,7 +64,16 @@ class AdapterBuilderContext(
         return ParameterizedTypeName.get(ClassName.get(BinaryAdapter::class.java), className)
     }
 
-    override fun generateValName(): String {
-        return "$valueName${valueOrder++}"
+    override fun getUniqueValName(base: String?): String {
+        if (base == null) {
+            return "var${varCount++}"
+        }
+        val order = existentValues[base] ?: 0
+        existentValues[base] = order + 1
+        return if (order == 0) {
+            base
+        } else {
+            "$base$order"
+        }
     }
 }

@@ -51,7 +51,7 @@ class ArrayCodeGenerator(
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ): TypeCodeGenerator.DeserializeResult {
-        val returnName = context.generateValName()
+        val returnName = context.getUniqueValName()
         val arrayDefine = (0 until deep).joinToString("") { "[]" }
         val arrayDimension = { deep: Int ->
             (0 until deep).joinToString("") {

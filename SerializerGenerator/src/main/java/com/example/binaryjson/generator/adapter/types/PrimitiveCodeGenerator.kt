@@ -34,7 +34,7 @@ class PrimitiveCodeGenerator(
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ): TypeCodeGenerator.DeserializeResult {
-        val valueName = context.generateValName()
+        val valueName = context.getUniqueValName()
         val primitiveType = type.unbox()
         val deserializeCode = buffer.name +
                 ".${BufferGeneratorHelper.invoke_readByType(primitiveType)}"
