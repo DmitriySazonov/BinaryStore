@@ -34,7 +34,7 @@ public class NameMap {
         this.lastId = lastId;
     }
 
-    public NameMap() {
+    public NameMap(int a) {
 
     }
 }

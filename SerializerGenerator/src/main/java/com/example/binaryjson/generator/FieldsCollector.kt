@@ -22,7 +22,6 @@ class FieldsCollector(
 
     fun addField(variable: VariableElement) {
         if (!variable.kind.isField) return
-        if (variable.enclosingElement != element) return
         fields += Field(
                 name = variable.simpleName.toString(),
                 typeMeta = createTypeMeta(variable),

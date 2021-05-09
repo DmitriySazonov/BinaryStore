@@ -9,7 +9,7 @@ import java.util.Map;
 @Persistable(id = "TestClassJava")
 public class TestClassJava {
 
-    @Persistable(id = "InnerClass", inject = InjectType.ASSIGNMENT)
+    @Persistable(id = "InnerClass", inject = InjectType.AUTO)
     static class InnerClass extends TestClassJava {
         Map<String, String> map;
         String[][][][] array;
@@ -19,6 +19,16 @@ public class TestClassJava {
         InnerClass() {
             super("", false,
                     false, (byte) 2, new TestNestedClass());
+        }
+
+        public InnerClass(
+                String testPublicField,
+                boolean testPrivateFiled,
+                Boolean testPrivateFiledBox,
+                short testShortField,
+                TestNestedClass testNestedClass
+        ) {
+            super(testPublicField, testPrivateFiled, testPrivateFiledBox, testShortField, testNestedClass);
         }
     }
 

@@ -18,14 +18,26 @@ data class TypeMetadata(
         val constructors: List<Constructor>
 ) {
     val type: TypeName = TypeName.get(element.asType())
+    val appropriatesConstructors = findAllAppropriateConstructors()
 
-    fun findMostAppropriateConstructor(): Constructor {
-        return constructors.maxByOrNull(::percentOfFit)
-                ?: Constructor(emptyList())
+    fun findMostAppropriateConstructor(): Constructor? {
+        if (constructors.isEmpty()) {
+            return Constructor(emptyList())
+        }
+        return appropriatesConstructors.maxByOrNull(::percentOfFit)
     }
 
     fun findFullMatchConstructor(): Constructor? {
-        return constructors.firstOrNull { percentOfFit(it) == 1f }
+        return appropriatesConstructors.firstOrNull { percentOfFit(it) == 1f }
+    }
+
+    private fun findAllAppropriateConstructors(): List<Constructor> {
+        val fieldsAsParams = fields.map {
+            Constructor.Param(it.name, it.typeMeta.type)
+        }.toSet()
+        return constructors.filter { constructor ->
+            constructor.params.all { it in fieldsAsParams }
+        }
     }
 
     private fun percentOfFit(constructor: Constructor): Float {

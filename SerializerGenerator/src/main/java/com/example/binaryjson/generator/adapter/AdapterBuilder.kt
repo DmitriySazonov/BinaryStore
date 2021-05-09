@@ -250,7 +250,7 @@ class AdapterBuilder(
             metadata: TypeMetadata,
     ) {
         val constructor = metadata.findFullMatchConstructor()
-                ?: throw BadConstructorException(metadata.type)
+                ?: throw BadConstructorException.FullMachError(metadata.type)
         generateNewObjectCode(VALUE, metadata.type, constructor,
                 fieldToValue.mapKeys { it.key.toConstructorParam() })
         addStatement("return $VALUE")
@@ -261,6 +261,7 @@ class AdapterBuilder(
             metadata: TypeMetadata
     ) {
         val constructor = metadata.findMostAppropriateConstructor()
+                ?: throw BadConstructorException.NotExistAppropriateConstructor(metadata.type)
         val mutableFieldsToValue = fieldToValue.mapKeys {
             it.key.toConstructorParam()
         }.toMutableMap()

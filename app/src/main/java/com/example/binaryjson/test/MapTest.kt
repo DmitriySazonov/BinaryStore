@@ -9,7 +9,7 @@ import kotlin.collections.HashMap
 
 object MapTest {
 
-    val map = hashMapOf(
+    val map = hashMapOf<Any, Any>(
             /*   null to null,
                "test" to "test",
                arrayOf(1, 2) to arrayOf(4, 5),
@@ -18,10 +18,10 @@ object MapTest {
                6.toDouble() to 7.toDouble(),
                'q' to 'r',
                hashMapOf("nested" to "map") to hashMapOf("should" to "work"),*/
-            TestClass() to NameMap().apply {
+            /*TestClass() to NameMap().apply {
                 nameMap["sdfsd"] = 2
                 nameMap["sdfsd"] = arrayOf(4, 5)
-            }
+            }*/
     )
 
     val enumMap = EnumMap<EnumTest, String>(EnumTest::class.java).apply {
