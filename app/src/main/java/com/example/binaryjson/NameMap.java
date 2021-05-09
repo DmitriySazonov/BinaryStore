@@ -27,9 +27,12 @@ public class NameMap {
     String russianText2 = "Привет мир";
     String russianText3 = "Привет мир";
 
+    Map<String, String> map;
+
     NameMap(
             int[] arr,
-            int lastId
+            int lastId,
+            Map<String, String> map
     ) {
         this.lastId = lastId;
     }

@@ -46,6 +46,12 @@ sealed class TypeMeta {
     }
 }
 
+val TypeName.rawType
+    get() = when (this) {
+        is ParameterizedTypeName -> rawType
+        else -> this
+    }
+
 private fun TypeName.toMeta(isStaticType: Boolean): TypeMeta {
     return when {
         this is ClassName -> TypeMeta.Class.Simple(this, isStaticType)

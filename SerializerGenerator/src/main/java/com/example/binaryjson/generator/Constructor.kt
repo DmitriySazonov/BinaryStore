@@ -17,7 +17,7 @@ class ConstructorCollector {
         constructors += Constructor(executable.parameters.map {
             Constructor.Param(
                     name = it.simpleName.toString(),
-                    type = ClassName.get(it.asType())
+                    type = ClassName.get(it.asType()).rawType
             )
         })
     }
