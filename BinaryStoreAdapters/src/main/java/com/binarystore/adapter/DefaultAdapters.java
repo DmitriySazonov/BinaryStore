@@ -28,6 +28,7 @@ public @interface DefaultAdapters {
     Key.Byte HASH_SET = new Key.Byte((byte) 26);
     Key.Byte LINKED_HASH_SET = new Key.Byte((byte) 27);
     Key.Byte TREE_SET = new Key.Byte((byte) 28);
+    Key.Byte LIST = new Key.Byte((byte) 29);
 
     Key.Byte NULL = new Key.Byte((byte) 100);
     Key.Byte CLASS = new Key.Byte((byte) 101);

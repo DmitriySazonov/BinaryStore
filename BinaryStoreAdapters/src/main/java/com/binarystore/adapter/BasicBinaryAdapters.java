@@ -8,6 +8,16 @@ import com.binarystore.adapter.boxed.FloatBinaryAdapter;
 import com.binarystore.adapter.boxed.IntBinaryAdapter;
 import com.binarystore.adapter.boxed.LongBinaryAdapter;
 import com.binarystore.adapter.boxed.ShortBinaryAdapter;
+import com.binarystore.adapter.collection.common.lists.ArrayListBinaryAdapter;
+import com.binarystore.adapter.collection.common.lists.LinkedListBinaryAdapter;
+import com.binarystore.adapter.collection.common.lists.ListBinaryAdapter;
+import com.binarystore.adapter.collection.common.lists.StackBinaryAdapter;
+import com.binarystore.adapter.collection.common.lists.VectorBinaryAdapter;
+import com.binarystore.adapter.collection.common.queues.ArrayDequeBinaryAdapter;
+import com.binarystore.adapter.collection.common.queues.PriorityQueueBinaryAdapter;
+import com.binarystore.adapter.collection.common.sets.HashSetBinaryAdapter;
+import com.binarystore.adapter.collection.common.sets.LinkedHashSetBinaryAdapter;
+import com.binarystore.adapter.collection.common.sets.TreeSetBinaryAdapter;
 import com.binarystore.adapter.map.ConcurrentHashMapBinaryAdapter;
 import com.binarystore.adapter.map.ConcurrentSkipListMapBinaryAdapter;
 import com.binarystore.adapter.map.EnumMapBinaryAdapter;
@@ -23,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Stack;
 import java.util.LinkedHashMap;
@@ -68,5 +79,6 @@ public class BasicBinaryAdapters {
         register.register(HashSet.class, HashSetBinaryAdapter.factory);
         register.register(LinkedHashSet.class, LinkedHashSetBinaryAdapter.factory);
         register.register(TreeSet.class, TreeSetBinaryAdapter.factory);
+        register.register(List.class, ListBinaryAdapter.factory);
     }
 }
