@@ -12,9 +12,9 @@ import java.util.Map;
 @Persistable(id = "NameMap", inject = InjectType.AUTO)
 public class NameMap {
 
-    int lastId = 0;
+    int lastId = 2;
     int[] arr;
-    Integer lastIdBox = 0;
+    Integer[] lastIdBox = {};
 
     @ProvideProperties(properties = {
             MapSettings.SkipItemSettingProperty.class,

@@ -5,6 +5,7 @@ import com.example.binaryjson.generator.*
 import com.example.binaryjson.generator.adapter.forEach
 import com.example.binaryjson.generator.adapter.getPrimitiveSize
 import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator.SizePart
+import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator.Variable
 import com.squareup.javapoet.CodeBlock
 
 class ArrayContext(
@@ -47,11 +48,12 @@ class ArrayCodeGenerator(
 
     override fun generateDeserialize(
             buffer: BufferName,
+            variable: Variable,
             properties: PropertiesName?,
             context: TypeCodeGenerator.Context,
             builder: CodeBlock.Builder,
     ): TypeCodeGenerator.DeserializeResult {
-        val returnName = context.getUniqueValName()
+        val returnName = variable.name
         val arrayDefine = (0 until deep).joinToString("") { "[]" }
         val arrayDimension = { deep: Int ->
             (0 until deep).joinToString("") {
@@ -59,7 +61,10 @@ class ArrayCodeGenerator(
             }
         }
         var deep = deep
-        builder.addStatement("\$T$arrayDefine $returnName", baseType)
+
+        if (variable is Variable.Unexcited) {
+            builder.addStatement("\$T$arrayDefine $returnName", baseType)
+        }
 
         builder.checkForNullInBuffer(buffer, nonnullCode = {
             val arrayContext = if (useArrayContext) ArrayContext(this, context) else context
@@ -67,9 +72,8 @@ class ArrayCodeGenerator(
                 this.forEach(returnName, typeMeta.type, beforeFor = {
                     this.addStatement("$it = new \$T${arrayDimension(deep--)}", baseType)
                 }) {
-                    val value = factory.create(baseTypeMeta)
-                            .generateDeserialize(buffer, properties, arrayContext, this)
-                    addStatement("$it = ${value.expression}")
+                    factory.create(baseTypeMeta).generateDeserialize(buffer,
+                            Variable.Assignable(it), properties, arrayContext, this)
                 }
             }
             add(innerCodeBuilder.build())

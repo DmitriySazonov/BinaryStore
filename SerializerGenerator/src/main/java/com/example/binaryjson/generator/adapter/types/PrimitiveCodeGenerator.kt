@@ -2,6 +2,7 @@ package com.example.binaryjson.generator.adapter.types
 
 import com.example.binaryjson.generator.*
 import com.example.binaryjson.generator.adapter.getPrimitiveSize
+import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator.*
 import com.squareup.javapoet.CodeBlock
 
 class PrimitiveCodeGenerator(
@@ -15,7 +16,7 @@ class PrimitiveCodeGenerator(
             value: ValueName,
             buffer: BufferName,
             properties: PropertiesName?,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder,
     ) {
         val invokeWrite = BufferGeneratorHelper.invoke_write(buffer, value)
@@ -30,36 +31,40 @@ class PrimitiveCodeGenerator(
 
     override fun generateDeserialize(
             buffer: BufferName,
+            variable: Variable,
             properties: PropertiesName?,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder,
-    ): TypeCodeGenerator.DeserializeResult {
-        val valueName = context.getUniqueValName()
+    ): DeserializeResult {
+        val valueName = variable.name
         val primitiveType = type.unbox()
         val deserializeCode = BufferGeneratorHelper.invoke_readByType(buffer, primitiveType)
         if (isBoxed) {
-            builder.addStatement("final \$T $valueName", type)
+            if (variable is Variable.Unexcited) {
+                builder.addStatement("final \$T $valueName", type)
+            }
             builder.checkForNullInBuffer(buffer, nonnullCode = {
                 addStatement("$valueName = $deserializeCode")
             }, nullCode = {
                 addStatement("$valueName = null")
             })
         } else {
-            builder.addStatement("final $type $valueName = $deserializeCode")
+            val def = if (variable is Variable.Unexcited) "final $type " else ""
+            builder.addStatement("$def$valueName = $deserializeCode")
         }
-        return TypeCodeGenerator.DeserializeResult(valueName)
+        return DeserializeResult(valueName)
     }
 
     override fun generateGetSize(
             value: ValueName,
             properties: PropertiesName?,
             accumulator: AccumulatorName,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder,
-    ): List<TypeCodeGenerator.SizePart> {
+    ): List<SizePart> {
         return listOf(
-                TypeCodeGenerator.SizePart.Constant(if (isBoxed) CHECK_FOR_NULL_SIZE else 0),
-                TypeCodeGenerator.SizePart.Constant(type.getPrimitiveSize())
+                SizePart.Constant(if (isBoxed) CHECK_FOR_NULL_SIZE else 0),
+                SizePart.Constant(type.getPrimitiveSize())
         )
     }
 }

@@ -1,6 +1,6 @@
 package com.binarystore.buffer;
 
-public class ByteBufferHelper {
+public final class ByteBufferHelper {
 
     private static final byte TRUE = ByteBuffer.TRUE;
     private static final byte FALSE = ByteBuffer.FALSE;

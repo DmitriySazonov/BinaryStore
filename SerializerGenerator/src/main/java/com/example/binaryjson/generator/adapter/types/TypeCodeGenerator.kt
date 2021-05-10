@@ -44,6 +44,11 @@ interface TypeCodeGenerator {
         class Constant(val size: Int) : SizePart()
     }
 
+    sealed class Variable(val name: String) {
+        class Unexcited(name: String) : Variable(name)
+        class Assignable(name: String) : Variable(name)
+    }
+
     inline class DeserializeResult(val expression: String)
 
     fun generateSerialize(
@@ -56,6 +61,7 @@ interface TypeCodeGenerator {
 
     fun generateDeserialize(
             buffer: BufferName,
+            variable: Variable,
             properties: PropertiesName?,
             context: Context,
             builder: CodeBlock.Builder,

@@ -5,6 +5,7 @@ import com.example.binaryjson.generator.*
 import com.example.binaryjson.generator.BinaryAdapterGeneratorHelper.invoke_key
 import com.example.binaryjson.generator.KeyGeneratorHelper.invoke_getSize
 import com.example.binaryjson.generator.KeyGeneratorHelper.invoke_saveTo
+import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator.*
 import com.squareup.javapoet.CodeBlock
 
 class ClassCodeGenerator(
@@ -15,7 +16,7 @@ class ClassCodeGenerator(
             value: ValueName,
             buffer: BufferName,
             properties: PropertiesName?,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder,
     ) {
         builder.checkForNullAndWrite(value, buffer) {
@@ -36,32 +37,35 @@ class ClassCodeGenerator(
 
     override fun generateDeserialize(
             buffer: BufferName,
+            variable: Variable,
             properties: PropertiesName?,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder,
-    ): TypeCodeGenerator.DeserializeResult {
-        val valueName = context.getUniqueValName()
-        builder.addStatement("final \$T $valueName", metaType.type)
+    ): DeserializeResult {
+        val valueName = variable.name
+        if (variable is Variable.Unexcited) {
+            builder.addStatement("final \$T $valueName", metaType.type)
+        }
         builder.checkForNullInBuffer(buffer, nonnullCode = {
             generateNonNullBranchDeserialize(valueName, buffer, properties, context, builder)
         }, nullCode = {
             addStatement("$valueName = null")
         })
-        return TypeCodeGenerator.DeserializeResult(valueName)
+        return DeserializeResult(valueName)
     }
 
     override fun generateGetSize(
             value: ValueName,
             properties: PropertiesName?,
             accumulator: AccumulatorName,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder,
-    ): List<TypeCodeGenerator.SizePart> {
+    ): List<SizePart> {
         builder.checkForNull(value, nonnullCode = {
             generateNonnullBranchGetSize(value, properties, accumulator, context, builder)
         })
         return listOf(
-                TypeCodeGenerator.SizePart.Constant(CHECK_FOR_NULL_SIZE)
+                SizePart.Constant(CHECK_FOR_NULL_SIZE)
         )
     }
 
@@ -69,7 +73,7 @@ class ClassCodeGenerator(
             value: ValueName,
             properties: PropertiesName?,
             accumulator: AccumulatorName,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder
     ) {
         val adapterName = if (metaType.staticType) {
@@ -90,15 +94,15 @@ class ClassCodeGenerator(
     private fun generateAdapterByClass(
             value: ValueName,
             properties: PropertiesName?,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder,
     ): String {
         val classExpression = "${value.name}.getClass()"
 
-        val name = context.getUniqueValName()
+        val name = context.getUniqueValName("adapter")
         val adapterTypeName = context.getAdapterTypeNameFor(metaType.type)
         if (context is ArrayContext) {
-            val lastClass = context.getUniqueValName()
+            val lastClass = context.getUniqueValName("lastClass")
             val adapterExpression = context.generateAdapterForClassExpression(
                     classExpression = InlineExpression(lastClass),
                     properties = properties
@@ -123,7 +127,7 @@ class ClassCodeGenerator(
             value: String,
             buffer: BufferName,
             properties: PropertiesName?,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder
     ) {
         val adapterName = if (metaType.staticType) {
@@ -143,10 +147,10 @@ class ClassCodeGenerator(
     private fun generateAdapterByKeyFromBuffer(
             bufferName: BufferName,
             properties: PropertiesName?,
-            context: TypeCodeGenerator.Context,
+            context: Context,
             builder: CodeBlock.Builder
     ): String {
-        val keyName = context.getUniqueValName()
+        val keyName = context.getUniqueValName("key")
         val keyType = KeyGeneratorHelper.type
         val invokeRead = KeyGeneratorHelper.invoke_read(bufferName)
         builder.addStatement("final \$T $keyName = \$T.$invokeRead",
@@ -154,8 +158,8 @@ class ClassCodeGenerator(
 
         return if (context is ArrayContext) {
             val adapterTypeName = context.getAdapterTypeNameFor(metaType.type)
-            val lastKeyName = context.getUniqueValName()
-            val adapterName = context.getUniqueValName()
+            val lastKeyName = context.getUniqueValName("lastKey")
+            val adapterName = context.getUniqueValName("adapter")
             val adapterByKeyExpression = context.generateAdapterByKeyExpression(
                     keyExpression = InlineExpression(lastKeyName),
                     properties = properties

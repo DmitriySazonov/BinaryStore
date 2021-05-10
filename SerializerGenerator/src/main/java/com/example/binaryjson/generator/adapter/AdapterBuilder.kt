@@ -177,7 +177,7 @@ class AdapterBuilder(
     }
 
     private fun generateSizeCode(context: AdapterBuilderContext, fields: List<Field>): CodeBlock {
-        val accumulator = "accumulator_${context.getUniqueValName()}"
+        val accumulator = context.getUniqueValName("accumulator")
         return CodeBlock.builder().apply {
             addStatement("int $accumulator = ${ByteBuffer.INTEGER_BYTES}") // size for version
             val parts = fields.map {
@@ -228,6 +228,9 @@ class AdapterBuilder(
                 fieldToValue[it] = TypeCodeGeneratorFactory.create(it.typeMeta)
                         .generateDeserialize(
                                 buffer = BufferName(BUFFER_NAME),
+                                variable = TypeCodeGenerator.Variable.Unexcited(
+                                        context.getUniqueValName(it.name)
+                                ),
                                 properties = getPropertyForField(context, it),
                                 context = context,
                                 builder = this
