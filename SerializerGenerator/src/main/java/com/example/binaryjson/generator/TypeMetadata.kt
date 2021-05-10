@@ -22,7 +22,7 @@ data class TypeMetadata(
 
     fun findMostAppropriateConstructor(): Constructor? {
         if (constructors.isEmpty()) {
-            return Constructor(emptyList())
+            return Constructor(emptyList(), isForced = false)
         }
         return appropriatesConstructors.maxByOrNull(::percentOfFit)
     }
@@ -35,9 +35,25 @@ data class TypeMetadata(
         val fieldsAsParams = fields.map {
             Constructor.Param(it.name, it.typeMeta.type)
         }.toSet()
-        return constructors.filter { constructor ->
-            constructor.params.all { it in fieldsAsParams }
+        val allAppropriate = ArrayList<Constructor>(constructors.size)
+        var collectOnlyForced = false
+        constructors.forEach { constructor ->
+            val isAppropriate = constructor.params.all { it in fieldsAsParams }
+            if (isAppropriate && (constructor.isForced || !collectOnlyForced)) {
+                if (constructor.isForced && !collectOnlyForced) {
+                    collectOnlyForced = true
+                    allAppropriate.clear()
+                }
+                allAppropriate.add(constructor)
+            }
+            if (!isAppropriate && constructor.isForced) {
+                throw BadConstructorException.InappropriateForcedConstructor(type)
+            }
         }
+        if (collectOnlyForced && allAppropriate.size > 1) {
+            throw BadConstructorException.MultiForcedConstructor(type, allAppropriate.size)
+        }
+        return allAppropriate
     }
 
     private fun percentOfFit(constructor: Constructor): Float {

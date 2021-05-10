@@ -1,7 +1,7 @@
 package com.example.binaryjson.generator
 
 import com.binarystore.IdType
-import com.binarystore.Persistable
+import com.binarystore.annotation.Persistable
 import com.example.binaryjson.generator.adapter.AdapterBuilder
 import com.example.binaryjson.generator.registrator.RegistratorBuilder
 import com.squareup.javapoet.ClassName
@@ -17,7 +17,7 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.tools.Diagnostic
 
-@SupportedAnnotationTypes(value = ["com.binarystore.Persistable"])
+@SupportedAnnotationTypes(value = ["com.binarystore.annotation.Persistable"])
 class BinaryAdapterGenerator : AbstractProcessor() {
 
     override fun process(annotations: Set<TypeElement?>, roundEnv: RoundEnvironment): Boolean {

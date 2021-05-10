@@ -1,8 +1,8 @@
 package com.example.binaryjson.generator
 
-import com.binarystore.Array
-import com.binarystore.ProvideProperties
-import com.binarystore.ProvideProperty
+import com.binarystore.annotation.Array
+import com.binarystore.annotation.ProvideProperties
+import com.binarystore.annotation.ProvideProperty
 import com.squareup.javapoet.ArrayTypeName
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.ParameterizedTypeName

@@ -1,4 +1,7 @@
-package com.binarystore;
+package com.binarystore.annotation;
+
+import com.binarystore.IdType;
+import com.binarystore.InjectType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

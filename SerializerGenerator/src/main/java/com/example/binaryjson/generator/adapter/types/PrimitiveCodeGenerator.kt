@@ -36,8 +36,7 @@ class PrimitiveCodeGenerator(
     ): TypeCodeGenerator.DeserializeResult {
         val valueName = context.getUniqueValName()
         val primitiveType = type.unbox()
-        val deserializeCode = buffer.name +
-                ".${BufferGeneratorHelper.invoke_readByType(primitiveType)}"
+        val deserializeCode = BufferGeneratorHelper.invoke_readByType(buffer, primitiveType)
         if (isBoxed) {
             builder.addStatement("final \$T $valueName", type)
             builder.checkForNullInBuffer(buffer, nonnullCode = {

@@ -1,4 +1,4 @@
-package com.binarystore;
+package com.binarystore.annotation;
 
 import com.binarystore.dependency.Property;
 
@@ -9,7 +9,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.FIELD})
-// @Repeatable() Need make it repeatable when java will be 8
-public @interface ProvideProperties {
-    Class<? extends Property<?>>[] properties();
+public @interface ProvideProperty {
+    Class<? extends Property<?>> property();
 }

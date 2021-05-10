@@ -52,10 +52,10 @@ public class ByteBufferHelper {
     public static void write(final byte[] bytes, final int offset, final String value) {
         final int len = value.length();
         char curChar;
-        for (int i = 0, j = offset; i < len; i++) {
+        for (int i = 0, j = offset - 1; i < len; i++) {
             curChar = value.charAt(i);
-            bytes[j++] = (byte) (curChar);
-            bytes[j++] = (byte) (curChar >>> 8);
+            bytes[++j] = (byte) (curChar);
+            bytes[++j] = (byte) (curChar >>> 8);
         }
     }
 
@@ -124,8 +124,8 @@ public class ByteBufferHelper {
 
     public static String readString(final byte[] bytes, final int offset, final int length) {
         final char[] chars = new char[length];
-        for (int i = 0, j = offset; i < length; i++) {
-            chars[i] = (char) (((bytes[j++] & 0xFF)) | ((bytes[j++] & 0xFF) << 8));
+        for (int i = 0, j = offset - 1; i < length; i++) {
+            chars[i] = (char) (((bytes[++j] & 0xFF)) | ((bytes[++j] & 0xFF) << 8));
         }
         return new String(chars);
     }

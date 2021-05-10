@@ -3,6 +3,7 @@ package com.example.binaryjson.generator.adapter
 import com.binarystore.InjectType
 import com.binarystore.adapter.BinaryAdapter
 import com.binarystore.adapter.BinaryAdapterProvider
+import com.binarystore.buffer.ByteBuffer
 import com.binarystore.dependency.SingletonProperties
 import com.example.binaryjson.generator.*
 import com.example.binaryjson.generator.adapter.types.TypeCodeGenerator
@@ -178,7 +179,7 @@ class AdapterBuilder(
     private fun generateSizeCode(context: AdapterBuilderContext, fields: List<Field>): CodeBlock {
         val accumulator = "accumulator_${context.getUniqueValName()}"
         return CodeBlock.builder().apply {
-            addStatement("int $accumulator = 0")
+            addStatement("int $accumulator = ${ByteBuffer.INTEGER_BYTES}") // size for version
             val parts = fields.map {
                 TypeCodeGeneratorFactory.create(it.typeMeta).generateGetSize(
                         value = ValueName("${VALUE}.${it.name}"),
@@ -202,6 +203,8 @@ class AdapterBuilder(
 
     private fun generateSerializeCode(context: AdapterBuilderContext, metadata: TypeMetadata): CodeBlock {
         return CodeBlock.builder().apply {
+            addStatement(BufferGeneratorHelper.invoke_write(BufferName(BUFFER_NAME),
+                    ValueName(VERSION_FIELD)))
             metadata.fields.map {
                 TypeCodeGeneratorFactory.create(it.typeMeta).generateSerialize(
                         value = ValueName("${VALUE}.${it.name}"),
@@ -217,6 +220,10 @@ class AdapterBuilder(
     private fun generateDeserializeCode(context: AdapterBuilderContext, metadata: TypeMetadata): CodeBlock {
         val fieldToValue = HashMap<Field, String>()
         return CodeBlock.builder().apply {
+            val readInt = BufferGeneratorHelper
+                    .invoke_readByType(BufferName(BUFFER_NAME), TypeName.INT)
+            val readVersion = context.getUniqueValName("version")
+            addStatement("final int $readVersion = $readInt")
             metadata.fields.forEach {
                 fieldToValue[it] = TypeCodeGeneratorFactory.create(it.typeMeta)
                         .generateDeserialize(

@@ -1,8 +1,8 @@
 package com.example.binaryjson;
 
-import com.binarystore.Array;
+import com.binarystore.annotation.Array;
 import com.binarystore.InjectType;
-import com.binarystore.Persistable;
+import com.binarystore.annotation.Persistable;
 
 import java.util.Map;
 

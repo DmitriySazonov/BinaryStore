@@ -1,6 +1,6 @@
 package com.example.binaryjson.test
 
-import com.binarystore.Persistable
+import com.binarystore.annotation.Persistable
 
 @Persistable(id = "StoryResponse")
 class StoryResponse(

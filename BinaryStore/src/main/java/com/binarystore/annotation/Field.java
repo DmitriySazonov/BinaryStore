@@ -1,6 +1,5 @@
-package com.binarystore;
+package com.binarystore.annotation;
 
-import com.binarystore.dependency.Property;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,6 +8,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.FIELD})
-public @interface ProvideProperty {
-    Class<? extends Property<?>> property();
+public @interface Field {
+    boolean staticType() default false;
 }

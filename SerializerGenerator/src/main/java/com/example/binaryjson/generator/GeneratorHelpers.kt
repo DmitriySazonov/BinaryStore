@@ -64,8 +64,8 @@ object BufferGeneratorHelper {
 
     fun invoke_readByte(): String = "readByte()"
 
-    fun invoke_readByType(typeName: TypeName): String =
-            "read${typeName.toString().capitalize(Locale.ROOT)}()"
+    fun invoke_readByType(bufferName: BufferName, typeName: TypeName): String =
+            "${bufferName.name}.read${typeName.toString().capitalize(Locale.ROOT)}()"
 }
 
 object MultiPropertiesGeneratorHelper {

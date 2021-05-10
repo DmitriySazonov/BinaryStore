@@ -1,8 +1,9 @@
 package com.example.binaryjson;
 
 import com.binarystore.InjectType;
-import com.binarystore.Persistable;
-import com.binarystore.ProvideProperties;
+import com.binarystore.annotation.BinaryConstructor;
+import com.binarystore.annotation.Persistable;
+import com.binarystore.annotation.ProvideProperties;
 import com.binarystore.adapter.map.MapSettings;
 
 import java.util.HashMap;
@@ -29,10 +30,19 @@ public class NameMap {
 
     Map<String, String> map;
 
+    @BinaryConstructor
     NameMap(
             int[] arr,
             int lastId,
             Map<String, String> map
+    ) {
+        this.lastId = lastId;
+    }
+
+    NameMap(
+            int[] arr,
+            int lastId,
+            String russianText3
     ) {
         this.lastId = lastId;
     }

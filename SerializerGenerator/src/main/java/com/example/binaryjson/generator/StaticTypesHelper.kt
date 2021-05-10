@@ -1,6 +1,6 @@
 package com.example.binaryjson.generator
 
-import com.binarystore.Field
+import com.binarystore.annotation.Field
 import com.example.binaryjson.generator.visitors.CanBeStaticTypeDetector
 import com.squareup.javapoet.ClassName
 import javax.annotation.processing.ProcessingEnvironment
