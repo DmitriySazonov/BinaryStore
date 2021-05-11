@@ -62,7 +62,7 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
         int elementCount = 0;
         for (Object element : value) {
             adapters.setValueClass(element);
-            if (checkForNull(adapters.lastValueAdapter, value)) {
+            if (checkForNull(adapters.lastValueAdapter, element)) {
                 continue;
             }
             int itemSize = 0;
@@ -96,10 +96,11 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for size
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for offset to meta
         for (Object element : value) {
-            final int offset = byteBuffer.getOffset();
-            if (checkForNull(adapters.lastValueAdapter, value)) {
+            adapters.setValueClass(element);
+            if (checkForNull(adapters.lastValueAdapter, element)) {
                 continue;
             }
+            final int offset = byteBuffer.getOffset();
             try {
                 adapters.lastValueAdapter.key().saveTo(byteBuffer);
                 adapters.lastValueAdapter.serialize(byteBuffer, element);
