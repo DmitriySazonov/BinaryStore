@@ -1,4 +1,4 @@
-package com.binarystore.adapter.collection.common.lists;
+package com.binarystore.adapter.collection.common.sets;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapterProvider;
@@ -9,18 +9,18 @@ import com.binarystore.adapter.collection.common.AbstractCollectionAdapter;
 import com.binarystore.dependency.Properties;
 import com.binarystore.dependency.PropertiesUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class ListBinaryAdapter extends AbstractCollectionAdapter<List> {
+public class SetBinaryAdapter extends AbstractCollectionAdapter<Set> {
 
     public static final Factory factory = new Factory();
-    private static final Key.Byte KEY = DefaultAdapters.LIST;
+    private static final Key.Byte KEY = DefaultAdapters.SET;
 
-    protected ListBinaryAdapter(
+    protected SetBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
             @Nonnull CollectionSettings settings,
             @Nonnull Properties properties
@@ -29,8 +29,8 @@ public class ListBinaryAdapter extends AbstractCollectionAdapter<List> {
     }
 
     @Override
-    protected List<?> createCollection(int size) {
-        return new ArrayList<>(size);
+    protected Set<?> createCollection(int size) {
+        return new HashSet<>();
     }
 
     @Nonnull
@@ -39,7 +39,7 @@ public class ListBinaryAdapter extends AbstractCollectionAdapter<List> {
         return KEY;
     }
 
-    private static class Factory implements AdapterFactory<List, ListBinaryAdapter> {
+    private static class Factory implements AdapterFactory<Set, SetBinaryAdapter> {
 
         @Override
         public Key.Byte adapterKey() {
@@ -49,10 +49,11 @@ public class ListBinaryAdapter extends AbstractCollectionAdapter<List> {
 
         @Nonnull
         @Override
-        public ListBinaryAdapter create(@Nonnull Context context) {
+        public SetBinaryAdapter create(@Nonnull Context context) {
             CollectionSettings settings = PropertiesUtils.getOrDefault(context, CollectionSettings.class,
                     CollectionSettings.defaultSettings);
-            return new ListBinaryAdapter(context.getAdapterProvider(), settings, context);
+            return new SetBinaryAdapter(context.getAdapterProvider(), settings, context);
         }
     }
+
 }

@@ -7,11 +7,9 @@ import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.NullBinaryAdapter;
 import com.binarystore.adapter.UnknownItemStrategy;
-import com.binarystore.adapter.map.AbstractMapBinaryAdapter;
 import com.binarystore.buffer.ByteBuffer;
 
 import java.util.Collection;
-import java.util.Map;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -47,10 +45,10 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
 
     protected CollectionBinaryAdapter(
             @Nonnull final BinaryAdapterProvider provider,
-            @CheckForNull final CollectionSettings settings
+            @Nonnull final CollectionSettings settings
     ) {
         this.adapterProvider = provider;
-        this.settings = settings != null ? settings : CollectionSettings.defaultSettings;
+        this.settings = settings;
     }
 
     protected abstract T createCollection(int size);
@@ -58,7 +56,7 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
     @Override
     public int getSize(@Nonnull T value) throws Exception {
         final Adapters adapters = new Adapters();
-        int accumulator = key().getSize();
+        int accumulator = 0;
         int elementCount = 0;
         for (Object element : value) {
             adapters.setValueClass(element);
@@ -107,7 +105,7 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
                 offsets[index++] = offset;
             } catch  (Throwable throwable) {
                 if (settings.exceptionItemStrategy == UnknownItemStrategy.THROW_EXCEPTION) {
-                    throw new IllegalStateException("Fail getSize for class" + element.getClass());
+                    throw new IllegalStateException("Fail serialization for class" + element.getClass());
                 }
                 byteBuffer.setOffset(offset);
             }
