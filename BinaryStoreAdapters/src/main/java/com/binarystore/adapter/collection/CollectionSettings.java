@@ -1,15 +1,14 @@
-package com.binarystore.adapter.map;
+package com.binarystore.adapter.collection;
 
+import com.binarystore.adapter.UnknownItemStrategy;
 import com.binarystore.dependency.Property;
 
 import javax.annotation.CheckForNull;
-import com.binarystore.adapter.UnknownItemStrategy;
-
 import javax.annotation.Nonnull;
 
-public final class MapSettings {
+public final class CollectionSettings {
 
-    public static MapSettings defaultSettings = new MapSettings(
+    public static CollectionSettings defaultSettings = new CollectionSettings(
             UnknownItemStrategy.SKIP, UnknownItemStrategy.SKIP
     );
 
@@ -18,7 +17,7 @@ public final class MapSettings {
     @Nonnull
     public final UnknownItemStrategy exceptionItemStrategy;
 
-    public MapSettings(
+    public CollectionSettings(
             @Nonnull UnknownItemStrategy unknownItemStrategy,
             @Nonnull UnknownItemStrategy exceptionItemStrategy
     ) {
@@ -26,7 +25,7 @@ public final class MapSettings {
         this.exceptionItemStrategy = exceptionItemStrategy;
     }
 
-    public abstract static class AbstractProperty implements Property<MapSettings> {
+    public abstract static class AbstractProperty implements Property<CollectionSettings> {
 
         @CheckForNull
         @Override
@@ -36,29 +35,29 @@ public final class MapSettings {
 
         @Nonnull
         @Override
-        public Class<MapSettings> typeClass() {
-            return MapSettings.class;
+        public Class<CollectionSettings> typeClass() {
+            return CollectionSettings.class;
         }
     }
 
     public final static class SkipItemSettingProperty extends AbstractProperty {
 
-        private static final MapSettings settings = new MapSettings(UnknownItemStrategy.SKIP,
+        private static final CollectionSettings settings = new CollectionSettings(UnknownItemStrategy.SKIP,
                 UnknownItemStrategy.SKIP);
 
         @Override
-        public MapSettings provide() {
+        public CollectionSettings provide() {
             return settings;
         }
     }
 
-    public final static class ThrowExceptionSettingProperty extends AbstractProperty {
+    public final static class CrashExceptionSettingProperty extends AbstractProperty {
 
-        private static final MapSettings settings = new MapSettings(UnknownItemStrategy.THROW_EXCEPTION,
+        private static final CollectionSettings settings = new CollectionSettings(UnknownItemStrategy.THROW_EXCEPTION,
                 UnknownItemStrategy.THROW_EXCEPTION);
 
         @Override
-        public MapSettings provide() {
+        public CollectionSettings provide() {
             return settings;
         }
     }

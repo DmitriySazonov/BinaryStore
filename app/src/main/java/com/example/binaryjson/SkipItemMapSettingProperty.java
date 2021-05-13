@@ -1,5 +1,6 @@
 package com.example.binaryjson;
 
+import com.binarystore.adapter.UnknownItemStrategy;
 import com.binarystore.adapter.map.MapSettings;
 import com.binarystore.dependency.Property;
 
@@ -22,6 +23,6 @@ public class SkipItemMapSettingProperty implements Property<MapSettings> {
     @CheckForNull
     @Override
     public MapSettings provide() {
-        return new MapSettings(MapSettings.ItemStrategy.SKIP, MapSettings.ItemStrategy.SKIP);
+        return new MapSettings(UnknownItemStrategy.SKIP, UnknownItemStrategy.SKIP);
     }
 }
