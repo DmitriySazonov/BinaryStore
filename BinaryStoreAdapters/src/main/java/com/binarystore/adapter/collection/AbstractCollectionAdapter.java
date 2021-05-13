@@ -1,10 +1,8 @@
-package com.binarystore.adapter.collection.common;
+package com.binarystore.adapter.collection;
 
 import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.Key;
-import com.binarystore.adapter.collection.CollectionBinaryAdapter;
-import com.binarystore.adapter.collection.CollectionSettings;
 import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.dependency.Properties;
 

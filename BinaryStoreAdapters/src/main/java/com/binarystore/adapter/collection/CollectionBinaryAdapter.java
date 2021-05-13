@@ -139,7 +139,14 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
             if (checkForNull(adapters.lastValueAdapter, valueKey)) {
                 continue;
             }
-            mutableCollection.add(adapters.lastValueAdapter.deserialize(byteBuffer));
+            try {
+                mutableCollection.add(adapters.lastValueAdapter.deserialize(byteBuffer));
+            } catch (Throwable throwable) {
+                if (settings.exceptionItemStrategy == UnknownItemStrategy.THROW_EXCEPTION) {
+                    throw new IllegalStateException("Fail deserialize for key " + valueKey);
+                }
+            }
+
         }
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES * size);
         return collection;

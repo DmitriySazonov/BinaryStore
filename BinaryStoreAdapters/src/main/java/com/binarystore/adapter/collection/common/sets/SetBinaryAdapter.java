@@ -5,7 +5,7 @@ import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.collection.CollectionSettings;
-import com.binarystore.adapter.collection.common.AbstractCollectionAdapter;
+import com.binarystore.adapter.collection.AbstractCollectionAdapter;
 import com.binarystore.dependency.Properties;
 import com.binarystore.dependency.PropertiesUtils;
 
