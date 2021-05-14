@@ -1,7 +1,6 @@
 package com.example.binaryjson.test
 
 import android.util.Log
-import com.binarystore.adapter.collection.common.queues.QueueBinaryAdapter
 import com.binarystore.buffer.StaticByteBuffer
 import com.example.binaryjson.TestClass
 import com.example.binaryjson.benchmark.Benchmark
