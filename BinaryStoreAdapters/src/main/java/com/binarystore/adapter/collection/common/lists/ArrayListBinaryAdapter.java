@@ -6,6 +6,7 @@ import com.binarystore.adapter.Key;
 import com.binarystore.adapter.collection.CollectionBinaryAdapter;
 import com.binarystore.adapter.collection.CollectionFactory;
 import com.binarystore.adapter.collection.CollectionSettings;
+import com.binarystore.buffer.ByteBuffer;
 
 import java.util.ArrayList;
 
@@ -23,6 +24,16 @@ public class ArrayListBinaryAdapter extends CollectionBinaryAdapter<ArrayList> {
             @CheckForNull CollectionSettings settings
     ) {
         super(provider, settings);
+    }
+
+    @Override
+    public ArrayList deserializeSubCollection(@Nonnull ByteBuffer byteBuffer, int startIndex, int endIndex) throws Exception {
+        return super.deserializeSubCollection(byteBuffer, startIndex, endIndex);
+    }
+
+    @Override
+    public Object deserializeElementAt(@Nonnull ByteBuffer byteBuffer, int index) throws Exception {
+        return super.deserializeElementAt(byteBuffer, index);
     }
 
     @Override

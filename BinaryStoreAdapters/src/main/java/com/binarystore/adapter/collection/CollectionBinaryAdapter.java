@@ -125,31 +125,95 @@ public abstract class CollectionBinaryAdapter<T extends Collection> extends Abst
     @Override
     public T deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception {
         final Adapters adapters = new Adapters();
-        final byte version = byteBuffer.readByte();
-        if (this.version != version) {
-            throw new VersionException(this.version, version);
-        }
+        checkVersion(byteBuffer);
         final int size = byteBuffer.readInt();
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // skip offest to meta
         final T collection = createCollection(size);
         final Collection<Object> mutableCollection = (Collection<Object>) collection;
         for (int i = 0; i < size; i++) {
-            final Key valueKey = Key.read(byteBuffer);
-            adapters.setValueKey(valueKey);
-            if (checkForNull(adapters.lastValueAdapter, valueKey)) {
-                continue;
-            }
-            try {
-                mutableCollection.add(adapters.lastValueAdapter.deserialize(byteBuffer));
-            } catch (Throwable throwable) {
-                if (settings.exceptionItemStrategy == UnknownItemStrategy.THROW_EXCEPTION) {
-                    throw new IllegalStateException("Fail deserialize for key " + valueKey);
-                }
-            }
-
+            mutableCollection.add(deserializeElement(byteBuffer, adapters));
         }
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES * size);
         return collection;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected T deserializeSubCollection(@Nonnull ByteBuffer byteBuffer, int startIndex, int endIndex) throws Exception {
+        final Adapters adapters = new Adapters();
+        checkVersion(byteBuffer);
+        final int size = byteBuffer.readInt();
+        checkSubCollectionBounds(startIndex, endIndex, size);
+
+        final int metaOffset = byteBuffer.readInt();  // find meta start index
+        byteBuffer.setOffset(metaOffset); // move to meta
+        byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES * startIndex); // find element index in byte buffer
+        final int elementOffset = byteBuffer.readInt();
+        byteBuffer.setOffset(elementOffset); // move to element
+
+        final int subCollectionSize = endIndex - startIndex + 1;
+
+        final T collection = createCollection(subCollectionSize);
+        final Collection<Object> mutableCollection = (Collection<Object>) collection;
+        for (int i = 0; i < subCollectionSize; i++) {
+            mutableCollection.add(deserializeElement(byteBuffer, adapters));
+        }
+        byteBuffer.setOffset(metaOffset);
+        byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES * size);
+        return collection;
+    }
+
+    protected Object deserializeElementAt(@Nonnull ByteBuffer byteBuffer, int index) throws Exception {
+        final Adapters adapters = new Adapters();
+        checkVersion(byteBuffer);
+        final int size = byteBuffer.readInt();
+        if (index < 0 || index >= size) {
+            throw new IllegalArgumentException("Illegal Capacity: " + index);
+        }
+
+        final int metaOffset = byteBuffer.readInt();  // find meta start index
+        byteBuffer.setOffset(metaOffset); // move to meta
+        byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES * index); // find element index in byte buffer
+        final int elementOffset = byteBuffer.readInt();
+        byteBuffer.setOffset(elementOffset); // move to element
+
+        Object result = deserializeElement(byteBuffer, adapters); // read element
+
+        byteBuffer.setOffset(metaOffset);
+        byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES * size);
+        return result;
+    }
+
+    private Object deserializeElement(@Nonnull ByteBuffer byteBuffer, Adapters adapters) throws Exception {
+        final Key valueKey = Key.read(byteBuffer);
+        adapters.setValueKey(valueKey);
+        Object result = null;
+        try {
+            if (!checkForNull(adapters.lastValueAdapter, valueKey)) {
+                result = adapters.lastValueAdapter.deserialize(byteBuffer);
+            }
+        } catch (Throwable throwable) {
+            if (settings.exceptionItemStrategy == UnknownItemStrategy.THROW_EXCEPTION) {
+                throw new IllegalStateException("Fail deserialize for key " + valueKey);
+            }
+        }
+        return result;
+    }
+
+    private void checkVersion(@Nonnull ByteBuffer byteBuffer) throws Exception {
+        final byte version = byteBuffer.readByte();
+        if (this.version != version) {
+            throw new VersionException(this.version, version);
+        }
+    }
+
+    private void checkSubCollectionBounds(int startIndex, int endIndex, int collectionSize) throws Exception {
+        if (startIndex < 0) {
+            throw new IndexOutOfBoundsException("fromIndex = " + startIndex);
+        } else if (endIndex > collectionSize) {
+            throw new IndexOutOfBoundsException("toIndex = " + endIndex);
+        } else if (startIndex > endIndex) {
+            throw new IllegalArgumentException("fromIndex(" + startIndex + ") > toIndex(" + endIndex + ")");
+        }
     }
 
     private boolean checkForNull(@CheckForNull BinaryAdapter<?> adapter, @Nonnull Object key) {
