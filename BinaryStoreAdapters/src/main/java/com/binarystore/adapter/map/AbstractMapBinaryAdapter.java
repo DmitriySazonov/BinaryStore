@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 @SuppressWarnings("rawtypes")
 public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBinaryAdapter<T> {
 
-    private class Adapters {
+    private final class Adapters {
         @CheckForNull
         BinaryAdapter<Object> lastKeyAdapter = null;
         @CheckForNull

@@ -1,11 +1,11 @@
-package com.binarystore.adapter.collection.common.sets;
+package com.binarystore.adapter.collection.sets;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.collection.CollectionSettings;
-import com.binarystore.adapter.collection.AbstractCollectionAdapter;
+import com.binarystore.adapter.collection.CollectionBinaryAdapter;
 import com.binarystore.dependency.Properties;
 import com.binarystore.dependency.PropertiesUtils;
 
@@ -15,7 +15,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class SetBinaryAdapter extends AbstractCollectionAdapter<Set> {
+public class SetBinaryAdapter extends CollectionBinaryAdapter<Set> {
 
     public static final Factory factory = new Factory();
     private static final Key.Byte KEY = DefaultAdapters.SET;

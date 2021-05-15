@@ -1,9 +1,9 @@
-package com.binarystore.adapter.collection.common.lists;
+package com.binarystore.adapter.collection.lists;
 
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
-import com.binarystore.adapter.collection.CollectionBinaryAdapter;
+import com.binarystore.adapter.collection.AbstractCollectionBinaryAdapter;
 import com.binarystore.adapter.collection.CollectionFactory;
 import com.binarystore.adapter.collection.CollectionSettings;
 
@@ -13,7 +13,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class StackBinaryAdapter extends CollectionBinaryAdapter<Stack> {
+public class StackBinaryAdapter extends AbstractCollectionBinaryAdapter<Stack> {
 
     public static final Factory factory = new Factory();
     private static final Key<?> KEY = DefaultAdapters.STACK;

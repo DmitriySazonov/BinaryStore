@@ -1,24 +1,24 @@
-package com.binarystore.adapter.collection.common.lists;
+package com.binarystore.adapter.collection.sets;
 
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
-import com.binarystore.adapter.collection.CollectionBinaryAdapter;
+import com.binarystore.adapter.collection.AbstractCollectionBinaryAdapter;
 import com.binarystore.adapter.collection.CollectionFactory;
 import com.binarystore.adapter.collection.CollectionSettings;
 
-import java.util.Vector;
+import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class VectorBinaryAdapter extends CollectionBinaryAdapter<Vector> {
+public class TreeSetBinaryAdapter extends AbstractCollectionBinaryAdapter<TreeSet> {
 
     public static final Factory factory = new Factory();
-    private static final Key<?> KEY = DefaultAdapters.VECTOR;
+    private static final Key<?> KEY = DefaultAdapters.TREE_SET;
 
-    protected VectorBinaryAdapter(
+    protected TreeSetBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
             @CheckForNull CollectionSettings settings
     ) {
@@ -26,8 +26,8 @@ public class VectorBinaryAdapter extends CollectionBinaryAdapter<Vector> {
     }
 
     @Override
-    protected Vector<?> createCollection(int size) {
-        return new Vector<>();
+    protected TreeSet<?> createCollection(int size) {
+        return new TreeSet<>();
     }
 
     @Nonnull
@@ -36,7 +36,7 @@ public class VectorBinaryAdapter extends CollectionBinaryAdapter<Vector> {
         return KEY;
     }
 
-    private static class Factory extends CollectionFactory<Vector, VectorBinaryAdapter> {
+    private static class Factory extends CollectionFactory<TreeSet, TreeSetBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
@@ -45,12 +45,13 @@ public class VectorBinaryAdapter extends CollectionBinaryAdapter<Vector> {
 
         @Nonnull
         @Override
-        public VectorBinaryAdapter create(
+        public TreeSetBinaryAdapter create(
                 @Nonnull BinaryAdapterProvider provider,
                 @Nonnull CollectionSettings settings
         ) {
-            return new VectorBinaryAdapter(provider, settings);
+            return new TreeSetBinaryAdapter(provider, settings);
         }
     }
 
 }
+

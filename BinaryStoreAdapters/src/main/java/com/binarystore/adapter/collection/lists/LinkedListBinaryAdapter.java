@@ -1,24 +1,24 @@
-package com.binarystore.adapter.collection.common.sets;
+package com.binarystore.adapter.collection.lists;
 
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
-import com.binarystore.adapter.collection.CollectionBinaryAdapter;
+import com.binarystore.adapter.collection.AbstractCollectionBinaryAdapter;
 import com.binarystore.adapter.collection.CollectionFactory;
 import com.binarystore.adapter.collection.CollectionSettings;
 
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class LinkedHashSetBinaryAdapter extends CollectionBinaryAdapter<LinkedHashSet> {
+public class LinkedListBinaryAdapter extends AbstractCollectionBinaryAdapter<LinkedList> {
 
     public static final Factory factory = new Factory();
-    private static final Key<?> KEY = DefaultAdapters.LINKED_HASH_SET;
+    private static final Key<?> KEY = DefaultAdapters.LINKED_LIST;
 
-    protected LinkedHashSetBinaryAdapter(
+    protected LinkedListBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
             @CheckForNull CollectionSettings settings
     ) {
@@ -26,8 +26,8 @@ public class LinkedHashSetBinaryAdapter extends CollectionBinaryAdapter<LinkedHa
     }
 
     @Override
-    protected LinkedHashSet<?> createCollection(int size) {
-        return new LinkedHashSet<>();
+    protected LinkedList<?> createCollection(int size) {
+        return new LinkedList<>();
     }
 
     @Nonnull
@@ -36,7 +36,7 @@ public class LinkedHashSetBinaryAdapter extends CollectionBinaryAdapter<LinkedHa
         return KEY;
     }
 
-    private static class Factory extends CollectionFactory<LinkedHashSet, LinkedHashSetBinaryAdapter> {
+    private static class Factory extends CollectionFactory<LinkedList, LinkedListBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
@@ -45,11 +45,11 @@ public class LinkedHashSetBinaryAdapter extends CollectionBinaryAdapter<LinkedHa
 
         @Nonnull
         @Override
-        public LinkedHashSetBinaryAdapter create(
+        public LinkedListBinaryAdapter create(
                 @Nonnull BinaryAdapterProvider provider,
                 @Nonnull CollectionSettings settings
         ) {
-            return new LinkedHashSetBinaryAdapter(provider, settings);
+            return new LinkedListBinaryAdapter(provider, settings);
         }
     }
 

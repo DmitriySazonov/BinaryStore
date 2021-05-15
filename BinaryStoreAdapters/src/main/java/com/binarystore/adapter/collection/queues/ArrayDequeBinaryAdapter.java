@@ -1,24 +1,24 @@
-package com.binarystore.adapter.collection.common.queues;
+package com.binarystore.adapter.collection.queues;
 
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
-import com.binarystore.adapter.collection.CollectionBinaryAdapter;
+import com.binarystore.adapter.collection.AbstractCollectionBinaryAdapter;
 import com.binarystore.adapter.collection.CollectionFactory;
 import com.binarystore.adapter.collection.CollectionSettings;
 
-import java.util.PriorityQueue;
+import java.util.ArrayDeque;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class PriorityQueueBinaryAdapter extends CollectionBinaryAdapter<PriorityQueue> {
+public class ArrayDequeBinaryAdapter extends AbstractCollectionBinaryAdapter<ArrayDeque> {
 
     public static final Factory factory = new Factory();
-    private static final Key<?> KEY = DefaultAdapters.PRIORITY_QUEUE;
+    private static final Key<?> KEY = DefaultAdapters.ARRAY_DEQUE;
 
-    protected PriorityQueueBinaryAdapter(
+    protected ArrayDequeBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
             @CheckForNull CollectionSettings settings
     ) {
@@ -26,8 +26,8 @@ public class PriorityQueueBinaryAdapter extends CollectionBinaryAdapter<Priority
     }
 
     @Override
-    protected PriorityQueue<?> createCollection(int size) {
-        return new PriorityQueue<>();
+    protected ArrayDeque<?> createCollection(int size) {
+        return new ArrayDeque<>();
     }
 
     @Nonnull
@@ -36,7 +36,7 @@ public class PriorityQueueBinaryAdapter extends CollectionBinaryAdapter<Priority
         return KEY;
     }
 
-    private static class Factory extends CollectionFactory<PriorityQueue, PriorityQueueBinaryAdapter> {
+    private static class Factory extends CollectionFactory<ArrayDeque, ArrayDequeBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
@@ -45,13 +45,12 @@ public class PriorityQueueBinaryAdapter extends CollectionBinaryAdapter<Priority
 
         @Nonnull
         @Override
-        public PriorityQueueBinaryAdapter create(
+        public ArrayDequeBinaryAdapter create(
                 @Nonnull BinaryAdapterProvider provider,
                 @Nonnull CollectionSettings settings
         ) {
-            return new PriorityQueueBinaryAdapter(provider, settings);
+            return new ArrayDequeBinaryAdapter(provider, settings);
         }
     }
 
 }
-

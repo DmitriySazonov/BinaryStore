@@ -1,24 +1,24 @@
-package com.binarystore.adapter.collection.common.sets;
+package com.binarystore.adapter.collection.sets;
 
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
-import com.binarystore.adapter.collection.CollectionBinaryAdapter;
+import com.binarystore.adapter.collection.AbstractCollectionBinaryAdapter;
 import com.binarystore.adapter.collection.CollectionFactory;
 import com.binarystore.adapter.collection.CollectionSettings;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class HashSetBinaryAdapter extends CollectionBinaryAdapter<HashSet> {
+public class LinkedHashSetBinaryAdapter extends AbstractCollectionBinaryAdapter<LinkedHashSet> {
 
     public static final Factory factory = new Factory();
-    private static final Key<?> KEY = DefaultAdapters.HASH_SET;
+    private static final Key<?> KEY = DefaultAdapters.LINKED_HASH_SET;
 
-    protected HashSetBinaryAdapter(
+    protected LinkedHashSetBinaryAdapter(
             @Nonnull BinaryAdapterProvider provider,
             @CheckForNull CollectionSettings settings
     ) {
@@ -26,8 +26,8 @@ public class HashSetBinaryAdapter extends CollectionBinaryAdapter<HashSet> {
     }
 
     @Override
-    protected HashSet<?> createCollection(int size) {
-        return new HashSet<>();
+    protected LinkedHashSet<?> createCollection(int size) {
+        return new LinkedHashSet<>();
     }
 
     @Nonnull
@@ -36,7 +36,7 @@ public class HashSetBinaryAdapter extends CollectionBinaryAdapter<HashSet> {
         return KEY;
     }
 
-    private static class Factory extends CollectionFactory<HashSet, HashSetBinaryAdapter> {
+    private static class Factory extends CollectionFactory<LinkedHashSet, LinkedHashSetBinaryAdapter> {
 
         @Override
         public Key<?> adapterKey() {
@@ -45,11 +45,11 @@ public class HashSetBinaryAdapter extends CollectionBinaryAdapter<HashSet> {
 
         @Nonnull
         @Override
-        public HashSetBinaryAdapter create(
+        public LinkedHashSetBinaryAdapter create(
                 @Nonnull BinaryAdapterProvider provider,
                 @Nonnull CollectionSettings settings
         ) {
-            return new HashSetBinaryAdapter(provider, settings);
+            return new LinkedHashSetBinaryAdapter(provider, settings);
         }
     }
 

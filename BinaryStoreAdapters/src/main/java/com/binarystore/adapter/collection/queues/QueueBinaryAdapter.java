@@ -1,11 +1,11 @@
-package com.binarystore.adapter.collection.common.queues;
+package com.binarystore.adapter.collection.queues;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.collection.CollectionSettings;
-import com.binarystore.adapter.collection.AbstractCollectionAdapter;
+import com.binarystore.adapter.collection.CollectionBinaryAdapter;
 import com.binarystore.dependency.Properties;
 import com.binarystore.dependency.PropertiesUtils;
 
@@ -15,7 +15,7 @@ import java.util.Queue;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class QueueBinaryAdapter extends AbstractCollectionAdapter<Queue> {
+public class QueueBinaryAdapter extends CollectionBinaryAdapter<Queue> {
 
     public static final Factory factory = new Factory();
     private static final Key.Byte KEY = DefaultAdapters.QUEUE;

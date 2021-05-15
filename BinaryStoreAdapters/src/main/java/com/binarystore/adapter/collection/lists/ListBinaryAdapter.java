@@ -1,11 +1,11 @@
-package com.binarystore.adapter.collection.common.lists;
+package com.binarystore.adapter.collection.lists;
 
 import com.binarystore.adapter.AdapterFactory;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.DefaultAdapters;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.collection.CollectionSettings;
-import com.binarystore.adapter.collection.AbstractCollectionAdapter;
+import com.binarystore.adapter.collection.CollectionBinaryAdapter;
 import com.binarystore.dependency.Properties;
 import com.binarystore.dependency.PropertiesUtils;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class ListBinaryAdapter extends AbstractCollectionAdapter<List> {
+public class ListBinaryAdapter extends CollectionBinaryAdapter<List> {
 
     public static final Factory factory = new Factory();
     private static final Key.Byte KEY = DefaultAdapters.LIST;
