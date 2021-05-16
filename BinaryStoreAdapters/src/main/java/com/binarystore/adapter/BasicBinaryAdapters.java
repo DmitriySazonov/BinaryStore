@@ -11,6 +11,7 @@ import com.binarystore.adapter.boxed.ShortBinaryAdapter;
 import com.binarystore.adapter.collection.lists.ArrayListBinaryAdapter;
 import com.binarystore.adapter.collection.lists.LinkedListBinaryAdapter;
 import com.binarystore.adapter.collection.lists.ListBinaryAdapter;
+import com.binarystore.adapter.collection.lists.SimpleBinaryLazyListAdapter;
 import com.binarystore.adapter.collection.lists.StackBinaryAdapter;
 import com.binarystore.adapter.collection.lists.VectorBinaryAdapter;
 import com.binarystore.adapter.collection.queues.ArrayDequeBinaryAdapter;
@@ -27,6 +28,7 @@ import com.binarystore.adapter.map.HashMapBinaryAdapter;
 import com.binarystore.adapter.map.LinkedHashMapBinaryAdapter;
 import com.binarystore.adapter.map.MapBinaryAdapter;
 import com.binarystore.adapter.map.TreeMapBinaryAdapter;
+import com.binarystore.collections.SimpleBinaryLazyList;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -86,5 +88,6 @@ public class BasicBinaryAdapters {
         register.register(List.class, ListBinaryAdapter.factory);
         register.register(Set.class, SetBinaryAdapter.factory);
         register.register(Queue.class, QueueBinaryAdapter.factory);
+        register.register(SimpleBinaryLazyList.class, SimpleBinaryLazyListAdapter.factory);
     }
 }

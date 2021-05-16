@@ -1,5 +1,7 @@
 package com.binarystore.buffer;
 
+import javax.annotation.Nonnull;
+
 public interface ByteBuffer {
 
     byte TRUE = 1;
@@ -13,6 +15,8 @@ public interface ByteBuffer {
     int LONG_BYTES = 8;
     int FLOAT_BYTES = 4;
     int DOUBLE_BYTES = 8;
+
+    StaticByteBuffer getSubBuffer(int start, int end);
 
     int getOffset();
 
@@ -40,7 +44,9 @@ public interface ByteBuffer {
 
     void write(final byte[] value);
 
-    void write(final String value);
+    void write(@Nonnull final String value);
+
+    void write(@Nonnull final StaticByteBuffer value);
 
     char readChar();
 

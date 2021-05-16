@@ -2,6 +2,8 @@ package com.binarystore.buffer;
 
 import java.util.Arrays;
 
+import javax.annotation.Nonnull;
+
 public class DynamicByteBuffer implements ByteBuffer {
 
     private byte[] bytes;
@@ -13,6 +15,12 @@ public class DynamicByteBuffer implements ByteBuffer {
 
     public DynamicByteBuffer(byte[] bytes) {
         this.bytes = bytes;
+    }
+
+    @Override
+    public StaticByteBuffer getSubBuffer(int start, int end) {
+        checkFreeSpace(end - Math.max(offset, start));
+        return new StaticByteBuffer(bytes, start, end);
     }
 
     @Override
@@ -99,10 +107,15 @@ public class DynamicByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public void write(final String value) {
+    public void write(@Nonnull final String value) {
         checkFreeSpace(CHAR_BYTES * value.length());
         ByteBufferHelper.write(bytes, offset, value);
         offset += CHAR_BYTES * value.length();
+    }
+
+    @Override
+    public void write(@Nonnull StaticByteBuffer value) {
+        write(value.getBytes());
     }
 
     @Override

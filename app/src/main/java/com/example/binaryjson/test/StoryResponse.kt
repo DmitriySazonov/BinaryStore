@@ -8,7 +8,7 @@ class StoryResponse(
         @JvmField val type: String,
         @JvmField val title: String,
         @JvmField val ttl: Long,
-        @JvmField val items: Array<Channel>,
+        @JvmField val items: List<Channel>,
         @JvmField val rid: String,
         @JvmField val item_id: String,
         @JvmField val item_type: String
@@ -60,6 +60,6 @@ class StoryResponse(
             @JvmField val id: String,
             @JvmField val source: Source,
             @JvmField val isSubscribed: Boolean,
-            @JvmField val stories: Array<Story>
+            @JvmField val stories: List<Story>
     )
 }

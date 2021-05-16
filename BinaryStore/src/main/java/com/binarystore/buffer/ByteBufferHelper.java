@@ -127,7 +127,7 @@ public final class ByteBufferHelper {
         for (int i = 0, j = offset - 1; i < length; i++) {
             chars[i] = (char) (((bytes[++j] & 0xFF)) | ((bytes[++j] & 0xFF) << 8));
         }
-        return new String(chars);
+        return new String(chars, 0, length);
     }
 
     private static short makeShort(byte b1, byte b0) {

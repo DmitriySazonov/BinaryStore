@@ -1,5 +1,6 @@
 package com.example.binaryjson.test
 
+import com.binarystore.collections.SimpleBinaryLazyList
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -18,8 +19,12 @@ object StoryResponseParser {
         )
     }
 
-    private fun parseChannels(array: JSONArray): Array<StoryResponse.Channel> {
-        return Array(array.length()) {
+    private fun <T> createList(collection: Collection<T>): List<T> {
+        return ArrayList<T>(collection)
+    }
+
+    private fun parseChannels(array: JSONArray): List<StoryResponse.Channel> {
+        return (0 until array.length()).map {
             val json = array.getJSONObject(it).getJSONObject("data")
             StoryResponse.Channel(
                     id = json.getString("id"),
@@ -27,11 +32,11 @@ object StoryResponseParser {
                     isSubscribed = json.getBoolean("isSubscribed"),
                     stories = parseStory(json.getJSONArray("stories"))
             )
-        }
+        }.let(::createList)
     }
 
-    private fun parseStory(array: JSONArray): Array<StoryResponse.Story> {
-        return Array(array.length()) {
+    private fun parseStory(array: JSONArray): List<StoryResponse.Story> {
+        return (0 until array.length()).map {
             val json = array.getJSONObject(it).getJSONObject("data")
             StoryResponse.Story(
                     id = json.getString("id"),
@@ -44,7 +49,7 @@ object StoryResponseParser {
                     video = json.getString("video"),
                     status = json.getString("status"),
             )
-        }
+        }.let(::createList)
     }
 
     private fun parsePreviews(json: JSONObject): StoryResponse.Previews {

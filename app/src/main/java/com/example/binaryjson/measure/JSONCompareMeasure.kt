@@ -20,6 +20,8 @@ class JSONCompareMeasure(context: Context) {
         val SERIALIZE = case("serialize")
         val DESERIALIZE = case("deserialize")
 
+        val ITERATE = case("iterate")
+
         val READ_JSON = case("read_json")
         val CREATE_JSON_OBJ = case("create_json_obj")
         val PARSE_FROM_JSON = case("parse_from_json")
@@ -70,6 +72,15 @@ class JSONCompareMeasure(context: Context) {
         benchmark.start(CompareCaseSuite.DESERIALIZE)
         val desResponse = adapter.deserialize(buffer)
         benchmark.end(CompareCaseSuite.DESERIALIZE)
+
+
+        /*   benchmark.start(CompareCaseSuite.ITERATE)
+           desResponse.items.forEach {
+               it.stories.forEach {
+
+               }
+           }
+           benchmark.end(CompareCaseSuite.ITERATE)*/
 
         benchmark.start(CompareCaseSuite.TO_BYTE_ARRAY)
         String(this.json.toByteArray(StandardCharsets.UTF_8), StandardCharsets.UTF_8)

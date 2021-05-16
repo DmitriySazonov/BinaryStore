@@ -2,6 +2,7 @@ package com.example.binaryjson.test
 
 import android.util.Log
 import com.binarystore.buffer.StaticByteBuffer
+import com.binarystore.collections.SimpleBinaryLazyList
 import com.example.binaryjson.TestClass
 import com.example.binaryjson.benchmark.Benchmark
 import com.example.binaryjson.compare.ObjectComparator
@@ -42,6 +43,16 @@ object CollectionTest {
             //TreeSet(currentTestData)
     )
 
+    private val lazyList = SimpleBinaryLazyList(listOf(
+            TestClass(),
+            TestClass(),
+            TestClass(),
+            TestClass(),
+            TestClass(),
+            TestClass(),
+            TestClass(),
+    ))
+
 
     object CaseSuite : Benchmark.CaseSuite() {
         val SERIALIZE = CaseSuite.case("serialize")
@@ -50,33 +61,36 @@ object CollectionTest {
     }
 
     fun start() {
-        testCases.forEach {
-            val collection = it
-            val benchmark = Benchmark(CaseSuite)
-            repeat(1) { _ ->
-                Log.d("Benchmark", "check ${it.javaClass}")
-                val provider = createDefaultBinaryAdapterManager()
-                val adapter = provider.getAdapterForClass(collection.javaClass, null)!!
-                benchmark.start(CaseSuite.GET_SIZE)
-                val size = adapter.getSize(collection)
-                benchmark.end(CaseSuite.GET_SIZE)
-                val buffer = StaticByteBuffer(size)
-                benchmark.start(CaseSuite.SERIALIZE)
-                adapter.serialize(buffer, collection)
-                benchmark.end(CaseSuite.SERIALIZE)
-                buffer.offset = 0
-                benchmark.start(CaseSuite.DESERIALIZE)
-                val newCollection = adapter.deserialize(buffer)
-                benchmark.end(CaseSuite.DESERIALIZE)
-
-                val compare = ObjectComparator.compare(collection, newCollection)
-                compare.toString()
-            }
-            benchmark.print()
-        }
+        start(lazyList)
+//        testCases.forEach(::start)
     }
-     private fun createTestObject() : Any {
-         return TestClass()
-     }
+
+    private fun start(collection: Collection<Any>) {
+        val benchmark = Benchmark(CaseSuite)
+        repeat(1) { _ ->
+            Log.d("Benchmark", "check ${collection.javaClass}")
+            val provider = createDefaultBinaryAdapterManager()
+            val adapter = provider.getAdapterForClass(collection.javaClass, null)!!
+            benchmark.start(CaseSuite.GET_SIZE)
+            val size = adapter.getSize(collection)
+            benchmark.end(CaseSuite.GET_SIZE)
+            val buffer = StaticByteBuffer(size)
+            benchmark.start(CaseSuite.SERIALIZE)
+            adapter.serialize(buffer, collection)
+            benchmark.end(CaseSuite.SERIALIZE)
+            buffer.offset = 0
+            benchmark.start(CaseSuite.DESERIALIZE)
+            val newCollection = adapter.deserialize(buffer)
+            benchmark.end(CaseSuite.DESERIALIZE)
+
+            val compare = ObjectComparator.compare(collection, newCollection)
+            compare.toString()
+        }
+        benchmark.print()
+    }
+
+    private fun createTestObject(): Any {
+        return TestClass()
+    }
 
 }
