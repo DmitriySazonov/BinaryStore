@@ -4,6 +4,24 @@ import javax.annotation.Nonnull;
 
 public interface ByteBuffer {
 
+    final class Meta {
+        int maxCharBufferLength = 0;
+        @Nonnull char[] charBuffer;
+
+        public Meta(@Nonnull char[] initialCharBuffer) {
+            charBuffer = initialCharBuffer;
+        }
+
+        public final void ensureCharBufferLength(final int length) {
+            if (maxCharBufferLength < length) {
+                maxCharBufferLength = length;
+            }
+            if (charBuffer.length < length) {
+                charBuffer = new char[maxCharBufferLength];
+            }
+        }
+    }
+
     byte TRUE = 1;
     byte FALSE = 0;
 

@@ -122,12 +122,16 @@ public final class ByteBufferHelper {
         System.arraycopy(bytes, offset, dst, 0, dst.length);
     }
 
-    public static String readString(final byte[] bytes, final int offset, final int length) {
-        final char[] chars = new char[length];
+    public static String readString(
+            final byte[] bytes,
+            final int offset,
+            final int length,
+            final char[] buffer
+    ) {
         for (int i = 0, j = offset - 1; i < length; i++) {
-            chars[i] = (char) (((bytes[++j] & 0xFF)) | ((bytes[++j] & 0xFF) << 8));
+            buffer[i] = (char) (((bytes[++j] & 0xFF)) | ((bytes[++j] & 0xFF) << 8));
         }
-        return new String(chars, 0, length);
+        return new String(buffer, 0, length);
     }
 
     private static short makeShort(byte b1, byte b0) {

@@ -1,8 +1,12 @@
 package com.binarystore.buffer;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 public class StaticByteBuffer implements ByteBuffer {
+
+    @Nonnull
+    public final Meta meta;
 
     private final byte[] bytes;
     private final int start;
@@ -20,16 +24,21 @@ public class StaticByteBuffer implements ByteBuffer {
     }
 
     public StaticByteBuffer(byte[] bytes, int start, int end) {
+        this(bytes, start, end, null);
+    }
+
+    public StaticByteBuffer(byte[] bytes, int start, int end, @CheckForNull Meta meta) {
         this.bytes = bytes;
         this.start = start;
         this.end = end;
         this.size = end - start + 1;
         this.absoluteOffset = start;
+        this.meta = meta == null ? new Meta(new char[0]) : meta;
     }
 
     @Override
     public StaticByteBuffer getSubBuffer(int start, int end) {
-        return new StaticByteBuffer(bytes, this.start + start, this.start + end);
+        return new StaticByteBuffer(bytes, this.start + start, this.start + end, meta);
     }
 
     final byte[] getBytes() {
@@ -112,8 +121,12 @@ public class StaticByteBuffer implements ByteBuffer {
 
     @Override
     public final void write(@Nonnull final String value) {
+        final int length = value.length();
         ByteBufferHelper.write(bytes, absoluteOffset, value);
-        absoluteOffset += CHAR_BYTES * value.length();
+        absoluteOffset += CHAR_BYTES * length;
+        if (meta.maxCharBufferLength < length) {
+            meta.maxCharBufferLength = length;
+        }
     }
 
     @Override
@@ -187,6 +200,7 @@ public class StaticByteBuffer implements ByteBuffer {
     public final String readString(final int length) {
         int oldOffset = absoluteOffset;
         absoluteOffset += CHAR_BYTES * length;
-        return ByteBufferHelper.readString(bytes, oldOffset, length);
+        meta.ensureCharBufferLength(length);
+        return ByteBufferHelper.readString(bytes, oldOffset, length, meta.charBuffer);
     }
 }

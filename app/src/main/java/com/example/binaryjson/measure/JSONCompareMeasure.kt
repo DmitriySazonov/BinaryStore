@@ -33,7 +33,7 @@ class JSONCompareMeasure(context: Context) {
     fun start() {
         test(Benchmark(CompareCaseSuite)) // warm up
         val benchmark = Benchmark(CompareCaseSuite)
-        val count = 1
+        val count = 100
         repeat(count) { test(benchmark) }
         benchmark.print()
     }

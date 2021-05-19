@@ -2,19 +2,24 @@ package com.binarystore.buffer;
 
 import java.util.Arrays;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 public class DynamicByteBuffer implements ByteBuffer {
+
+    @Nonnull
+    public final Meta meta;
 
     private byte[] bytes;
     private int offset = 0;
 
     public DynamicByteBuffer(int initialSize) {
-        this.bytes = new byte[initialSize];
+        this(new byte[initialSize], null);
     }
 
-    public DynamicByteBuffer(byte[] bytes) {
+    public DynamicByteBuffer(byte[] bytes, @CheckForNull Meta meta) {
         this.bytes = bytes;
+        this.meta = meta == null ? new Meta(new char[0]) : meta;
     }
 
     @Override
@@ -108,9 +113,13 @@ public class DynamicByteBuffer implements ByteBuffer {
 
     @Override
     public void write(@Nonnull final String value) {
-        checkFreeSpace(CHAR_BYTES * value.length());
+        final int length = value.length();
+        checkFreeSpace(CHAR_BYTES * length);
         ByteBufferHelper.write(bytes, offset, value);
         offset += CHAR_BYTES * value.length();
+        if (meta.maxCharBufferLength < length) {
+            meta.maxCharBufferLength = length;
+        }
     }
 
     @Override
@@ -184,7 +193,8 @@ public class DynamicByteBuffer implements ByteBuffer {
     public String readString(final int length) {
         int oldOffset = offset;
         offset += CHAR_BYTES * length;
-        return ByteBufferHelper.readString(bytes, oldOffset, length);
+        meta.ensureCharBufferLength(length);
+        return ByteBufferHelper.readString(bytes, oldOffset, length, meta.charBuffer);
     }
 
     private void checkFreeSpace(final int needSpace) {
