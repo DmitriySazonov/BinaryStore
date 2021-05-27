@@ -6,7 +6,7 @@ import com.binarystore.adapter.BinaryDeserializer;
 import com.binarystore.adapter.Key;
 import com.binarystore.adapter.UnknownItemStrategy;
 import com.binarystore.adapter.collection.CollectionSettings;
-import com.binarystore.adapter.collection.utils.AdapterHelper;
+import com.binarystore.adapter.collection.utils.CollectionAdapterHelper;
 import com.binarystore.adapter.collection.utils.CollectionAdapterUtils;
 import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.buffer.StaticByteBuffer;
@@ -57,7 +57,7 @@ public abstract class CollectionBinaryDeserializerV1<T extends Collection> imple
     @SuppressWarnings("unchecked")
     public final T deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception {
         final int rootOffset = byteBuffer.getOffset();
-        final AdapterHelper adapters = new AdapterHelper(adapterProvider);
+        final CollectionAdapterHelper adapters = new CollectionAdapterHelper(adapterProvider);
         CollectionAdapterUtils.checkVersion(byteBuffer, version);
         final int size = byteBuffer.readInt();
         final int absoluteOffsetToMeta = rootOffset + byteBuffer.readInt();
@@ -82,7 +82,7 @@ public abstract class CollectionBinaryDeserializerV1<T extends Collection> imple
 
     private Object deserializeElement(
             @Nonnull ByteBuffer byteBuffer,
-            @Nonnull AdapterHelper adapters,
+            @Nonnull CollectionAdapterHelper adapters,
             int endOfEntry
     ) throws Exception {
         final Key valueKey = Key.read(byteBuffer);

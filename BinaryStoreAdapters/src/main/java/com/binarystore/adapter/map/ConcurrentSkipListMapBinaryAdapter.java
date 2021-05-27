@@ -24,7 +24,7 @@ public class ConcurrentSkipListMapBinaryAdapter extends AbstractMapBinaryAdapter
 
     @Nonnull
     @Override
-    protected ConcurrentSkipListMap createMap(int size, @Nonnull ByteBuffer buffer) {
+    protected ConcurrentSkipListMap createMap(int size) {
         return new ConcurrentSkipListMap();
     }
 
