@@ -1,6 +1,8 @@
 package com.example.binaryjson.test
 
-import com.binarystore.collections.SimpleBinaryLazyList
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -48,8 +50,17 @@ object StoryResponseParser {
                     previews = parsePreviews(json.getJSONObject("previews")),
                     video = json.getString("video"),
                     status = json.getString("status"),
+                    blurredPreview = json.getBase64Bitmap("blurredPreview")
             )
         }.let(::createList)
+    }
+
+    private fun JSONObject.getBase64Bitmap(name: String): Bitmap {
+        return getString(name).let {
+            Base64.decode(it, Base64.DEFAULT)
+        }.let {
+            BitmapFactory.decodeByteArray(it, 0, it.size)
+        }
     }
 
     private fun parsePreviews(json: JSONObject): StoryResponse.Previews {

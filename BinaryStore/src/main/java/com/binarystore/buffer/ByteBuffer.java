@@ -1,12 +1,16 @@
 package com.binarystore.buffer;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import javax.annotation.Nonnull;
 
 public interface ByteBuffer {
 
     final class Meta {
         int maxCharBufferLength = 0;
-        @Nonnull char[] charBuffer;
+        @Nonnull
+        char[] charBuffer;
 
         public Meta(@Nonnull char[] initialCharBuffer) {
             charBuffer = initialCharBuffer;
@@ -35,6 +39,8 @@ public interface ByteBuffer {
     int DOUBLE_BYTES = 8;
 
     StaticByteBuffer getSubBuffer(int start, int end);
+
+    int getAbsoluteOffset();
 
     int getOffset();
 
@@ -85,4 +91,11 @@ public interface ByteBuffer {
     void readBytes(final byte[] dst);
 
     String readString(final int length);
+
+
+    @Nonnull
+    OutputStream reserveOutputStream(final int size);
+
+    @Nonnull
+    InputStream reserveInputStream(final int size);
 }

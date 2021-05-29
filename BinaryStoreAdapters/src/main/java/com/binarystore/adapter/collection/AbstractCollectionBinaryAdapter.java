@@ -13,14 +13,14 @@ import javax.annotation.Nonnull;
 @SuppressWarnings("rawtypes")
 public abstract class AbstractCollectionBinaryAdapter<T extends Collection> extends AbstractBinaryAdapter<T> {
 
-    private final CollectionBinarySerializer serializer;
+    private final CollectionBinarySerializer<T> serializer;
     private final CollectionBinaryDeserializerV1<T> deserializer;
 
     protected AbstractCollectionBinaryAdapter(
             @Nonnull final BinaryAdapterProvider provider,
             @Nonnull final CollectionSettings settings
     ) {
-        this.serializer = new CollectionBinarySerializer(provider, settings);
+        this.serializer = new CollectionBinarySerializer<>(provider, settings);
         this.deserializer = new CollectionBinaryDeserializerV1<T>(provider, settings) {
             @Override
             public T createCollection(int size) {
@@ -42,7 +42,6 @@ public abstract class AbstractCollectionBinaryAdapter<T extends Collection> exte
     }
 
     @Nonnull
-    @SuppressWarnings("unchecked")
     @Override
     public T deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception {
         return deserializer.deserialize(byteBuffer);

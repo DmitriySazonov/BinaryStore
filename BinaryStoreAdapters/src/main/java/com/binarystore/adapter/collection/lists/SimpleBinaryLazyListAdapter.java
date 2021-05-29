@@ -16,23 +16,25 @@ import com.binarystore.collections.SimpleBinaryLazyList;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
 public final class SimpleBinaryLazyListAdapter extends AbstractBinaryAdapter<SimpleBinaryLazyList>
-        implements CollectionBinaryDeserializerV1.Delegate {
+        implements CollectionBinaryDeserializerV1.Delegate,
+        CollectionBinarySerializer.Delegate<SimpleBinaryLazyList> {
 
     public static final Factory factory = new Factory();
     public static final Key.Byte KEY = DefaultAdapters.SIMPLE_LAZY_LIST;
-    private final CollectionBinarySerializer serializer;
+    private final CollectionBinarySerializer<SimpleBinaryLazyList> serializer;
     private final CollectionBinaryDeserializerV1<Collection> deserializer;
 
     protected SimpleBinaryLazyListAdapter(
             @Nonnull final BinaryAdapterProvider provider,
             @Nonnull final CollectionSettings settings
     ) {
-        this.serializer = new CollectionBinarySerializer(provider, settings, true);
+        this.serializer = new CollectionBinarySerializer<>(provider, settings, this);
         this.deserializer = new CollectionBinaryDeserializerV1<Collection>(provider, settings, this) {
 
             @Override
@@ -68,6 +70,29 @@ public final class SimpleBinaryLazyListAdapter extends AbstractBinaryAdapter<Sim
     @Override
     public Object deserialize(BinaryAdapter<Object> adapter, StaticByteBuffer buffer) {
         return new LazyBinaryEntry<>(buffer, adapter);
+    }
+
+    @Override
+    public boolean overrideItemSerialize(ByteBuffer buffer, Object item) {
+        if (item instanceof LazyBinaryEntry) {
+            buffer.write(((LazyBinaryEntry) item).buffer);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int overrideItemGetSize(Object item) {
+        if (item instanceof LazyBinaryEntry) {
+            return ((LazyBinaryEntry) item).buffer.getSize();
+        }
+        return NOT_OVERRIDE;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Iterator<Object> overrideIterator(SimpleBinaryLazyList collection) {
+        return collection.lazyIterator();
     }
 
     private static final class Factory extends CollectionFactory<SimpleBinaryLazyList, SimpleBinaryLazyListAdapter> {

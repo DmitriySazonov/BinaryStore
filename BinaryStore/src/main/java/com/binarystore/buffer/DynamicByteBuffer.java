@@ -1,5 +1,7 @@
 package com.binarystore.buffer;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
 import javax.annotation.CheckForNull;
@@ -26,6 +28,11 @@ public class DynamicByteBuffer implements ByteBuffer {
     public StaticByteBuffer getSubBuffer(int start, int end) {
         checkFreeSpace(end - Math.max(offset, start));
         return new StaticByteBuffer(bytes, start, end);
+    }
+
+    @Override
+    public int getAbsoluteOffset() {
+        return offset;
     }
 
     @Override
@@ -195,6 +202,18 @@ public class DynamicByteBuffer implements ByteBuffer {
         offset += CHAR_BYTES * length;
         meta.ensureCharBufferLength(length);
         return ByteBufferHelper.readString(bytes, oldOffset, length, meta.charBuffer);
+    }
+
+    @Nonnull
+    @Override
+    public ByteArrayInputStream reserveInputStream(int size) {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public ByteArrayOutputStream reserveOutputStream(int size) {
+        return null;
     }
 
     private void checkFreeSpace(final int needSpace) {

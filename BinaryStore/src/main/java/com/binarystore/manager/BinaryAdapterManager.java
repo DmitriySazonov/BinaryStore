@@ -63,8 +63,8 @@ public class BinaryAdapterManager implements BinaryAdapterProvider, AdapterFacto
 
     private final AdapterFactoryContext defaultFactoryContext;
 
-    public BinaryAdapterManager() {
-        defaultFactoryContext = new AdapterFactoryContext(this, null);
+    public BinaryAdapterManager(@CheckForNull final Properties properties) {
+        defaultFactoryContext = new AdapterFactoryContext(this, properties);
     }
 
     public void resolveAllAdapters() throws Exception {

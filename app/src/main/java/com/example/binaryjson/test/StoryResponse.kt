@@ -1,6 +1,10 @@
 package com.example.binaryjson.test
 
+import android.graphics.Bitmap
+import com.binarystore.adapter.bitmap.BitmapSettings
 import com.binarystore.annotation.Persistable
+import com.binarystore.annotation.ProvideProperties
+import com.binarystore.dependency.Property
 
 @Persistable(id = "StoryResponse")
 class StoryResponse(
@@ -52,7 +56,9 @@ class StoryResponse(
             @JvmField val preview: String,
             @JvmField val previews: Previews,
             @JvmField val video: String,
-            @JvmField val status: String
+            @JvmField val status: String,
+//            @field:ProvideProperties(properties = [BitmapSettingsProperty::class])
+            @JvmField val blurredPreview: Bitmap?
     )
 
     @Persistable(id = "Channel")
@@ -62,4 +68,13 @@ class StoryResponse(
             @JvmField val isSubscribed: Boolean,
             @JvmField val stories: List<Story>
     )
+
+    class BitmapSettingsProperty : Property<BitmapSettings> {
+        override fun name(): String? = null
+
+        override fun typeClass(): Class<BitmapSettings> = BitmapSettings::class.java
+
+        override fun provide(): BitmapSettings =
+                BitmapSettings(Bitmap.CompressFormat.PNG, 100)
+    }
 }
