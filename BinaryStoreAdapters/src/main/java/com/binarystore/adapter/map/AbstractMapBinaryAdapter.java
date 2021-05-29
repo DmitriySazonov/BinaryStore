@@ -1,24 +1,13 @@
 package com.binarystore.adapter.map;
 
-import com.binarystore.VersionException;
 import com.binarystore.adapter.AbstractBinaryAdapter;
-import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
-import com.binarystore.adapter.Key;
-import com.binarystore.adapter.NullBinaryAdapter;
-import com.binarystore.adapter.UnknownItemStrategy;
-import com.binarystore.adapter.collection.AbstractCollectionBinaryAdapter;
-import com.binarystore.adapter.collection.serialization.CollectionBinaryDeserializerV1;
-import com.binarystore.adapter.collection.serialization.CollectionBinarySerializer;
 import com.binarystore.adapter.map.serialization.MapBinaryDeserializer;
 import com.binarystore.adapter.map.serialization.MapBinarySerializer;
 import com.binarystore.buffer.ByteBuffer;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
@@ -52,16 +41,7 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
     @Nonnull
     protected abstract T createMap(int size) throws Exception;
 
-    protected int getSizeAdditionalMeta(@Nonnull T value) throws Exception {
-        return 0;
-    }
-
-    protected void serializeAdditionalMeta(@Nonnull ByteBuffer buffer, @Nonnull T value) throws Exception {
-
-    }
-
     @Override
-    @SuppressWarnings("unchecked")
     public int getSize(@Nonnull T value) throws Exception {
         return serializer.getSize(value);
     }

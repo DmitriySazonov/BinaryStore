@@ -12,8 +12,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        MapTest.start()
-//        CollectionTest.start()
+        //MapTest.start()
+        //CollectionTest.start()
 
 
         findViewById<View>(R.id.testRun).setOnClickListener {

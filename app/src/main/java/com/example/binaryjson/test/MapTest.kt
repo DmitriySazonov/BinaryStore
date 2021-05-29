@@ -1,6 +1,7 @@
 package com.example.binaryjson.test
 
 import com.binarystore.buffer.StaticByteBuffer
+import com.binarystore.map.SimpleBinaryLazyMap
 import com.example.binaryjson.*
 import com.example.binaryjson.benchmark.Benchmark
 import com.example.binaryjson.compare.ObjectComparator
@@ -24,6 +25,15 @@ object MapTest {
             }*/
     )
 
+    val lazyMap = SimpleBinaryLazyMap<Int, TestClass>(mapOf(
+            1 to TestClass(),
+            2 to TestClass(),
+            3 to TestClass(),
+            4 to TestClass(),
+            5 to TestClass(),
+            6 to TestClass()
+    ))
+
     val enumMap = EnumMap<EnumTest, String>(EnumTest::class.java).apply {
         fillMap()
     }
@@ -40,12 +50,19 @@ object MapTest {
 
     fun start() {
 
-        val map = mapOf("Singleton" to "map")
+        val map = SimpleBinaryLazyMap<Int, TestClass>(mapOf(
+                1 to TestClass(),
+                2 to TestClass(),
+                3 to TestClass(),
+                4 to TestClass(),
+                5 to TestClass(),
+                6 to TestClass()
+        ))
         val benchmark = Benchmark(CaseSuite)
         repeat(1) {
             val provider = createDefaultBinaryAdapterManager()
             provider.register(EnumTest::class.java, EnumTestBinaryAdapter.Factory())
-            val adapter = provider.getAdapterForClass(Map::class.java, null)!!
+            val adapter = provider.getAdapterForClass(map.javaClass, null)!!
             benchmark.start(CaseSuite.GET_SIZE)
             val size = adapter.getSize(map)
             benchmark.end(CaseSuite.GET_SIZE)

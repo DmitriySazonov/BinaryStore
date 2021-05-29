@@ -50,7 +50,6 @@ public class MapBinarySerializer implements BinarySerializer<Map> {
      * Scheme
      * version - 1 byte
      * written item count - 4 byte // may not be equals map.size
-     * additional meta - n byte // see in heirs
      * offset to meta begin - 4 byte
      * data  - sum of items key + value
      * key_1|value_1
@@ -97,7 +96,6 @@ public class MapBinarySerializer implements BinarySerializer<Map> {
         }
         return (ByteBuffer.BYTE_BYTES +  // version
                 ByteBuffer.INTEGER_BYTES +  // map size
-                getSizeAdditionalMeta(value) + // additional meta for heir
                 ByteBuffer.INTEGER_BYTES +  // offset to meta
                 accumulator +  // data size
                 ByteBuffer.INTEGER_BYTES * actualSize // entries offsets
@@ -114,7 +112,6 @@ public class MapBinarySerializer implements BinarySerializer<Map> {
         final int startOffset = byteBuffer.getOffset();
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for size
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for offset to meta
-        serializeAdditionalMeta(byteBuffer, value); // see in heir
         final Set<Map.Entry> entries = value.entrySet();
         for (Map.Entry entry : entries) {
             final int offset = byteBuffer.getOffset();
@@ -131,8 +128,8 @@ public class MapBinarySerializer implements BinarySerializer<Map> {
 
             try {
                 adapters.lastKeyAdapter.key().saveTo(byteBuffer);
-                adapters.lastValueAdapter.key().saveTo(byteBuffer);
                 adapters.lastKeyAdapter.serialize(byteBuffer, entryKey);
+                adapters.lastValueAdapter.key().saveTo(byteBuffer);
                 adapters.lastValueAdapter.serialize(byteBuffer, entryValue);
                 offsets[index++] = offset;
             } catch (Throwable throwable) {
@@ -151,14 +148,4 @@ public class MapBinarySerializer implements BinarySerializer<Map> {
             byteBuffer.write(offsets[i]);
         }
     }
-
-    protected int getSizeAdditionalMeta(@Nonnull Map value) throws Exception {
-        return 0;
-    }
-
-    protected void serializeAdditionalMeta(@Nonnull ByteBuffer buffer, @Nonnull Map value) throws Exception {
-
-    }
-
-
 }
