@@ -33,7 +33,7 @@ class JSONCompareMeasure(context: Context) {
     fun start() {
         test(Benchmark(CompareCaseSuite)) // warm up
         val benchmark = Benchmark(CompareCaseSuite)
-        val count = 100
+        val count = 1
         repeat(count) { test(benchmark) }
         benchmark.print()
     }
@@ -74,13 +74,13 @@ class JSONCompareMeasure(context: Context) {
         benchmark.end(CompareCaseSuite.DESERIALIZE)
 
 
-        /*   benchmark.start(CompareCaseSuite.ITERATE)
-           desResponse.items.forEach {
-               it.stories.forEach {
-
-               }
-           }
-           benchmark.end(CompareCaseSuite.ITERATE)*/
+        benchmark.start(CompareCaseSuite.ITERATE)
+        desResponse.items.forEach {
+            it.stories.forEach {
+//                it.toString()
+            }
+        }
+        benchmark.end(CompareCaseSuite.ITERATE)
 
         benchmark.start(CompareCaseSuite.TO_BYTE_ARRAY)
         String(this.json.toByteArray(StandardCharsets.UTF_8), StandardCharsets.UTF_8)

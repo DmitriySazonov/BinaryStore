@@ -51,7 +51,7 @@ public final class CollectionSettings {
         }
     }
 
-    public final static class CrashExceptionSettingProperty extends AbstractProperty {
+    public final static class ThrowExceptionSettingProperty extends AbstractProperty {
 
         private static final CollectionSettings settings = new CollectionSettings(UnknownItemStrategy.THROW_EXCEPTION,
                 UnknownItemStrategy.THROW_EXCEPTION);

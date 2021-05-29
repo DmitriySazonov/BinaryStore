@@ -1,4 +1,4 @@
-package com.binarystore.adapter.preference;
+package com.binarystore.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;

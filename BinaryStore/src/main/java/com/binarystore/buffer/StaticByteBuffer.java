@@ -1,5 +1,9 @@
 package com.binarystore.buffer;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
@@ -8,7 +12,7 @@ public class StaticByteBuffer implements ByteBuffer {
     @Nonnull
     public final Meta meta;
 
-    private final byte[] bytes;
+    public final byte[] bytes;
     private final int start;
     private final int end;
     private final int size;
@@ -43,6 +47,11 @@ public class StaticByteBuffer implements ByteBuffer {
 
     final byte[] getBytes() {
         return bytes;
+    }
+
+    @Override
+    public int getAbsoluteOffset() {
+        return absoluteOffset;
     }
 
     @Override
@@ -202,5 +211,56 @@ public class StaticByteBuffer implements ByteBuffer {
         absoluteOffset += CHAR_BYTES * length;
         meta.ensureCharBufferLength(length);
         return ByteBufferHelper.readString(bytes, oldOffset, length, meta.charBuffer);
+    }
+
+    @Nonnull
+    @Override
+    public InputStream reserveInputStream(int size) {
+        final ByteArrayInputStream stream =
+                new ByteArrayInputStream(bytes, absoluteOffset, size);
+        absoluteOffset += size * BYTE_BYTES;
+        return stream;
+    }
+
+    @Nonnull
+    @Override
+    public OutputStream reserveOutputStream(int size) {
+        final InnerByteArrayOutputStream stream =
+                new InnerByteArrayOutputStream(bytes, absoluteOffset, size);
+        absoluteOffset += size * BYTE_BYTES;
+        return stream;
+    }
+
+    private final static class InnerByteArrayOutputStream extends OutputStream {
+
+        private int offset;
+        private final int end;
+        private final byte[] bytes;
+
+        InnerByteArrayOutputStream(byte[] bytes, int offset, int length) {
+            this.bytes = bytes;
+            this.offset = offset;
+            this.end = offset + length;
+        }
+
+        public final void write(int value) {
+            if (offset + 1 > end) {
+                throw new IndexOutOfBoundsException();
+            }
+            bytes[offset] = (byte) value;
+            ++offset;
+        }
+
+        public final void write(@Nonnull byte[] value, int start, int length) {
+            final int rangeEnd = start + length;
+            final boolean valueIndexesBad = start < 0 || start > rangeEnd
+                    || rangeEnd > value.length;
+            final boolean outOfBound = (offset + length) > this.end;
+            if (valueIndexesBad || outOfBound) {
+                throw new IndexOutOfBoundsException();
+            }
+            System.arraycopy(value, start, bytes, offset, length);
+            offset += length;
+        }
     }
 }

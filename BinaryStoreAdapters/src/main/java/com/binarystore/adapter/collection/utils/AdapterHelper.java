@@ -15,30 +15,14 @@ public final class AdapterHelper {
     public BinaryAdapter<Object> lastValueAdapter = null;
 
     private final BinaryAdapterProvider adapterProvider;
-    private final boolean allowUseValueAsAdapter;
 
     public AdapterHelper(
             @Nonnull BinaryAdapterProvider adapterProvider
     ) {
-        this(adapterProvider, false);
-    }
-
-    public AdapterHelper(
-            @Nonnull BinaryAdapterProvider adapterProvider,
-            boolean allowUseValueAsAdapter
-    ) {
         this.adapterProvider = adapterProvider;
-        this.allowUseValueAsAdapter = allowUseValueAsAdapter;
     }
 
-    @SuppressWarnings("unchecked")
     public final void setValueClass(@CheckForNull Object value) throws Exception {
-        if (allowUseValueAsAdapter && value instanceof BinaryAdapter) {
-            lastValueClass = value.getClass();
-            lastValueAdapter = (BinaryAdapter<Object>) value;
-            return;
-        }
-
         final Class<?> valueClass = value != null ? value.getClass() : NullBinaryAdapter.NULL_CLASS;
         if (valueClass != lastValueClass) {
             lastValueClass = valueClass;
