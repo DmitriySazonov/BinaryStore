@@ -50,7 +50,7 @@ object MapTest {
 
     fun start() {
 
-        val map = SimpleBinaryLazyMap<Int, TestClass>(mapOf(
+        val map = SimpleBinaryLazyMap(mapOf(
                 1 to TestClass(),
                 2 to TestClass(),
                 3 to TestClass(),

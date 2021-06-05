@@ -10,12 +10,12 @@ import javax.annotation.Nonnull;
 
 public class SimpleBinaryLazyMap<K, V> extends AbstractBinaryLazyMap<K, V> {
 
-    private final HashMap<K, V> innerMap;
+    private final InnerLazyMap<K, V> innerMap;
 
     public SimpleBinaryLazyMap(
-            @Nonnull Map<K, V> map
+            @Nonnull Map<K, V > map
     ) {
-        innerMap = new HashMap<>();
+        innerMap = new InnerLazyMap<>();
         innerMap.putAll(map);
     }
 
