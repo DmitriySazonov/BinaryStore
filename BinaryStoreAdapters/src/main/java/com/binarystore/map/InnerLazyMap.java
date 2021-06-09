@@ -12,8 +12,11 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import javax.annotation.Nonnull;
+
 public class InnerLazyMap<K, V> implements Map<K, V> {
 
+    @Nonnull
     protected HashMap<K, Object> innerHashMap = new HashMap<K, Object>();
 
     @Override

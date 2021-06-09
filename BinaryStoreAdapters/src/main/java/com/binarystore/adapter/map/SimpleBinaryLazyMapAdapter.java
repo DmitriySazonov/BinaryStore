@@ -23,7 +23,9 @@ public class SimpleBinaryLazyMapAdapter extends AbstractBinaryAdapter<SimpleBina
 
     public static final SimpleBinaryLazyMapAdapter.Factory factory = new SimpleBinaryLazyMapAdapter.Factory();
     public static final Key.Byte KEY = DefaultAdapters.SIMPLE_LAZY_LIST;
+    @Nonnull
     private final MapBinarySerializer serializer;
+    @Nonnull
     private final MapBinaryDeserializer<Map> deserializer;
 
     protected SimpleBinaryLazyMapAdapter(

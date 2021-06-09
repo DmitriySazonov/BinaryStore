@@ -4,9 +4,14 @@ import com.binarystore.adapter.LazyBinaryEntry;
 
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public class LazyEntry<K, V> implements Map.Entry<K, V> {
 
+    @Nonnull
     private final K key;
+    @Nullable
     private V value;
 
     LazyEntry(K key, V value) {

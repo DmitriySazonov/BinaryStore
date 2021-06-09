@@ -22,12 +22,12 @@ import javax.annotation.Nonnull;
 public class MapBinarySerializer implements BinarySerializer<Map> {
 
     private static final byte version = 1;
+    private final boolean allowUseValueAsAdapter;
 
     @Nonnull
     private final BinaryAdapterProvider adapterProvider;
     @Nonnull
     private final MapSettings settings;
-    private final boolean allowUseValueAsAdapter;
 
     public MapBinarySerializer(
             @Nonnull BinaryAdapterProvider adapterProvider,

@@ -13,14 +13,10 @@ import javax.annotation.Nonnull;
 @SuppressWarnings("rawtypes")
 public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBinaryAdapter<T> {
 
+    @Nonnull
     private final MapBinarySerializer serializer;
+    @Nonnull
     private final MapBinaryDeserializer<T> deserializer;
-    private final byte version = 1;
-
-    @Nonnull
-    private final MapSettings settings;
-    @Nonnull
-    private final BinaryAdapterProvider adapterProvider;
 
     protected AbstractMapBinaryAdapter(
             @Nonnull final BinaryAdapterProvider provider,
@@ -34,8 +30,6 @@ public abstract class AbstractMapBinaryAdapter<T extends Map> extends AbstractBi
                 return AbstractMapBinaryAdapter.this.createMap(size);
             }
         };
-        this.adapterProvider = provider;
-        this.settings = settings;
     }
 
     @Nonnull

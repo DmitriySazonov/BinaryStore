@@ -20,7 +20,6 @@ import javax.annotation.Nonnull;
 public abstract class MapBinaryDeserializer<T extends Map> implements BinaryDeserializer<T> {
 
     public interface Delegate {
-
         Object deserialize(BinaryAdapter<Object> adapter, StaticByteBuffer buffer) throws Exception;
     }
 
