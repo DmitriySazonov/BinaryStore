@@ -69,8 +69,8 @@ public abstract class CollectionBinaryDeserializerV1<T extends Collection> imple
         final T collection = createCollection(size);
         for (int i = 0; i < size; i++) {
             byteBuffer.setOffset(itemOffsets[i]);
-            final int relativeEndOfEntry = i + 1 < size ? itemOffsets[i + 1] : absoluteOffsetToMeta;
-            final Object element = deserializeElement(byteBuffer, adapters, relativeEndOfEntry);
+            final int absoluteEndOfEntry = i + 1 < size ? itemOffsets[i + 1] : absoluteOffsetToMeta;
+            final Object element = deserializeElement(byteBuffer, adapters, absoluteEndOfEntry);
             if (element != SKIP_ITEM) {
                 collection.add(element);
             }
