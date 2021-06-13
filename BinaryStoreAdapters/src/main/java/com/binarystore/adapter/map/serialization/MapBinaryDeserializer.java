@@ -71,14 +71,15 @@ public abstract class MapBinaryDeserializer<T extends Map> implements BinaryDese
         final Map<Object, Object> mutableMap = (Map<Object, Object>) map;
         for (int i = 0; i < size; i++) {
             byteBuffer.setOffset(itemOffsets[i]);
-            final int relativeEndOfEntry = i + 1 < size ? itemOffsets[i + 1] : absoluteOffsetToMeta;
+            final int absoluteEndOfEntry = i + 1 < size ? itemOffsets[i + 1] : absoluteOffsetToMeta;
             Object key = deserializeKey(byteBuffer, adapters);
-            Object value = deserializeValue(byteBuffer, adapters, relativeEndOfEntry);
+            Object value = deserializeValue(byteBuffer, adapters, absoluteEndOfEntry);
             if (key == SKIP_ITEM || value == SKIP_ITEM) {
                 continue;
             }
             mutableMap.put(key, value);
         }
+        byteBuffer.setOffset(absoluteOffsetToMeta);
         byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES * size);
         return map;
     }
@@ -120,6 +121,4 @@ public abstract class MapBinaryDeserializer<T extends Map> implements BinaryDese
             return SKIP_ITEM;
         }
     }
-
-
 }

@@ -10,7 +10,7 @@ import com.binarystore.adapter.map.serialization.MapBinaryDeserializer;
 import com.binarystore.adapter.map.serialization.MapBinarySerializer;
 import com.binarystore.buffer.ByteBuffer;
 import com.binarystore.buffer.StaticByteBuffer;
-import com.binarystore.map.SimpleBinaryLazyMap;
+import com.binarystore.map.BinaryLazyMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,17 +18,17 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
-public class SimpleBinaryLazyMapAdapter extends AbstractBinaryAdapter<SimpleBinaryLazyMap>
+public class BinaryLazyMapAdapter extends AbstractBinaryAdapter<BinaryLazyMap>
         implements MapBinaryDeserializer.Delegate {
 
-    public static final SimpleBinaryLazyMapAdapter.Factory factory = new SimpleBinaryLazyMapAdapter.Factory();
-    public static final Key.Byte KEY = DefaultAdapters.SIMPLE_LAZY_LIST;
+    public static final BinaryLazyMapAdapter.Factory factory = new BinaryLazyMapAdapter.Factory();
+    public static final Key.Byte KEY = DefaultAdapters.SIMPLE_LAZY_MAP;
     @Nonnull
     private final MapBinarySerializer serializer;
     @Nonnull
     private final MapBinaryDeserializer<Map> deserializer;
 
-    protected SimpleBinaryLazyMapAdapter(
+    protected BinaryLazyMapAdapter(
             @Nonnull final BinaryAdapterProvider provider,
             @Nonnull final MapSettings settings
     ) {
@@ -49,20 +49,20 @@ public class SimpleBinaryLazyMapAdapter extends AbstractBinaryAdapter<SimpleBina
     }
 
     @Override
-    public int getSize(@Nonnull SimpleBinaryLazyMap value) throws Exception {
+    public int getSize(@Nonnull BinaryLazyMap value) throws Exception {
         return serializer.getSize(value);
     }
 
     @Override
-    public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull SimpleBinaryLazyMap value) throws Exception {
+    public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull BinaryLazyMap value) throws Exception {
         serializer.serialize(byteBuffer, value);
     }
 
     @Nonnull
     @SuppressWarnings("unchecked")
     @Override
-    public SimpleBinaryLazyMap deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception {
-        return new SimpleBinaryLazyMap(deserializer.deserialize(byteBuffer));
+    public BinaryLazyMap deserialize(@Nonnull ByteBuffer byteBuffer) throws Exception {
+        return new BinaryLazyMap(deserializer.deserialize(byteBuffer));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SimpleBinaryLazyMapAdapter extends AbstractBinaryAdapter<SimpleBina
         return new LazyBinaryEntry<>(buffer, adapter);
     }
 
-    private static final class Factory extends MapFactory<SimpleBinaryLazyMap, SimpleBinaryLazyMapAdapter> {
+    private static final class Factory extends MapFactory<BinaryLazyMap, BinaryLazyMapAdapter> {
 
         @Override
         public Key<?> adapterKey() {
@@ -78,10 +78,10 @@ public class SimpleBinaryLazyMapAdapter extends AbstractBinaryAdapter<SimpleBina
         }
 
         @Override
-        protected SimpleBinaryLazyMapAdapter create(
+        protected BinaryLazyMapAdapter create(
                 @Nonnull BinaryAdapterProvider provider,
                 @Nonnull MapSettings settings) {
-            return new SimpleBinaryLazyMapAdapter(provider, settings);
+            return new BinaryLazyMapAdapter(provider, settings);
         }
     }
 }

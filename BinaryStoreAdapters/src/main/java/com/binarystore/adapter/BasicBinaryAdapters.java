@@ -27,10 +27,10 @@ import com.binarystore.adapter.map.EnumMapBinaryAdapter;
 import com.binarystore.adapter.map.HashMapBinaryAdapter;
 import com.binarystore.adapter.map.LinkedHashMapBinaryAdapter;
 import com.binarystore.adapter.map.MapBinaryAdapter;
-import com.binarystore.adapter.map.SimpleBinaryLazyMapAdapter;
+import com.binarystore.adapter.map.BinaryLazyMapAdapter;
 import com.binarystore.adapter.map.TreeMapBinaryAdapter;
 import com.binarystore.collections.SimpleBinaryLazyList;
-import com.binarystore.map.SimpleBinaryLazyMap;
+import com.binarystore.map.BinaryLazyMap;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class BasicBinaryAdapters {
         register.register(ConcurrentSkipListMap.class, ConcurrentSkipListMapBinaryAdapter.factory);
         register.register(EnumMap.class, EnumMapBinaryAdapter.factory);
         register.register(Map.class, MapBinaryAdapter.factory);
-        register.register(SimpleBinaryLazyMap.class, SimpleBinaryLazyMapAdapter.factory);
+        register.register(BinaryLazyMap.class, BinaryLazyMapAdapter.factory);
 
         register.register(Class.class, ClassBinaryAdapter.factory);
         register.register(Enum.class, EnumBinaryAdapter.factory);

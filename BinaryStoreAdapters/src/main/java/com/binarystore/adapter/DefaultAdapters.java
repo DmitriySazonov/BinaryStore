@@ -33,6 +33,7 @@ public @interface DefaultAdapters {
     Key.Byte QUEUE = new Key.Byte((byte) 31);
 
     Key.Byte SIMPLE_LAZY_LIST = new Key.Byte((byte) 33);
+    Key.Byte SIMPLE_LAZY_MAP = new Key.Byte((byte) 34);
 
     Key.Byte NULL = new Key.Byte((byte) 100);
     Key.Byte CLASS = new Key.Byte((byte) 101);

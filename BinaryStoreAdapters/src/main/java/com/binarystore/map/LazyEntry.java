@@ -14,11 +14,12 @@ public class LazyEntry<K, V> implements Map.Entry<K, V> {
     @Nullable
     private V value;
 
-    LazyEntry(K key, V value) {
+    LazyEntry(@Nonnull K key, @Nullable V value) {
         this.key = key;
         this.value = value;
     }
 
+    @Nonnull
     @Override
     public K getKey() {
         return key;
@@ -33,7 +34,6 @@ public class LazyEntry<K, V> implements Map.Entry<K, V> {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            setValue(value);
         }
         return value;
     }

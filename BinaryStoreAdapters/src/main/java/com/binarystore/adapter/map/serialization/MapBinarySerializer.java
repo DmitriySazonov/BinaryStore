@@ -1,12 +1,8 @@
 package com.binarystore.adapter.map.serialization;
 
-import com.binarystore.adapter.BinaryAdapter;
 import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.BinarySerializer;
-import com.binarystore.adapter.Key;
 import com.binarystore.adapter.UnknownItemStrategy;
-import com.binarystore.adapter.collection.utils.CollectionAdapterHelper;
-import com.binarystore.adapter.map.AbstractMapBinaryAdapter;
 import com.binarystore.adapter.map.MapSettings;
 import com.binarystore.adapter.map.utils.MapAdapterHelper;
 import com.binarystore.adapter.map.utils.MapAdapterUtils;
@@ -15,7 +11,6 @@ import com.binarystore.buffer.ByteBuffer;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("rawtypes")
@@ -104,17 +99,18 @@ public class MapBinarySerializer implements BinarySerializer<Map> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void serialize(@Nonnull ByteBuffer byteBuffer, @Nonnull Map value) throws Exception {
+    public void serialize(@Nonnull ByteBuffer buffer, @Nonnull Map value) throws Exception {
         int index = 0;
+        final int rootOffset = buffer.getOffset();
         final MapAdapterHelper adapters = new MapAdapterHelper(adapterProvider, allowUseValueAsAdapter);
         final int[] offsets = new int[value.size()];
-        byteBuffer.write(version);
-        final int startOffset = byteBuffer.getOffset();
-        byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for size
-        byteBuffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for offset to meta
+        buffer.write(version);
+        final int startOffset = buffer.getOffset();
+        buffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for size
+        buffer.moveOffset(ByteBuffer.INTEGER_BYTES); // space for offset to meta
         final Set<Map.Entry> entries = value.entrySet();
         for (Map.Entry entry : entries) {
-            final int offset = byteBuffer.getOffset();
+            final int offset = buffer.getOffset();
             final Object entryKey = entry.getKey();
             final Object entryValue = entry.getValue();
             adapters.setKeyClass(entryKey);
@@ -127,25 +123,25 @@ public class MapBinarySerializer implements BinarySerializer<Map> {
             }
 
             try {
-                adapters.lastKeyAdapter.key().saveTo(byteBuffer);
-                adapters.lastKeyAdapter.serialize(byteBuffer, entryKey);
-                adapters.lastValueAdapter.key().saveTo(byteBuffer);
-                adapters.lastValueAdapter.serialize(byteBuffer, entryValue);
-                offsets[index++] = offset;
+                adapters.lastKeyAdapter.key().saveTo(buffer);
+                adapters.lastKeyAdapter.serialize(buffer, entryKey);
+                adapters.lastValueAdapter.key().saveTo(buffer);
+                adapters.lastValueAdapter.serialize(buffer, entryValue);
+                offsets[index++] = offset - rootOffset;
             } catch (Throwable throwable) {
                 if (settings.exceptionItemStrategy == UnknownItemStrategy.THROW_EXCEPTION) {
                     throw new IllegalStateException("Fail serialization for key " + entryKey);
                 }
-                byteBuffer.setOffset(offset);
+                buffer.setOffset(offset);
             }
         }
-        final int endDataOffset = byteBuffer.getOffset();
-        byteBuffer.setOffset(startOffset);
-        byteBuffer.write(index); // write actual size of map
-        byteBuffer.write(endDataOffset); // write offset to start of meta
-        byteBuffer.setOffset(endDataOffset); // move to the end to write meta
+        final int endDataOffset = buffer.getOffset();
+        buffer.setOffset(startOffset);
+        buffer.write(index); // write actual size of map
+        buffer.write(endDataOffset - rootOffset); // write offset to start of meta
+        buffer.setOffset(endDataOffset); // move to the end to write meta
         for (int i = 0; i < index; i++) {
-            byteBuffer.write(offsets[i]);
+            buffer.write(offsets[i]);
         }
     }
 }
