@@ -1,9 +1,13 @@
 package com.example.binaryjson.test
 
 import com.binarystore.buffer.StaticByteBuffer
-import com.example.binaryjson.*
+import com.binarystore.map.BinaryLazyMap
+import com.example.binaryjson.EnumTest
+import com.example.binaryjson.EnumTestBinaryAdapter
+import com.example.binaryjson.TestClass
 import com.example.binaryjson.benchmark.Benchmark
 import com.example.binaryjson.compare.ObjectComparator
+import com.example.binaryjson.createDefaultBinaryAdapterManager
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -24,6 +28,15 @@ object MapTest {
             }*/
     )
 
+    val lazyMap = BinaryLazyMap<Int, TestClass>(mapOf(
+            1 to TestClass(),
+            2 to TestClass(),
+            3 to TestClass(),
+            4 to TestClass(),
+            5 to TestClass(),
+            6 to TestClass()
+    ))
+
     val enumMap = EnumMap<EnumTest, String>(EnumTest::class.java).apply {
         fillMap()
     }
@@ -40,12 +53,28 @@ object MapTest {
 
     fun start() {
 
-        val map = mapOf("Singleton" to "map")
+        val innerMap = BinaryLazyMap<Int, Any>(mapOf(
+                10 to TestClass(),
+                20 to TestClass(),
+                30 to TestClass(),
+                40 to TestClass(),
+                50 to TestClass(),
+                60 to TestClass()
+        ))
+        val map = BinaryLazyMap<Int, Any>(mapOf(
+                1 to TestClass(),
+                2 to TestClass(),
+                3 to TestClass(),
+                4 to TestClass(),
+                5 to TestClass(),
+                6 to TestClass(),
+                7 to innerMap
+        ))
         val benchmark = Benchmark(CaseSuite)
         repeat(1) {
             val provider = createDefaultBinaryAdapterManager()
             provider.register(EnumTest::class.java, EnumTestBinaryAdapter.Factory())
-            val adapter = provider.getAdapterForClass(Map::class.java, null)!!
+            val adapter = provider.getAdapterForClass(map.javaClass, null)!!
             benchmark.start(CaseSuite.GET_SIZE)
             val size = adapter.getSize(map)
             benchmark.end(CaseSuite.GET_SIZE)

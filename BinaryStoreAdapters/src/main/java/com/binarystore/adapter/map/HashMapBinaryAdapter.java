@@ -24,7 +24,7 @@ public class HashMapBinaryAdapter extends AbstractMapBinaryAdapter<HashMap> {
 
     @Nonnull
     @Override
-    protected HashMap<?, ?> createMap(int size, @Nonnull ByteBuffer buffer) {
+    protected HashMap<?, ?> createMap(int size) {
         return new HashMap<>(size, 1f);
     }
 

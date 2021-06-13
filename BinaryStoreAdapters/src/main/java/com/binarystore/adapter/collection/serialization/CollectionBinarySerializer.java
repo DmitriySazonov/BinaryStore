@@ -4,7 +4,7 @@ import com.binarystore.adapter.BinaryAdapterProvider;
 import com.binarystore.adapter.BinarySerializer;
 import com.binarystore.adapter.UnknownItemStrategy;
 import com.binarystore.adapter.collection.CollectionSettings;
-import com.binarystore.adapter.collection.utils.AdapterHelper;
+import com.binarystore.adapter.collection.utils.CollectionAdapterHelper;
 import com.binarystore.adapter.collection.utils.CollectionAdapterUtils;
 import com.binarystore.buffer.ByteBuffer;
 
@@ -56,7 +56,7 @@ public final class CollectionBinarySerializer<Collection extends java.util.Colle
 
     @Override
     public final int getSize(@Nonnull Collection value) throws Exception {
-        final AdapterHelper adapters = new AdapterHelper(adapterProvider);
+        final CollectionAdapterHelper adapters = new CollectionAdapterHelper(adapterProvider);
         int accumulator = 0;
         int elementCount = 0;
 
@@ -108,7 +108,7 @@ public final class CollectionBinarySerializer<Collection extends java.util.Colle
     ) throws Exception {
         int index = 0;
         final int rootOffset = buffer.getOffset();
-        final AdapterHelper adapters = new AdapterHelper(adapterProvider);
+        final CollectionAdapterHelper adapters = new CollectionAdapterHelper(adapterProvider);
         final int[] offsets = new int[value.size()];
         buffer.write(version);
         final int startOffset = buffer.getOffset();

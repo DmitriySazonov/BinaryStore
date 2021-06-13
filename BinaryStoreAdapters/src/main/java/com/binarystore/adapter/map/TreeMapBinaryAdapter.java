@@ -25,7 +25,7 @@ public class TreeMapBinaryAdapter extends AbstractMapBinaryAdapter<TreeMap> {
     @Nonnull
     @Override
     @SuppressWarnings("SortedCollectionWithNonComparableKeys")
-    protected TreeMap<?, ?> createMap(int size, @Nonnull ByteBuffer buffer) {
+    protected TreeMap<?, ?> createMap(int size) {
         return new TreeMap<>();
     }
 

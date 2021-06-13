@@ -24,7 +24,7 @@ public class ConcurrentHashMapBinaryAdapter extends AbstractMapBinaryAdapter<Con
 
     @Nonnull
     @Override
-    protected ConcurrentHashMap createMap(int size, @Nonnull ByteBuffer buffer) {
+    protected ConcurrentHashMap createMap(int size) {
         return new ConcurrentHashMap(size, 1f);
     }
 

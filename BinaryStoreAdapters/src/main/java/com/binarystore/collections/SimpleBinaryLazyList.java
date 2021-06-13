@@ -16,7 +16,7 @@ public final class SimpleBinaryLazyList<T> extends AbstractBinaryLazyList<T> {
     public SimpleBinaryLazyList(
             @Nonnull Collection<T> values
     ) {
-        this(values.toArray());
+        innerList = new ArrayList<Object>(values);
     }
 
     public SimpleBinaryLazyList(

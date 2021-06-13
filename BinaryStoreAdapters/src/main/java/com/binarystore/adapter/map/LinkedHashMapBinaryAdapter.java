@@ -24,7 +24,7 @@ public class LinkedHashMapBinaryAdapter extends AbstractMapBinaryAdapter<LinkedH
 
     @Nonnull
     @Override
-    protected LinkedHashMap createMap(int size, @Nonnull ByteBuffer buffer) {
+    protected LinkedHashMap createMap(int size) {
         return new LinkedHashMap(size, 1f);
     }
 

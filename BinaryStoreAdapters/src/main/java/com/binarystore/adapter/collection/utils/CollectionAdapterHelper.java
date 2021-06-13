@@ -8,21 +8,37 @@ import com.binarystore.adapter.NullBinaryAdapter;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public final class AdapterHelper {
+public final class CollectionAdapterHelper {
 
     public Key<?> lastValueKey = null;
     public Class<?> lastValueClass = null;
     public BinaryAdapter<Object> lastValueAdapter = null;
 
     private final BinaryAdapterProvider adapterProvider;
+    private final boolean allowUseValueAsAdapter;
 
-    public AdapterHelper(
+    public CollectionAdapterHelper(
             @Nonnull BinaryAdapterProvider adapterProvider
     ) {
-        this.adapterProvider = adapterProvider;
+        this(adapterProvider, false);
     }
 
+    public CollectionAdapterHelper(
+            @Nonnull BinaryAdapterProvider adapterProvider,
+            boolean allowUseValueAsAdapter
+    ) {
+        this.adapterProvider = adapterProvider;
+        this.allowUseValueAsAdapter = allowUseValueAsAdapter;
+    }
+
+    @SuppressWarnings("unchecked")
     public final void setValueClass(@CheckForNull Object value) throws Exception {
+        if (allowUseValueAsAdapter && value instanceof BinaryAdapter) {
+            lastValueClass = value.getClass();
+            lastValueAdapter = (BinaryAdapter<Object>) value;
+            return;
+        }
+
         final Class<?> valueClass = value != null ? value.getClass() : NullBinaryAdapter.NULL_CLASS;
         if (valueClass != lastValueClass) {
             lastValueClass = valueClass;

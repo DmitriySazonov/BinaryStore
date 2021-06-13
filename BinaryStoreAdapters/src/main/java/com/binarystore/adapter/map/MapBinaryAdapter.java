@@ -78,7 +78,7 @@ public class MapBinaryAdapter extends AbstractMapBinaryAdapter<Map> {
 
     @Nonnull
     @Override
-    protected Map createMap(int size, @Nonnull ByteBuffer buffer) {
+    protected Map createMap(int size) {
         return new HashMap();
     }
 
